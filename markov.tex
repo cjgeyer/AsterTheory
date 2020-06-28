@@ -1,0 +1,227 @@
+
+\chapter{Markov Properties}
+\label{app:markov}
+
+Markov properties of graphical models are considered a fundamental part
+of the theory \citep[Section~3.2]{lauritzen}.  They are much less important
+for aster models, so unimportant that the literature does not mention them.
+So perhaps most readers will want to skip this appendix.  Nevertheless,
+perhaps these ideas might find some future use.  So we do them.
+
+\begin{theorem} \label{th:markov-one}
+For any dependence group $G$, define
+$$
+   A = \set{ j \in J : (\exists k \in G)(j \succeq k) }
+$$
+and
+$$
+   \mathcal{H} = \set{ H \in \mathcal{G} : H \subset A }.
+$$
+Then
+\begin{equation} \label{eq:markov-one}
+   \pr(y_{A} \mid y_{J \setminus A})
+   =
+   \prod_{H \in \mathcal{H}} \pr(y_H \mid y_{q(H)}),
+\end{equation}
+and $y_A$ and $y_{J \setminus A}$ are conditionally
+independent given $y_{q(G)}$.
+\end{theorem}
+Elements of $A$ are elements of $G$ and their successors,
+successors of successors, successors of successors of successors, and so forth.
+\begin{proof}
+First, $\bigcup \mathcal{H} = A$ because every $j \in A$ is contained in
+some $H \in \mathcal{G}$, and either $H = G$ or $q(H) \in A$, and in either
+case $H \subset A$.
+
+Using the total order on $\mathcal{G}$ guaranteed to exist
+by Theorem~\ref{th:factorize}, enumerate the elements of $H$
+to agree with the total order on $\mathcal{G}$, that is,
+$H_1 < H_2 < \cdots < H_k$ and $\mathcal{H}$ has $k$ elements.
+
+Now calculate the marginal distribution of $y_{J \setminus A}$ by
+summing-integrating out (sum if discrete, integrate if continuous)
+$y_{H_1}$, $y_{H_2}$, $\ldots,$ $y_{H_k}$
+from the joint distribution \eqref{eq:factorize} in that order.
+Since the elements of $H_1$ have no successors, $y_{H_1}$ appears only in
+the term $\pr(y_{H_1} \mid y_{q(H_1)})$, so when we sum-integrate we get one.
+Now sum-integrate out $y_{H_2}$.  Since the elements of $y_{H_2}$ have no
+successors in the variables that are left (they may have had successors in
+$y_{H_1}$ but those variables are now gone), we get one again.  And so forth.
+When all of the $y_{H_i}$ have been summed-integrated out (in the order we
+enumerated them), we get one for every sum-integral.  That leaves
+\begin{equation} \label{eq:markov-one-marginal}
+   \pr(y_{J \setminus A})
+   =
+   \prod_{G \in \mathcal{G} \setminus \mathcal{H}} \pr(y_G \mid y_{q(G)}).
+\end{equation}
+Dividing the joint distribution \eqref{eq:factorize} by the marginal
+distribution \eqref{eq:markov-one-marginal}, gives
+the conditional distribution \eqref{eq:markov-one}.
+
+The last statement of the theorem follows immediately from
+\eqref{eq:markov-one}.  If $U$, $V$, and $W$ are random vectors
+and the conditional distribution of $U$ given $V$ and $W$ does not depend
+on $W$, then
+\begin{align*}
+   \pr(U, W \mid V)
+   & =
+   \frac{\pr(U, V, W)}{\pr(V)}
+   \\
+   & =
+   \frac{\pr(U \mid V, W) \pr(V, W)}{\pr(V)}
+   \\
+   & =
+   \frac{\pr(U \mid V) \pr(V, W)}{\pr(V)}
+   \\
+   & =
+   \pr(U \mid V) \pr(W \mid V)
+\end{align*}
+which says $U$ and $W$ are conditionally independent given $V$.
+Moreover, $U$, $V$, and $W$ are conditionally independent given $V$,
+because a constant random vector is independent of any random vector,
+even itself, and conditioning on $V$ is like treating $V$ as if it
+were constant.
+\end{proof}
+
+\begin{theorem} \label{th:markov-two}
+Let $\mathcal{H}$ be any subset of $\mathcal{G}$.  Then the random vectors
+$y_H$, $H \in \mathcal{H}$ are conditionally independent given
+the random scalars $y_{q(H)}$, $H \in \mathcal{H}$.
+\end{theorem}
+In particular, if $G_1$ and $G_2$ are distinct elements of $\mathcal{G}$,
+then $y_{G_1}$ is conditionally independent of $y_{G_2}$
+given $y_{q(G_1)}$ and $y_{q(G_2)}$.
+
+This theorem does not say that the components of these random vectors are
+conditionally independent.  The components of $y_G$ are dependent given
+$y_{q(G)}$.  That is the whole point of dependence groups.
+\begin{proof}
+As in the preceding proof, use the total order on $\mathcal{G}$ guaranteed
+to exist by Theorem~\ref{th:factorize}.
+Enumerate $\mathcal{G}$ as $G_1 < G_2 < \cdots < G_n$.
+Then $H_j = G_{i_j}$ for $j = 1$, $\ldots,$ $m$,
+where $1 \le i_1 < i_2 < \cdots < i_m \le n$.
+
+Also as in the preceding proof, we integrate out $y_G$ one at a time
+in order skipping when $G \in \mathcal{H}$ and also not integrating out
+any $y_{q(H)}$ for $H \in \mathcal{H}$.
+
+We start by sum-integrating out $y_{G_1}$ if $G_1 \neq H_1$ obtaining
+$$
+   \pr(y_{G_2 \cup \cdots \cup G_n})
+   =
+   \prod_{i = 2}^n \pr(y_{G_i} \mid y_{q(G_i)}).
+$$
+and keep going repeating this again and again obtaining
+\begin{align*}
+   \pr(y_{\set{G \in \mathcal{G} : G \ge H_1}})
+   & =
+   \prod_{\substack{G \in \mathcal{G} \\ G \ge H_1}}
+   \pr(y_G \mid y_{q(G)})
+   \\
+   & =
+   \pr(y_{H_1} \mid y_{q(H_1)})
+   \prod_{\substack{G \in \mathcal{G} \\ G > H_1}}
+   \pr(y_G \mid y_{q(G)})
+\end{align*}
+(if $G_1 = H_1$ we haven't done anything yet and this is just the same
+factorization as \eqref{eq:factorize} in different notation).
+
+Now we have to be careful with our notation.  Define
+$$
+   Q = \set{ q(H) : H \in \mathcal{H} }
+$$
+we need to not sum-integrate out any components of $y_Q$.
+
+If $G_{i_1 + 1} \neq H_2$, then we want to sum-integrate out
+$y_{G_{i_1 + 1} \setminus Q}$ obtaining
+\begin{multline*}
+   \pr(y_{H_1 \cup \{q(H_1)\} \cup \set{G \in \mathcal{G} : G > G_{i_1 + 1}}})
+   \\
+   =
+   \pr(y_{H_1} \mid y_{q(H_1)})
+   \pr(y_{G_{i_1 + 1} \cap Q} \mid y_{q(G_{i_1 + 1})})
+   \prod_{j = i_1 + 2}^n
+   \pr(y_{G_i} \mid y_{q(G_i)}).
+\end{multline*}
+Since $G_{i_1 + 1} \cap Q$ may be the empty set, we need to say what
+$y_\emptyset$ means.  This is the subvector of length zero that is really
+the only function $\emptyset \to \real$, which is the empty function
+(which has the empty graph).  Hence $y_\emptyset$ has only one possible
+value (the empty function) and must be a constant random vector.
+Thus $\pr(y_\emptyset \mid y_j) = 1$ regardless of what $y_j$ is when
+$y_\emptyset$ has the only possible value it can have.
+
+Continuing this process, we obtain
+\begin{multline*}
+   \pr(y_{H_1 \cup \{q(H_1)\} \cup \{ G_{i_2}, \ldots, G_n \}})
+   \\
+   =
+   \pr(y_{H_1} \mid y_{q(H_1)})
+   \prod_{j = i_1 + 1}^{i_2 - 1}
+   \pr(y_{G_j \cap Q} \mid y_{q(G_j)})
+   \prod_{j = i_2}^n
+   \pr(y_{G_i} \mid y_{q(G_i)}).
+\end{multline*}
+And we can now see how this process continues
+$$
+   \pr(y_{H_1 \cup H_2 \cup \cdots \cup H_m \cup Q})
+   =
+   \prod_{H \in \mathcal{H}}
+   \pr(y_H \mid y_{q(H)})
+   \prod_{G \in \mathcal{G} \setminus \mathcal{H}}
+   \pr(y_{G \cap Q} \mid y_{q(G)})
+$$
+And now integrating out $y_{H \setminus Q}$ in order gives
+\begin{align*}
+   \pr(y_Q)
+   & =
+   \prod_{H \in \mathcal{H}}
+   \pr(y_{H \cap Q} \mid y_{q(H)})
+   \prod_{G \in \mathcal{G} \setminus \mathcal{H}}
+   \pr(y_{G \cap Q} \mid y_{q(G)})
+\end{align*}
+(Note that every $j \in Q$ appears ``in front of the bar'' in
+exactly one of these conditional probabilities because $\mathcal{G}$
+is a partition.)
+So
+\begin{align*}
+   \pr(y_{H_1 \cup H_2 \cup \cdots \cup H_m} \mid y_Q)
+   & =
+   \prod_{H \in \mathcal{H}}
+   \frac{ \pr(y_H \mid y_{q(H)}) }{ \pr(y_{H \cap Q} \mid y_{q(H)}) }
+   \\
+   & =
+   \prod_{H \in \mathcal{H}}
+   \frac{ \pr(y_{H \cup \{q(H)\}}) }{ \pr(y_{(H \cap Q) \cup \{q(H)\}}) }
+   \\
+   & =
+   \prod_{H \in \mathcal{H}}
+   \pr( y_{H \setminus Q} \mid y_{Q} )
+   \\
+   & =
+   \prod_{H \in \mathcal{H}}
+   \pr( y_H \mid y_{Q} )
+\end{align*}
+(the last step being that variables repeated ``in front of'' and ``behind''
+the bar in a conditional probability are treated as constant).
+And reading from end to end gives the assertion of the theorem.
+\end{proof}
+
+It is not clear (to me) that this theorem is much use,
+but the following corollary is very important.
+\begin{corollary} \label{cor:independent}
+If in Theorem~\ref{th:markov-two}
+$$
+   \mathcal{H} = \set{ G \in \mathcal{G} : q(G) \notin J },
+$$
+then the random vectors
+$y_H$, $H \in \mathcal{H}$ are stochastically independent.
+\end{corollary}
+\begin{proof}
+This is because the random variables $y_{q(H)}$ for $H \in \mathcal{H}$
+are actually constant random variables.  Hence conditioning on them
+has no effect.  In the notation of the proof of Theorem~\ref{th:markov-two}
+$\pr( y_H \mid y_{Q} ) = \pr( y_H )$.
+\end{proof}
+

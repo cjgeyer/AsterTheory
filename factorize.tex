@@ -1,0 +1,55 @@
+
+\chapter{The Factorization Theorem}
+\label{app:factorize}
+
+\begin{proof}[Proof of Theorem~\ref{th:factorize}]
+A valid factorization factors joint equals conditional times marginal
+$$
+   \pr(y) = \pr(y_{G_1} \mid y_{N \setminus G_1}) \pr(y_{N \setminus G_1})
+$$
+The marginal on the right-hand side can then be considered a joint to be
+factored further
+$$
+   \pr(y)
+   =
+   \pr(y_{G_1} \mid y_{N \setminus G_1})
+   \pr(y_{G_2} \mid y_{N \setminus (G_1 \cup G_2)})
+   \pr(y_{N \setminus (G_1 \cup G_2)})
+$$
+and again and again giving
+\begin{equation} \label{eq:factorize-general}
+   \pr(y)
+   =
+   \pr(y_{N \setminus \bigcup_{j = 1}^k G_j})
+   \prod_{i = 1}^k
+   \pr(y_{G_i} \mid y_{N \setminus \bigcup_{j = 1}^i G_j})
+\end{equation}
+and the only condition that is required to make \eqref{eq:factorize-general}
+valid is that the index sets $G_i$ are disjoint.  This is the only operation
+in classical (non-measure-theoretic) probability theory that factorizes
+probability distributions.  A factorization is valid if and only if it
+has the form \eqref{eq:factorize-general}.
+
+When we match up \eqref{eq:factorize} and \eqref{eq:factorize-general}
+we see that the $G_i$ must be the elements of $\mathcal{G}$ so the two
+products are the same.  For the conditional distributions to
+match up we must have $\pr(y_{G_i} \mid y_{N \setminus \bigcup_{j = 1}^i G_j})$
+in \eqref{eq:factorize-general} can actually be written as
+$\pr(y_{G_i} \mid y_{q(G_i)})$, that is,
+\begin{itemize}
+\item this conditional distribution actually depends only on the single
+    variable $y_{q(G_i)}$ not on the rest of the variables that are components
+    of $y_{N \setminus \bigcup_{j = 1}^i G_j}$ and
+\item $q(G_i) \in N \setminus \bigcup_{j = 1}^i G_j$, that is, either
+    $q(G_i) \in G_j$ for some $j > i$ or $q(G_i)$ is an initial node
+    ($q(G_i) \notin G_j$ for any $j$).  In either case,
+    $q(G_i) \in G_j$ implies $i < j$.  Thus we have the condition of
+    the theorem: $G_i < G_j$ if and only if $i < j$.
+\end{itemize}
+Finally, we must match up the marginal term on the right-hand side of
+\eqref{eq:factorize-general}.  It matches nothing in \eqref{eq:factorize},
+which is the same as saying it must be equal to one, which is they same as
+saying $y_{N \setminus J}$ where $J = \bigcup \mathcal{G}$ is a constant
+random vector.
+\end{proof}
+

@@ -4,7 +4,8 @@
 
 \section{Background}
 
-Aster models \citep*{aster1,aster2,reaster} are parametric statistical models
+Aster models \citep*{aster1,aster2,reaster} \index{aster model}
+are parametric statistical models
 specifically designed for life history analysis.  They are exponential family
 models that generalize generalized linear models (GLM) that are also
 exponential family models (for example, logistic regression and
@@ -22,7 +23,8 @@ They model the conditional distribution of the response vector given
 covariate data.  The marginal distribution of covariate data is not
 modeled.
 
-In life history analysis, the data are about survival and reproduction
+In life history analysis, \index{life history analysis}
+the data are about survival and reproduction
 of biological organisms.  Thus aster models also generalize discrete time
 survival analysis (aster models model not only survival but also
 what happens conditional on survival).
@@ -57,6 +59,8 @@ Currently, all software for aster models is written in the R statistical
 computing language \citep{r-core}.  There are two CRAN
 (\url{cran.r-project.org}) packages, \code{aster} \citep{aster-package} and
 \code{aster2} \citep{aster2-package}.
+\index{R package!aster@\code{aster}}
+\index{R package!aster2@\code{aster2}}
 
 Both R and these packages can be installed in minutes on any computer,
 so any user can get started with aster models in almost no time.
@@ -105,6 +109,9 @@ Like all functions, it knows its domain and codomain.
 It knows it is a function $A \to \real$.
 So it knows its components are $y_j$, $j \in A$.
 And these are also the components of $y$ for $j \in A$.
+Since the components of $y_A$ are a subset of the components of $y$,
+we say $y_A$ is a \emph{subvector} of $y$.
+\index{subvector}
 
 If we were to insist that all vectors, including subvectors, have
 index sets $\{1, \ldots, k\}$ for some natural number $k$.  Then we could
@@ -157,52 +164,41 @@ probabilities and expectations.
 If $J$ is the index set of the response vector $y$ of an aster model,
 then there is a partition $\mathcal{G}$ of $J$
 and a function $q : \mathcal{G} \to N$, where $N \supset J$, such that
+\index{aster model!property!factorization}
+\index{factorization|seeunder{aster model}}
 the joint distribution of $y$ factorizes as
 \begin{equation} \label{eq:factorize}
    \pr(y) = \prod_{G \in \mathcal{G}} \pr(y_G \mid y_{q(G)})
 \end{equation}
 
-This differs from the usual notation for chain graph models
-\citep[equation~3.23]{lauritzen} in several ways.
-\begin{itemize}
-\item In \eqref{eq:factorize} $q(G)$ is an index.
-      In (3.23) in \citet{lauritzen} the analog of $q(G)$ is an index set.
+In this factorization, each component $y_j$ of the response vector $y$
+appears exactly once ``in front of the bar'' in a conditional on
+the right-hand side (because $\mathcal{G}$ is a partition of $J$ so
+each $j \in J$ is in exactly one $G \in \mathcal{G}$).
+So every component of $y$ is treated as random (the joint distribution
+of $y$ is modeled).
+Random variables $y_{q(G)}$ that appear ``behind the bar'' in a conditional
+on the right-hand side may or may not be elements of $y$.  They are not
+if $q(G) \notin J$.  The distribution of such random variables is not
+modeled by \eqref{eq:factorize}.  So they are treated as constant random
+variables.
 
-\item In \eqref{eq:factorize} $q(G)$ takes values in $N$ which is larger
-      than the index set $J$ of all random variables.
-      In (3.23) in \citet{lauritzen} the analog of $q(G)$ takes values that
-      are subsets of the index set $J$ of all random variables.
-
-\item In \eqref{eq:factorize} every distribution on the right-hand side
-      appears to be conditional.
-      This also holds in (3.23) in \citet{lauritzen}.
-
-\item In \eqref{eq:factorize} we can tell when what appears to be a conditional
-      distribution is actually marginal when $q(G) \notin J$, so $y_{q(G)}$
-      does not denote a component of the response vector and hence is
-      considered a constant random variable (and conditioning on a constant
-      random variable or random vector is the same as not conditioning).
-      In (3.23) in \citet{lauritzen} we can tell when what appears to be
-      a conditional distribution is actually marginal when the analog of
-      $q(G)$ is the empty set (and conditioning on the empty set of
-      random variables is the same as not conditioning).
-\end{itemize}
-
-If we were going to follow the convention in graphical model theory that
-$y$ is the vector of all the $y_j$, we would have to rewrite our factorization
-as
-$$
-   \pr(y) = \prod_{G \in \mathcal{G}} \pr(y_G \mid y_{q(G)})
-   \prod_{j \in N \setminus J} \pr(y_j)
-$$
-and consider $y$ to have index set $N$ rather than $J$.
-But since each $y_j$ in the second product on the right-hand side is
-a constant random variable, we always have $\pr(y_j) = 1$ when $y_j$
-is the only value that variable can have,
-and the second product disappears giving us \eqref{eq:factorize}.
+We say \eqref{eq:factorize} is \emph{valid} if what are denoted as
+conditional distributions on the right-hand side agree with the conditional
+distributions derived from the left-hand side (the joint distribution) by
+the usual operations of probability theory.
+\begin{theorem} \label{th:factorize}
+The factorization \eqref{eq:factorize} is valid if and only if
+the partition $\mathcal{G}$ can be totally ordered
+by some total ordering $<$ such that $q(G) \in H$ implies $G < H$.
+\end{theorem}
+A proof of this theorem is straightforward and given
+in Appendix~\ref{app:factorize}.
+It could also be derived from the discussion of chain graph models
+in \citet[equation~3.23]{lauritzen}.
 
 In \eqref{eq:factorize} we have been deliberately vague about what $\pr$ is
-supposed, to mean, since there are many ways to specify probability
+supposed to mean, since there are many ways to specify probability
 distributions and any of them will do.
 \begin{itemize}
 \item If $y$ is a discrete random vector,
@@ -219,90 +215,27 @@ distributions and any of them will do.
 In any of these cases the multiplication indicated in \eqref{eq:factorize}
 is actual multiplication of real-valued thingummies.
 
-Now, translating the usual notation of graphical models into our notation,
-the condition for \eqref{eq:factorize} to be a valid factorization, that is,
-that what appear to be conditional distributions on the right-hand side could
-be derived from the joint distribution by the usual operations of probability
-theory, is as follows.
-\begin{theorem} \label{th:factorize}
-The factorization \eqref{eq:factorize} is valid if and only if
-the partition $\mathcal{G}$ can be totally ordered
-by some total ordering $<$ such that $q(G) \in H$ implies $G < H$.
-\end{theorem}
-\begin{proof}
-A valid factorization factors joint equals conditional times marginal
-$$
-   \pr(y) = \pr(y_{G_1} \mid y_{N \setminus G_1}) \pr(y_{N \setminus G_1})
-$$
-The marginal on the right-hand side can then be considered a joint to be
-factored further
-$$
-   \pr(y)
-   =
-   \pr(y_{G_1} \mid y_{N \setminus G_1})
-   \pr(y_{G_2} \mid y_{N \setminus (G_1 \cup G_2)})
-   \pr(y_{N \setminus (G_1 \cup G_2)})
-$$
-and again and again giving
-\begin{equation} \label{eq:factorize-general}
-   \pr(y)
-   =
-   \pr(y_{N \setminus \bigcup_{j = 1}^k G_j})
-   \prod_{i = 1}^k
-   \pr(y_{G_i} \mid y_{N \setminus \bigcup_{j = 1}^i G_j})
-\end{equation}
-and the only condition that is required to make \eqref{eq:factorize-general}
-valid is that the index sets $G_i$ are disjoint.  This is the only operation
-in classical (non-measure-theoretic) probability theory that factorizes
-probability distributions.  A factorization is valid if and only if it
-has the form \eqref{eq:factorize-general}.
-
-When we match up \eqref{eq:factorize} and \eqref{eq:factorize-general}
-we see that the $G_i$ must be the elements of $\mathcal{G}$ so the two
-products are the same.  For the conditional distributions to
-match up we must have $\pr(y_{G_i} \mid y_{N \setminus \bigcup_{j = 1}^i G_j})$
-in \eqref{eq:factorize-general} can actually be written as
-$\pr(y_{G_i} \mid y_{q(G_i)})$, that is,
-\begin{itemize}
-\item this conditional distribution actually depends only on the single
-    variable $y_{q(G_i)}$ not on the rest of the variables that are components
-    of $y_{N \setminus \bigcup_{j = 1}^i G_j}$ and
-\item $q(G_i) \in N \setminus \bigcup_{j = 1}^i G_j$, that is, either
-    $q(G_i) \in G_j$ for some $j > i$ or $q(G_i)$ is an initial node
-    ($q(G_i) \notin G_j$ for any $j$).  In either case,
-    $q(G_i) \in G_j$ implies $i < j$.  Thus we have the condition of
-    the theorem: $G_i < G_j$ if and only if $i < j$.
-\end{itemize}
-Finally, we must match up the marginal term on the right-hand side of
-\eqref{eq:factorize-general}.  It matches nothing in \eqref{eq:factorize},
-which is the same as saying it must be equal to one, which is they same as
-saying $y_{N \setminus J}$ where $J = \bigcup \mathcal{G}$ is a constant
-random vector.
-\end{proof}
-
 The total order asserted to exist by the theorem need not be unique and
-usually is not unique.  In the case of an aster graph that has no arrows
-or lines, the components of the response vector are stochastically independent,
-each element of $\mathcal{G}$ is a singleton set and
-$$
-   \pr(y) = \prod_{G \in \mathcal{G}} \pr(y_G)
-$$
-and it is clear that any total order on $\mathcal{G}$ will do in this case.
-
+usually is not unique.
 We can find such a total order using the algorithm called topological sort
+\index{topological sort}
 \citep[Section~6.6]{aho-et-al} Using R function \code{tsort} in R package
 \code{pooh}
-\citep{pooh-package} for each $G \in \mathcal{G}$ such that there exists
+\citep{pooh-package}
+\index{R package!pooh@\code{pooh}}
+for each $G \in \mathcal{G}$ such that there exists
 a (necessarily unique) $H \in \mathcal{G}$ such that $q(G) \in H$
-let $G$ be a component of the vector \code{from} that is an argument to this
-function and
+let $G$ be a component of the vector \code{from} that is an argument to
+\code{tsort} and
 let $H$ be the corresponding component of the vector \code{to} that is another
-argument to this function and
-neither vector has any other components.  Then invoking this function with
+argument to \code{tsort} and
+neither vector has any other components.  Then invoking \code{tsort} with
 these \code{from} and \code{to} arguments and \code{domain} argument that is
 $\mathcal{G}$ strung out in a vector in any order
 will determine a (not necessarily unique) total order that agrees with
-Theorem~\ref{th:factorize}.
+Theorem~\ref{th:factorize}.  If the user has made a mistake and incorrectly
+specified the $q$ function so there is no total order that satisfies
+Theorem~\ref{th:factorize}, then \code{tsort} will give an error.
 
 Current code in R packages \code{aster} and \code{aster2} does not
 actually use the topological sort algorithm but rather forces the user
@@ -326,12 +259,18 @@ notation that allows for them.  So we will never have an analog of equation
 \section{Graphs}
 
 Each factorization goes with a graph \citep[Section~3.2.3]{lauritzen}.
+\index{aster graph}
+\index{graph|see{aster graph}}
 The nodes of the graph are either the elements of $N$ or the components
 of $y$ corresponding to these elements ($y_j$ for $j \in N$).
-There is a directed edge, also called an \emph{arrow}
+There is a directed edge, also called an \emph{arrow},
+\index{node}
+\index{edge}
+\index{arrow}
+\index{line}
 $q(G) \longrightarrow j$ (or if one prefers $y_{q(G)} \longrightarrow y_j$)
 for every $G \in \mathcal{G}$ and every $j \in G$.
-There is an undirected edge, also called a \emph{line}
+There is an undirected edge, also called a \emph{line},
 $j \myline k$ (or if one prefers $y_j \myline y_k$)
 for every $G \in \mathcal{G}$ and every $j, k \in G$ such that $j \neq k$.
 
@@ -361,16 +300,25 @@ Graphs can be helpful, but we do not have to use them.
 In aster theory, we say
 \begin{itemize}
 \item a node is \emph{initial} if it has no incoming arrows
+\index{node!initial}
+\index{initial node|seeunder{node}}
     or lines (when thinking about the graph) or if it is not an element
     of $J = \bigcup \mathcal{G}$ (when thinking about the function $q$),
 \item a node is \emph{terminal} if it has no outgoing arrows
+\index{node!terminal}
+\index{terminal node|seeunder{node}}
     (it may have outgoing lines and will have outgoing lines if it is
     an element of an element of $\mathcal{G}$ that is not a singleton set),
 \item if there is an arrow $j \longrightarrow k$, then we say that $j$
     is the \emph{predecessor} of $k$ (or $y_j$ is the predecessor of $y_k$),
+\index{node!predecessor}
+\index{predecessor node|seeunder{node}}
 \item and, conversely, that $k$ is a \emph{successor} of $j$
     (or $y_k$ is the successor of $y_j$).
+\index{node!successor}
+\index{successor node|seeunder{node}}
 \end{itemize}
+
 In mainstream graphical model theory, a different terminology is more widely
 used \citep{lauritzen} root = initial, leaf = terminal, parent = predecessor,
 child = successor.  We do not use this terminology in aster model theory
@@ -386,6 +334,7 @@ is a function that takes elements of $\mathcal{G}$ as arguments).
 
 In mainstream graph theory, a chain graph with only arrows (no lines) having
 the at-most-one-predecessor property is called a \emph{tree} and a disjoint
+\index{aster model!property!at most one predecessor}
 union of trees is called a \emph{forest}, but we do not use this terminology
 either (avoiding serious confusion when the application involves data on
 real trees in real forests).  It is enough to say that aster graphs
@@ -412,6 +361,7 @@ by using mathematical notation introduced in the next section.
 Finally, we need a term for $\mathcal{G}$ and its elements.
 The terminology we have been using in our writings about aster models is
 elements of $\mathcal{G}$ are \emph{dependence groups}.
+\index{dependence group}
 The mainstream graphical models terminology \citep{lauritzen} is
 \emph{chain components}.  Both have two words and four syllables.
 Neither is very elegant.  We don't like the ``chain'' terminology because
@@ -423,6 +373,8 @@ thought of a better term.
 
 It is useful to have not only the set-to-index predecessor function $q$
 defined in Section~\ref{sec:factorization} above but also the index-to-index
+\index{predecessor function!set-to-index}
+\index{predecessor function!index-to-index}
 predecessor function $p$ defined as follows
 $$
    p(j) = k \ifandonlyif j \in G \in \mathcal{G} \opand q(G) = k.
@@ -435,34 +387,44 @@ But $p$ and $\mathcal{G}$ together determine $q$.
 \label{sec:closure}
 
 The \emph{predecessor relation} on $N$ is the function $p$ thought
-of as a relation, that is, as the set
+of as a relation, that is, thinking set-theoretically
+\citep[Section~7]{halmos-set-theory} as the set
 $$
    \set{ (j, p(j)) : j \in J }
 $$
 of its argument-value pairs.
 
-Its transitive closure is the smallest transitive relation $R$ containing it.
+We need a notation from dynamical systems theory for repeated application
+of a function.  If $f$ is any function whose domain and codomain are the same,
+then it makes sense to compose $f$ with itself.  Then we let $f^0$ denote
+the identity function on the domain of $f$, let $f^1 = f$, $f^2 = f \circ f$,
+and, in general, $f^{n + 1} = f^n \circ f$.
+So
+\begin{align*}
+   f^0(x) & = x
+   \\
+   f^1(x) & = f(x)
+   \\
+   f^2(x) & = f(f(x))
+   \\
+   f^3(x) & = f(f(f(x)))
+\end{align*}
+and so forth.
+
+The transitive closure of the predecessor relation
+is the smallest transitive relation $R$ containing it.
+\index{predecessor relation!transitive closure}
 As with most relations, we prefer denoting this relation by infix notation:
 saying $j \succ k$ rather than $(j, k) \in R$, that is, $j \succ k$ means
-one of the following
-\begin{align*}
-   k & = p(j)
-   \\
-   k & = p(p(j))
-   \\
-   k & = p(p(p(j)))
-   \\
-   & \andsoforth
-\end{align*}
-holds (an arbitrary number of applications of $p$ are allowed).
+$k = p^n(j)$ for some positive integer $n$.
 
 \begin{theorem} \label{th:transitive-closure}
-The transitive closure of the predecessor relation is a strict partial order.
+Under the conditions of Theorem~\ref{th:factorize},
+the transitive closure of the predecessor relation is a strict partial order.
 \end{theorem}
 \begin{proof}
-Define $p^0(j) = j$, $p^1(j) = p(j)$, and $p^n(j) = p(p^{n - 1}(j))$ for
-$n > 1$.  Then $j \succ k$ implies $j \in G$ for some $G \in \mathcal{G}$ and
-$k = p^n(q(G))$ for some natural number $n$.
+If $j \succ k$, then $j \in G$ for some $G \in \mathcal{G}$ and
+$k = p^n(q(G))$ for some natural number $n$ ($n = 0$ is allowed).
 
 If $k \in H$ for some $H \in \mathcal{G}$,
 then we have $G < H$ in the total ordering
@@ -487,6 +449,7 @@ implies $G < H$.
 
 The non-strict counterpart of this relation
 is the reflexive transitive closure of the predecessor relation,
+\index{predecessor relation!reflexive transitive closure}
 which is denoted $\succeq$.
 We have $j \succeq k$ if and only if $j \succ k$ or $j = k$.
 
@@ -500,6 +463,12 @@ of $\succeq$.
 The inverse of the predecessor relation is the successor relation,
 so $\prec$ is the transitive closure of the successor relation
 and $\preceq$ is the reflexive transitive closure of the successor relation.
+\index{successor relation!transitive closure}
+\index{successor relation!reflexive transitive closure}
+\index{transitive closure|seeunder{predecessor relation}}
+\index{transitive closure|seeunder{successor relation}}
+\index{reflexive closure|seeunder{predecessor relation}}
+\index{reflexive closure|seeunder{successor relation}}
 
 The choice of whether the transitive closure of the predecessor relation
 is denoted $\succ$ or $\prec$ is arbitrary.  Either choice works so long
@@ -521,231 +490,6 @@ our policy is to avoid these terms
 to avoid confusion in biological applications.
 If we need words rather than symbols, we have to use the long winded ones:
 ``reflexive transitive closure of the predecessor relation'' and so forth.
-
-\section{Markov Properties}
-
-Markov properties of graphical models are considered a fundamental part
-of the theory \citep[Section~3.2]{lauritzen}.  They are much less important
-for aster models, so unimportant that the literature does not mention them.
-So perhaps most readers will want to skip this section.  Nevertheless,
-perhaps these ideas might find some future use.  So we do them.
-
-\begin{theorem} \label{th:markov-one}
-For any dependence group $G$, define
-$$
-   A = \set{ j \in J : (\exists k \in G)(j \succeq k) }
-$$
-and
-$$
-   \mathcal{H} = \set{ H \in \mathcal{G} : H \subset A }.
-$$
-Then
-\begin{equation} \label{eq:markov-one}
-   \pr(y_{A} \mid y_{J \setminus A})
-   =
-   \prod_{H \in \mathcal{H}} \pr(y_H \mid y_{q(H)}),
-\end{equation}
-and $y_A$ and $y_{J \setminus A}$ are conditionally
-independent given $y_{q(G)}$.
-\end{theorem}
-Elements of $A$ are elements of $G$ and their successors,
-successors of successors, successors of successors of successors, and so forth.
-\begin{proof}
-First, $\bigcup \mathcal{H} = A$ because every $j \in A$ is contained in
-some $H \in \mathcal{G}$, and either $H = G$ or $q(H) \in A$, and in either
-case $H \subset A$.
-
-Using the total order on $\mathcal{G}$ guaranteed to exist
-by Theorem~\ref{th:factorize}, enumerate the elements of $H$
-to agree with the total order on $\mathcal{G}$, that is,
-$H_1 < H_2 < \cdots < H_k$ and $\mathcal{H}$ has $k$ elements.
-
-Now calculate the marginal distribution of $y_{J \setminus A}$ by
-summing-integrating out (sum if discrete, integrate if continuous)
-$y_{H_1}$, $y_{H_2}$, $\ldots,$ $y_{H_k}$
-from the joint distribution \eqref{eq:factorize} in that order.
-Since the elements of $H_1$ have no successors, $y_{H_1}$ appears only in
-the term $\pr(y_{H_1} \mid y_{q(H_1)})$, so when we sum-integrate we get one.
-Now sum-integrate out $y_{H_2}$.  Since the elements of $y_{H_2}$ have no
-successors in the variables that are left (they may have had successors in
-$y_{H_1}$ but those variables are now gone), we get one again.  And so forth.
-When all of the $y_{H_i}$ have been summed-integrated out (in the order we
-enumerated them), we get one for every sum-integral.  That leaves
-\begin{equation} \label{eq:markov-one-marginal}
-   \pr(y_{J \setminus A})
-   =
-   \prod_{G \in \mathcal{G} \setminus \mathcal{H}} \pr(y_G \mid y_{q(G)}).
-\end{equation}
-Dividing the joint distribution \eqref{eq:factorize} by the marginal
-distribution \eqref{eq:markov-one-marginal}, gives
-the conditional distribution \eqref{eq:markov-one}.
-
-The last statement of the theorem follows immediately from
-\eqref{eq:markov-one}.  If $U$, $V$, and $W$ are random vectors
-and the conditional distribution of $U$ given $V$ and $W$ does not depend
-on $W$, then
-\begin{align*}
-   \pr(U, W \mid V)
-   & =
-   \frac{\pr(U, V, W)}{\pr(V)}
-   \\
-   & =
-   \frac{\pr(U \mid V, W) \pr(V, W)}{\pr(V)}
-   \\
-   & =
-   \frac{\pr(U \mid V) \pr(V, W)}{\pr(V)}
-   \\
-   & =
-   \pr(U \mid V) \pr(W \mid V)
-\end{align*}
-which says $U$ and $W$ are conditionally independent given $V$.
-Moreover, $U$, $V$, and $W$ are conditionally independent given $V$,
-because a constant random vector is independent of any random vector,
-even itself, and conditioning on $V$ is like treating $V$ as if it
-were constant.
-\end{proof}
-
-\begin{theorem} \label{th:markov-two}
-Let $\mathcal{H}$ be any subset of $\mathcal{G}$.  Then the random vectors
-$y_H$, $H \in \mathcal{H}$ are conditionally independent given
-the random scalars $y_{q(H)}$, $H \in \mathcal{H}$.
-\end{theorem}
-In particular, if $G_1$ and $G_2$ are distinct elements of $\mathcal{G}$,
-then $y_{G_1}$ is conditionally independent of $y_{G_2}$
-given $y_{q(G_1)}$ and $y_{q(G_2)}$.
-
-This theorem does not say that the components of these random vectors are
-conditionally independent.  The components of $y_G$ are dependent given
-$y_{q(G)}$.  That is the whole point of dependence groups.
-\begin{proof}
-As in the preceding proof, use the total order on $\mathcal{G}$ guaranteed
-to exist by Theorem~\ref{th:factorize}.
-Enumerate $\mathcal{G}$ as $G_1 < G_2 < \cdots < G_n$.
-Then $H_j = G_{i_j}$ for $j = 1$, $\ldots,$ $m$,
-where $1 \le i_1 < i_2 < \cdots < i_m \le n$.
-
-Also as in the preceding proof, we integrate out $y_G$ one at a time
-in order skipping when $G \in \mathcal{H}$ and also not integrating out
-any $y_{q(H)}$ for $H \in \mathcal{H}$.
-
-We start by sum-integrating out $y_{G_1}$ if $G_1 \neq H_1$ obtaining
-$$
-   \pr(y_{G_2 \cup \cdots \cup G_n})
-   =
-   \prod_{i = 2}^n \pr(y_{G_i} \mid y_{q(G_i)}).
-$$
-and keep going repeating this again and again obtaining
-\begin{align*}
-   \pr(y_{\set{G \in \mathcal{G} : G \ge H_1}})
-   & =
-   \prod_{\substack{G \in \mathcal{G} \\ G \ge H_1}}
-   \pr(y_G \mid y_{q(G)})
-   \\
-   & =
-   \pr(y_{H_1} \mid y_{q(H_1)})
-   \prod_{\substack{G \in \mathcal{G} \\ G > H_1}}
-   \pr(y_G \mid y_{q(G)})
-\end{align*}
-(if $G_1 = H_1$ we haven't done anything yet and this is just the same
-factorization as \eqref{eq:factorize} in different notation).
-
-Now we have to be careful with our notation.  Define
-$$
-   Q = \set{ q(H) : H \in \mathcal{H} }
-$$
-we need to not sum-integrate out any components of $y_Q$.
-
-If $G_{i_1 + 1} \neq H_2$, then we want to sum-integrate out
-$y_{G_{i_1 + 1} \setminus Q}$ obtaining
-\begin{multline*}
-   \pr(y_{H_1 \cup \{q(H_1)\} \cup \set{G \in \mathcal{G} : G > G_{i_1 + 1}}})
-   \\
-   =
-   \pr(y_{H_1} \mid y_{q(H_1)})
-   \pr(y_{G_{i_1 + 1} \cap Q} \mid y_{q(G_{i_1 + 1})})
-   \prod_{j = i_1 + 2}^n
-   \pr(y_{G_i} \mid y_{q(G_i)}).
-\end{multline*}
-Since $G_{i_1 + 1} \cap Q$ may be the empty set, we need to say what
-$y_\emptyset$ means.  This is the subvector of length zero that is really
-the only function $\emptyset \to \real$, which is the empty function
-(which has the empty graph).  Hence $y_\emptyset$ has only one possible
-value (the empty function) and must be a constant random vector.
-Thus $\pr(y_\emptyset \mid y_j) = 1$ regardless of what $y_j$ is when
-$y_\emptyset$ has the only possible value it can have.
-
-Continuing this process, we obtain
-\begin{multline*}
-   \pr(y_{H_1 \cup \{q(H_1)\} \cup \{ G_{i_2}, \ldots, G_n \}})
-   \\
-   =
-   \pr(y_{H_1} \mid y_{q(H_1)})
-   \prod_{j = i_1 + 1}^{i_2 - 1}
-   \pr(y_{G_j \cap Q} \mid y_{q(G_j)})
-   \prod_{j = i_2}^n
-   \pr(y_{G_i} \mid y_{q(G_i)}).
-\end{multline*}
-And we can now see how this process continues
-$$
-   \pr(y_{H_1 \cup H_2 \cup \cdots \cup H_m \cup Q})
-   =
-   \prod_{H \in \mathcal{H}}
-   \pr(y_H \mid y_{q(H)})
-   \prod_{G \in \mathcal{G} \setminus \mathcal{H}}
-   \pr(y_{G \cap Q} \mid y_{q(G)})
-$$
-And now integrating out $y_{H \setminus Q}$ in order gives
-\begin{align*}
-   \pr(y_Q)
-   & =
-   \prod_{H \in \mathcal{H}}
-   \pr(y_{H \cap Q} \mid y_{q(H)})
-   \prod_{G \in \mathcal{G} \setminus \mathcal{H}}
-   \pr(y_{G \cap Q} \mid y_{q(G)})
-\end{align*}
-(Note that every $j \in Q$ appears ``in front of the bar'' in
-exactly one of these conditional probabilities because $\mathcal{G}$
-is a partition.)
-So
-\begin{align*}
-   \pr(y_{H_1 \cup H_2 \cup \cdots \cup H_m} \mid y_Q)
-   & =
-   \prod_{H \in \mathcal{H}}
-   \frac{ \pr(y_H \mid y_{q(H)}) }{ \pr(y_{H \cap Q} \mid y_{q(H)}) }
-   \\
-   & =
-   \prod_{H \in \mathcal{H}}
-   \frac{ \pr(y_{H \cup \{q(H)\}}) }{ \pr(y_{(H \cap Q) \cup \{q(H)\}}) }
-   \\
-   & =
-   \prod_{H \in \mathcal{H}}
-   \pr( y_{H \setminus Q} \mid y_{Q} )
-   \\
-   & =
-   \prod_{H \in \mathcal{H}}
-   \pr( y_H \mid y_{Q} )
-\end{align*}
-(the last step being that variables repeated ``in front of'' and ``behind''
-the bar in a conditional probability are treated as constant).
-And reading from end to end gives the assertion of the theorem.
-\end{proof}
-
-It is not clear (to me) that this theorem is much use,
-but the following corollary is very important.
-\begin{corollary} \label{cor:independent}
-If in Theorem~\ref{th:markov-two}
-$$
-   \mathcal{H} = \set{ G \in \mathcal{G} : q(G) \notin J },
-$$
-then the random vectors
-$y_H$, $H \in \mathcal{H}$ are stochastically independent.
-\end{corollary}
-\begin{proof}
-This is because the random variables $y_{q(H)}$ for $H \in \mathcal{H}$
-are actually constant random variables.  Hence conditioning on them
-has no effect.  In the notation of the proof of Theorem~\ref{th:markov-two}
-$\pr( y_H \mid y_{Q} ) = \pr( y_H )$.
-\end{proof}
 
 \section{Two Kinds of Aster Graphs}
 
