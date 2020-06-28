@@ -1,0 +1,58 @@
+
+\documentclass[11pt,oneside]{book}
+
+\usepackage{amscd}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{indentfirst}
+\usepackage{makeidx}
+\usepackage{natbib}
+\bibliographystyle{charlie}
+\usepackage{Sweave}
+\usepackage{tikz-cd}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+
+\setcounter{tocdepth}{2}
+
+\input{macros}
+
+\makeindex
+
+\begin{document}
+
+\title{Aster Models}
+
+\author{Charles J. Geyer}
+
+\maketitle
+
+\frontmatter
+
+\chapter{Preface}
+
+This is a book about the theory of aster models.  Its main intended
+readers are implementers of aster software.  So far, that is just the
+author.  The reason for the book is to go into all the gory details
+so the software can do the Right Thing.
+
+Other readers may also find this book useful in having all of the theory
+of aster models in one place and presented with consistent notation.
+But they may have to skip a lot of material they don't want to read.
+
+\tableofcontents
+
+\mainmatter
+
+\input{intro}
+
+\bibliography{tpa}
+
+\printindex
+
+\end{document}
+
+
+
