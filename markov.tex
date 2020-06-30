@@ -3,11 +3,17 @@
 \label{app:markov}
 
 Markov properties of graphical models are considered a fundamental part
-of the theory \citep[Section~3.2]{lauritzen}.  They are much less important
+of the theory \citep[Chapter~3]{lauritzen}.  They are much less important
 for aster models, so unimportant that the literature on aster models
 does not mention them.
 So perhaps most readers will want to skip this appendix.  Nevertheless,
 perhaps these ideas might find some future use.  So we do them.
+
+A Markov property is a conditional independence relation derived from a
+\index{aster model!property!Markov}
+\index{Markov property|seeunder{aster model}}
+graph (or for aster models from the fundamental factorization
+\eqref{eq:factorize}).
 
 \begin{lemma} \label{lem:markov}
 Let $\mathcal{H}$ be any subset of $\mathcal{G}$.  Then the random vectors
@@ -311,4 +317,37 @@ where the next-to-last step is \eqref{eq:notice-before-after}.
 And reading from end to end gives the assertion that the induction step
 must prove.  Hence we are done.
 \end{proof}
+
+Let
+$$
+   \mathcal{G}_\text{initial}
+   =
+   \set{ G \in \mathcal{G} : q(G) \notin J }
+$$
+(the notation is perhaps a bit misleading, this is the subset of $\mathcal{G}$
+whose elements have predecessors that are initial nodes).
+Now for $G \in \mathcal{G}_\text{initial}$, let
+$$
+   H_G = \set{ j \in J : (\exists k \in G)(j \succeq k) }
+$$
+where, as usual $\succeq$ denotes the reflexive transitive closure of the
+predecessor relation.  These $H_G$ are the node sets for what are called
+aster graphs for ``individuals'' (in scare quotes)
+in Section~\ref{sec:scare-quotes} above.
+Let
+$$
+   \mathcal{H} = \set{ H_G : G \in \mathcal{G}_\text{initial} }.
+$$
+
+\begin{corollary}
+The random vectors $y_H$, $H \in \mathcal{H}$ with $\mathcal{H}$ as
+defined above are (unconditionally) independent.
+\end{corollary}
+\begin{proof}
+Immediate from the theorem because the $Q$ corresponding to this $\mathcal{H}$
+consists of initial nodes only so $y_Q$ is a constant random vector, and
+conditioning on a constant has no effect.  Any things conditionally independent
+given $y_Q$ are unconditionally independent given $y_Q$.
+\end{proof}
+
 
