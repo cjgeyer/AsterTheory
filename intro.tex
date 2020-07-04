@@ -830,7 +830,7 @@ nodes, which are given by
 \end{equation}
 because the mean value of a constant random variable is its constant value.
 
-Using the reflexive transistive closure of the predecessor relation $\preceq$
+Using the reflexive transistive closure of the successor relation $\preceq$
 we can rewrite the above as follows
 \begin{equation} \label{eq:xi-mu-prod}
     \mu_j
@@ -1080,7 +1080,8 @@ Here is a more complicated aster graph from \citet{aster3}
 \end{equation}
 
 Again, because this graph has only arrows, no lines, each node is
-a dependence group all by itself.
+a dependence group all by itself.  The label Poi on arrows indicates
+the Poisson distribution.
 
 This graph is for simulated data, which \citet{aster3} used because
 at the time no data for aster models as complicated as \eqref{gr:aster3} had
@@ -1106,12 +1107,14 @@ Because the organism in question (\emph{Chamaecrista fasciculata}, common
 name partridge pea) was an annual plant, there is only one ``column.''
 (As mentioned above, ``rows'' and ``columns'' are not part of the graphical
 structure --- the only thing that matters is which nodes are connected
-by which arrows --- and \citeauthor{stanton-geddes-tiffin-shaw} actually
+by which arrows and lines (if any) ---
+and \citeauthor{stanton-geddes-tiffin-shaw} actually
 laid out their graph in a row.)
 
 Statistically, there are some important differences between these graphs.
 Graph \eqref{gr:aster3} has both Poisson (Poi) and zero-truncated Poisson
-(0-Poi) arrows and hence illustrates when to use which.
+(0-Poi) arrows and hence illustrates when to use which
+(see also Section~\ref{sec:zero-inflated} below).
 In graph \eqref{gr:aster1} every predecessor node is Bernoulli,
 but in graph \eqref{gr:aster3} $y_{13}$ through $y_{16}$ are non-Bernoulli
 predecessor nodes.  So \eqref{gr:aster3} shows that predecessor values can
@@ -1275,6 +1278,10 @@ but does not require, modeling variance as a function of covariates.
 We see that the aster formalism suggests new possibilities.  In order to
 have a two-parameter normal distribution, we need two-node dependence groups.
 %%%%%%%%%% NEED FORWARD REFERENCE to two-parameter normal %%%%%%%%%%
+%%%%%%%%%% NEED FORWARD REFERENCE to one-parameter normal %%%%%%%%%%
+
+\subsection{Zero-Inflated Poisson}
+\label{sec:zero-inflated}
 
 \subsection{Not Really Missing Data}
 
