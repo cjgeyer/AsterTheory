@@ -3,6 +3,7 @@
 \label{ch:introduction}
 
 \section{Background}
+\label{sec:background}
 
 Aster models \citep*{aster1,aster2,reaster} \index{aster model}
 are parametric statistical models
@@ -51,7 +52,7 @@ Aster models also have the predecessor-is-sample-size property
 that makes the joint distribution of the response vector an exponential
 family.  This property can be seen to generalize unnamed properties
 of survival analysis, life-table analysis, Leslie matrix analysis,
-and population growth rate analysis.
+and population growth rate analysis (Section~\ref{sec:mu-and-xi} below).
 
 \section{Software}
 \label{sec:software}
@@ -78,11 +79,31 @@ else is either missing or much harder to use than in R package \code{aster}.
 So any aster model that can be done with R package \code{aster} should
 be done with that package.
 
+\section{Summary}
+
+Aster models combine three ideas
+\begin{itemize}
+\item factorization of a joint distribution into a product of marginals
+    and conditionals (Section~\ref{sec:factorization} below),
+\item the predecessor is sample size property (Section~\ref{sec:piss} below),
+    which says the conditioning variables in the conditional distributions
+    in the factorization act like sample sizes, and
+\item the exponential family property (Section~\ref{sec:aster-expfam} below),
+    which says the conditional distributions in the factorization are
+    exponential families of distributions,
+\end{itemize}
+into one big idea.  Together the make the joint distribution of the
+response vector also an exponential family.  And this makes aster models
+as well-behaved as generalized linear models or log-linear models for
+categorical data analysis, even though they are far more more complicated.
+
 \section{Vectors and Subvectors}
 \label{sec:subvector}
 
 We adopt a notation from \citet{lauritzen} for subvectors, but fuss about it
-more.  As in set theory \citep[Section~8]{halmos-set-theory}, if $A$ and $B$
+more.
+
+As in set theory \citep[Section~8]{halmos-set-theory}, if $A$ and $B$
 are sets, then $A^B$ denotes the set of all functions $B \to A$.
 In particular, if $J$ is a finite set, then we let $\real^J$ denote
 the set of all functions $J \to \real$.  This set can also be considered
@@ -119,6 +140,10 @@ If we were to insist that all vectors, including subvectors, have
 index sets $\{1, \ldots, k\}$ for some natural number $k$.  Then we could
 not distinguish different subvectors of the same length, or at least could
 not without ugly and cumbersome extra decoration of the notation.
+(It is hard to explain how elegant this notation is with simple examples,
+but a perusal of Appendix~\ref{app:markov} will show this notation is
+extremely powerful, and that appendix would be much longer and more confusing
+if we had to use conventional notation with indices going from 1 to $k$.)
 
 Our notation does have the drawback that we have only the convention
 that lower case letters denote elements of sets and upper case letters
@@ -149,7 +174,7 @@ vector depend on the values of other components, so we frequently write
 \begin{gather*}
    E(y_A \mid y_j)
    \\
-   \Pr(y_A \in B \mid y_j)
+   \pr(y_A \mid y_j)
 \end{gather*}
 and the like.  And we do not want this dependence confused with dependence
 on covariate data.
@@ -217,12 +242,15 @@ distributions and any of them will do.
 In any of these cases the multiplication indicated in \eqref{eq:factorize}
 is actual multiplication of real-valued thingummies.
 
+\subsection{Topological Sort}
+
 The total order asserted to exist by the theorem need not be unique and
 usually is not unique.
 We can find such a total order using the algorithm called topological sort
 \index{topological sort}
-\citep[Section~6.6]{aho-et-al} Using R function \code{tsort} in R package
-\code{pooh}
+\citep[Section~6.6]{aho-et-al}.
+
+Using R function \code{tsort} in R package \code{pooh}
 \citep{pooh-package}
 \index{R package!pooh@\code{pooh}}
 for each $G \in \mathcal{G}$ such that there exists
@@ -243,13 +271,15 @@ Current code in R packages \code{aster} and \code{aster2} does not
 actually use the topological sort algorithm but rather forces the user
 to input the data so that the numerical order of the components of the
 response vector is the total order, that is, considering the index set
-of the response vector to be $\{1, \ldots, n\}$ for some integer $n$
+of the response vector to be $\{1, \ldots, n\}$ for some integer $n$,
 current code requires $q(G) < j$ for any $j \in G$.
-It is up to the user to present the data in this way.  The computer is no help.
+It is up to the user to input the data in this way.  The computer is no help.
+
 But we could make the computer figure this out in future versions of the
 software.
 
-\section{Further Factorization}
+\subsection{Further Factorization}
+\label{sec:further-factorize}
 
 In \citet{lauritzen} chain graph factorizations like our \eqref{eq:factorize}
 and his equation (3.23) can be further factorized, his equation (3.24).
@@ -285,6 +315,9 @@ Conversely, the graph determines the function $q$.
     non-initial).
 \item The elements of $\mathcal{G}$ are the maximal connected components
     of the graph of lines having node set $J$.
+    (The graph of lines is the graph obtained by keeping all the nodes
+    and lines but removing all the arrows).
+    \index{aster graph!of lines}
     This includes any singleton sets of $J$ that have no incoming lines.
 \item The graph of $q$ is determined by the arrows: $(G, q(G))$ is an
     argument-value pair whenever there is an arrow $j \longrightarrow k$
@@ -292,9 +325,28 @@ Conversely, the graph determines the function $q$.
 \end{itemize}
 
 Thus we can reason with with graphs or with $q$ functions (which we will
-soon learn to call \emph{predecessor functions}).
-%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+soon learn to call \emph{predecessor functions}, Section~\ref{sec:other} below).
 Graphs can be helpful, but we do not have to use them.
+
+\subsection{Exception}
+\label{sec:exception-dependence-group-lines}
+
+In theory, as stated above, there is a line between every pair of distinct
+elements of every dependence group and no other lines.
+
+In practice, this leads to annoying and unnecessary clutter.
+Because we never further factorize dependence groups
+(Section~\ref{sec:further-factorize} above), we can find the dependence
+groups from the graph if we only include enough lines so that each
+dependence group is a connected subgraph of the graph of lines
+(again, this is the graph obtained by keeping all the nodes and lines but
+removing all the arrows).
+\index{aster graph!of lines}
+
+This exception is illustrated in graph \eqref{gr:multi} below
+where only two lines
+rather than three are used to connect the nodes of each
+dependence group of size three.
 
 \section{Graphical Terminology}
 \label{sec:graphical-terminology}
@@ -310,7 +362,10 @@ In aster theory, we say
 \index{node!terminal}
 \index{terminal node|seeunder{node}}
     (it may have outgoing lines and will have outgoing lines if it is
-    an element of an element of $\mathcal{G}$ that is not a singleton set),
+    an element of an element of $\mathcal{G}$ that is not a singleton set)
+    (when thinking about the graph) or if it is not an element
+    of $\set{ q(G) : G \in \mathcal{G} }$
+    (when thinking about the function $q$),
 \item if there is an arrow $j \longrightarrow k$, then we say that $j$
     is the \emph{predecessor} of $k$ (or $y_j$ is the predecessor of $y_k$),
 \index{node!predecessor}
@@ -331,13 +386,13 @@ when there is an available alternative (even when that alternative is less
 popular).
 
 In any aster graph every node has at most one predecessor and all nodes in
+\index{aster model!property!at most one predecessor}
 the same $G \in \mathcal{G}$ must have the same predecessor (because $q$
 is a function that takes elements of $\mathcal{G}$ as arguments).
 
 In mainstream graph theory, a chain graph with only arrows (no lines) having
-the at-most-one-predecessor property is called a \emph{tree} and a disjoint
-\index{aster model!property!at most one predecessor}
-union of trees is called a \emph{forest}, but we do not use this terminology
+the at-most-one-predecessor property is called a \emph{forest} and its maximal
+connected components are called \emph{trees}, but we do not use this terminology
 either (avoiding serious confusion when the application involves data on
 real trees in real forests).  It is enough to say that aster graphs
 have the at-most-one-predecessor property.
@@ -358,7 +413,8 @@ predecessor of predecessor of predecessor and so forth or
 successor of successor of successor and so forth.
 Fortunately, we rarely need these concepts.
 And when we do need these concepts we can avoid the cumbersome verbiage
-by using mathematical notation introduced in the next section.
+by using mathematical notation introduced in Section~\ref{sec:closure}
+below.
 
 Finally, we need a term for $\mathcal{G}$ and its elements.
 The terminology we have been using in our writings about aster models is
@@ -371,362 +427,112 @@ we are not using general chain graph theory (aster models are very special
 chain graphs).  Our term \emph{dependence group} is not great, but we haven't
 thought of a better term.
 
-\section{Some Aster Graphs}
+\subsection{Exception}
+\label{sec:exception-root}
 
-The first published aster model \citep{aster1} had this graph
-\begin{equation} \label{gr:aster1}
-\begin{CD}
-   1
-   @>\text{Ber}>>
-   y_1
-   @>\text{Ber}>>
-   y_2
-   @>\text{Ber}>>
-   y_3
-   \\
-   @.
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   \\
-   \hphantom{1}
-   @.
-   y_4
-   @.
-   y_5
-   @.
-   y_6
-   \\
-   @.
-   @VV\text{0-Poi}V
-   @VV\text{0-Poi}V
-   @VV\text{0-Poi}V
-  \\
-   \hphantom{1}
-   @.
-   y_7
-   @.
-   y_8
-   @.
-   y_9
-\end{CD}
-\end{equation}
-which is for one individual.  There are 570 individuals in the data set,
-which is included in the R package \texttt{aster}.  So one can think of the
-full aster graph as 570 copies of this graph with the subscripts changed
-so the nodes (the $y_j$) are all different.
+R package \code{aster} uses ``root'' node for initial node.
+\index{node!root}
+\index{root node|seeunder{node}}
+We hadn't completely thought through the terminology when that package
+was written, and we have kept this inconsistency for reasons of backward
+compatibility.
 
-Because there are only arrows, no lines, connecting nodes, each node is
-a dependence group all by itself.
+\section{Two Kinds of Aster Graphs}
+\label{sec:scare-quotes}
 
-The individuals are plants of the species \emph{Echinacea angustifolia},
-whose common name is narrow-leaved
-purple coneflower.  These data were collected by the Echinacea Project
-(\url{http://echinaceaproject.org/}), a long-running project funded by
-the National Science Foundation (the co-PI's are the second and third authors
-of \citet{aster1}).  The way \eqref{gr:aster1} is laid out,
-variables in the first column ($y_1$, $y_4$, and $y_7$) are for 2002,
-those in the second column are for 2003,
-those in the third column are for 2004,
-those in the first row ($y_1$, $y_2$, and $y_3$) measure survival
-(0 = dead, 1 = alive),
-those in the second row indicate flowering
-(0 = no flowers, 1 = some flowers),
-those in the third row are flower head counts
-(actual number of flower heads).
+The graphs for aster models are often very large with thousands or tens of
+thousands of nodes, but usually they are composed of isomorphic subgraphs.
+So drawing one of these isomorphic subgraphs is enough.
+If you've seen one, you've seen them all.
+(Graphs are isomorphic if a drawing of one can be laid on a drawing of the
+other with everything --- nodes, lines, and arrows --- matching up.)
 
-Of course,
-the ``rows'' and ``columns'' are not part of the graphical structure.
-The only thing that matters is which nodes are connected by which arrows.
+An aster graph need not be composed of all isomorphic subgraphs,
+but the only published example of that is, as far as I know,
+\citet{aster-hornworm}.
 
-Aster graphs can get a lot bigger than \eqref{gr:aster1}.
-The Echinacea Project now has data for years since 2004 (which extends
-the graph with many more ``columns'') and data for more life history
-stages (which extends the graph with more ``rows'').
+To distinguish these two kinds of graphs, we call the aster graph described
+in the preceding section the \emph{full aster graph} (we consider the ``full''
+redundant but the emphasis may help avoid confusion).
+\index{aster graph!full}
 
-The node labels (the $y_j$) are random variables, components of the response
-vector.  The arrows indicate conditional distributions.
-An arrow
-\begin{equation} \label{gr:one-arrow-conditional}
-\begin{CD}
-   y_i @>>> y_j
-\end{CD}
-\end{equation}
-indicates the conditional distribution of $y_j$ given $y_i$.
-An arrow
-\begin{equation} \label{gr:one-arrow-marginal}
-\begin{CD}
-   1 @>>> y_i
-\end{CD}
-\end{equation}
-indicates the marginal distribution of $y_i$,
-because conditioning on a constant random variable is the same as not
-conditioning.
+Certain subgraphs of the full aster graph, we then call graphs
+for ``individuals'' (in scare quotes for reasons to be explained presently).
+These are easier to recognize than describe.
 
-Labels on the arrows name the distribution.
-Ber is for Bernoulli (any zero-or-one-valued random variable), and
-0-Poi is for zero-truncated Poisson (Poisson conditioned on being nonzero).
-This explanation of arrows and their distributions is incomplete and will
-be picked up again in Section~\ref{sec:piss}.
+Current aster software (Section~\ref{sec:software} above) forces
+$q(G) \neq q(H)$ whenever $G \neq H$ and $q(G)$ and $q(H)$ are initial nodes.
+In this case, the graph for an ``individual'' (in scare quotes)
+consists of the subgraph consisting of one initial node and all of its
+successors or successors of successors or successors of successors
+of successors and so forth with arbitrarily many repetitions
+of ``successors of'' and all of the arrows and lines in the full graph
+connecting these nodes.
+\index{aster graph!for ``individual''}
+(This is where the term ``descendant'' in its graph-theoretic sense would
+come in handy if we allowed ourselves to use it.  The graph for an
+``individual'' consists of one initial node, all of its descendant nodes,
+and all of the lines and arrows going between these nodes.  But once we
+have the idea of the graph for an ``individual'' we no longer need the
+term ``descendant.'')
 
-Here is a more complicated aster graph from \citet{aster3}
-\begin{equation} \label{gr:aster3}
-\begin{CD}
-   1
-   @>\text{Ber}>>
-   y_1
-   @>\text{Ber}>>
-   y_2
-   @>\text{Ber}>>
-   y_3
-   @>\text{Ber}>>
-   y_4
-   \\
-   @.
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   \\
-   \hphantom{1}
-   @.
-   y_5
-   @.
-   y_6
-   @.
-   y_7
-   @.
-   y_8
-   \\
-   @.
-   @VV\text{0-Poi}V
-   @VV\text{0-Poi}V
-   @VV\text{0-Poi}V
-   @VV\text{0-Poi}V
-   \\
-   \hphantom{1}
-   @.
-   y_9
-   @.
-   y_{10}
-   @.
-   y_{11}
-   @.
-   y_{12}
-   \\
-   @.
-   @VV\text{Poi}V
-   @VV\text{Poi}V
-   @VV\text{Poi}V
-   @VV\text{Poi}V
-   \\
-   \hphantom{1}
-   @.
-   y_{13}
-   @.
-   y_{14}
-   @.
-   y_{15}
-   @.
-   y_{16}
-   \\
-   @.
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   @VV\text{Ber}V
-   \\
-   \hphantom{1}
-   @.
-   y_{17}
-   @.
-   y_{18}
-   @.
-   y_{19}
-   @.
-   y_{20}
-\end{CD}
-\end{equation}
-This graph is for simulated data, which \citet{aster3} used because
-at the time no data for aster models as complicated as \eqref{gr:aster3} had
-been collected by biologists, and it was important to give such
-an illustration of the possibilities of aster models.
-Like in \eqref{gr:aster1} the ``columns'' in \eqref{gr:aster3} are for
-data in successive years.  The first three ``rows'' of \eqref{gr:aster3}
-can be taken to be the same as those of \eqref{gr:aster1}: survival,
-flowering indicator variables, and flower counts.  The fourth row of
-\eqref{gr:aster3} is seed counts, and the fifth row is number of seeds
-that germinate (produce new plants).  Of course, since the data
-are simulated, the story about these variables is just a story.
-It could be told differently, and \citet{aster3} do have a story
-where the same graph could be for data about an animal rather than a plant.
+But aster theory as described so far does not force this convention.
+If $y_j = 1$, for all initial nodes $j$, which is the case with most
+(but not all) aster applications, then it would do no harm if all initial
+nodes were fused into one initial node.  That would invalidate nothing but
+the way we just described graphs for ``individuals'' (in scare quotes).
 
-This graph did serve as a good example of what was possible.
-\citet*[in the on-line appendix]{stanton-geddes-tiffin-shaw}
-discuss an aster model with seven life history stages (one of which is
-artificial, modeling random sampling in the data collection process, hence
-only six are about life history of the organisms) and thus would be
-like the graph \eqref{gr:aster3} except with seven ``rows.''
-Because the organism in question (\emph{Chamaecrista fasciculata}, common
-name partridge pea) was an annual plant, there is only one ``column.''
-(As mentioned above, ``rows'' and ``columns'' are not part of the graphical
-structure --- the only thing that matters is which nodes are connected
-by which arrows --- and \citeauthor{stanton-geddes-tiffin-shaw} actually
-laid out their graph in a row.)
+Thus we have to be a bit more careful.  If $G$ is a dependence group whose
+predecessor $q(G)$ is initial, then the graph for the ``individual''
+(in scare quotes) containing $G$ consists of $q(G)$, the nodes in $G$
+and their successors or successors of successors or successors of successors
+of successors and so forth with arbitrarily many repetitions
+of ``successors of'' and all of the arrows and lines in the full graph
+connecting these nodes.
+\index{aster graph!for ``individual''}
+(And it would make this definition a little shorter
+if we allowed ourselves to use the word ``descendant'' in its graph-theoretic
+sense.)
 
-Statistically, there are some important differences between these graphs.
-Graph \eqref{gr:aster3} has both Poisson (Poi) and zero-truncated Poisson
-(0-Poi) arrows and hence illustrates when to use which.
-In graph \eqref{gr:aster1} every predecessor node is Bernoulli,
-but in graph \eqref{gr:aster3} $y_{13}$ through $y_{16}$ are non-Bernoulli
-predecessor nodes.  So \eqref{gr:aster3} shows that predecessor values can
-be any nonnegative integer.
+There are two reasons why the scare quotes.
+\begin{itemize}
+\item In life history
+analysis, the graph for an ``individual'' ideally goes one or more times
+around the life cycle (exactly).  Thus it may involve data not only for
+one biological individual but also for its offspring and perhaps offspring
+of offspring (if the experiment goes twice around the life cycle) or even
+perhaps more remote descendants (where here ``descendants'' means real
+biological descendants, not the graphical models idea of descendants).
+\item If the value of the constant $y_j$ at the initial node of the
+graph for an ``individual'' is greater than one, then the data for this
+``individual'' is actually cumulative data for $y_j$ real biological
+individuals and perhaps their real biological descendants.
+\end{itemize}
 
-The graph \eqref{gr:multi} comes from a still unpublished manuscript for a book
-about aster models.  It was the first graph for a model for an animal having
-life history stages like an insect's larva, pupa, and adult.  We present this
-graph for hypothetical data even though a similar model has been fit to real
-data by \citet{aster-hornworm}.  Those data are for the tobacco hornworm
-\emph{Manducca sexta}, which is an insect (a moth) that does have these life
-history stages.  These data were not collected with the intention of using
-an aster model (which were very new when the experiment was done) and so were
-not ideal for aster analysis.  Although an aster analysis was done by
-\citet{aster-hornworm}, it does not serve as quite as clean an example as
-the graph \eqref{gr:multi}.
+%%%%%%%%%% NEED FORWARD REFERENCE to example graphs %%%%%%%%%%
+%%%%%%%%%% maybe ?????
 
-\begin{equation} \label{gr:multi}
-\begin{tikzcd}
-  \hphantom{1} & y_1 & y_4 & y_7 & y_{10}
-  \\
-  1
-  \arrow{r}{\mathcal{M}}
-  \arrow{rd}{\mathcal{M}}
-  \arrow{ru}{\mathcal{M}}
-  & y_2
-  \arrow[dash]{u}
-  \arrow[dash]{d}
-  \arrow{r}{\mathcal{M}}
-  \arrow{rd}{\mathcal{M}}
-  \arrow{ru}{\mathcal{M}}
-  & y_5
-  \arrow[dash]{u}
-  \arrow[dash]{d}
-  \arrow{r}{\mathcal{M}}
-  \arrow{rd}{\mathcal{M}}
-  \arrow{ru}{\mathcal{M}}
-  & y_8
-  \arrow[dash]{u}
-  \arrow[dash]{d}
-  \arrow{r}{\mathcal{M}}
-  \arrow{rd}{\mathcal{M}}
-  \arrow{ru}{\mathcal{M}}
-  & y_{11}
-  \arrow[dash]{u}
-  \arrow[dash]{d}
-  \\
-  \hphantom{1} & y_3 \arrow{d}{\text{Ber}} & y_6 \arrow{d}{\text{Ber}} 
-  & y_9 \arrow{d}{\text{Ber}} & y_{12} \arrow{d}{\text{Ber}}
-  \\
-  \hphantom{1} & y_{13} \arrow{d}{\text{0-Poi}}
-  & y_{14} \arrow{d}{\text{0-Poi}} 
-  & y_{15} \arrow{d}{\text{0-Poi}} & y_{16} \arrow{d}{\text{0-Poi}}
-  \\
-  \hphantom{1} & y_{17} & y_{18} & y_{19} & y_{20}
-\end{tikzcd}
-\end{equation}
+If one does not like our terminology of ``individual'' in scare quotes,
+our advice is to just explain what data the graph is for.  It may actually
+be for a biological individual, for a biological individual
+and its offspring, or $n$ biological individuals.  Just say what it is.
 
-As always, the constant 1 at the initial node
-of the graph indicates that the graph is for one individual.
-In addition to the notations Ber = Bernoulli
-and 0-Poi = zero-truncated Poisson, which we have already met,
-we now also have $\mathcal{M}$ = multinomial.
-Lines without arrowheads are ``lines'' connecting nodes in the
-same dependence group.  Hence the dependence groups containing more than
-one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11, 12\}$.
-Other nodes are dependence groups all by themselves; $\{j\}$ is a dependence
-group for $j \ge 13$.
+Or we could use the characterization of Corollary~\ref{cor:markov} in
+Appendix~\ref{app:markov}, which says the subgraphs for ``individuals''
+are stochastically independent subvectors of the response vector.
+\index{aster graph!for ``individual''}
 
-Each of the multi-node dependence groups has a conditional multinomial
-distribution with, as usual, predecessor as sample size.  Since each
-predecessor is zero-or-one-valued, if a predecessor (say $y_2$) is
-equal to one, then exactly one of its three successor nodes ($y_4$, $y_5$,
-and $y_6$) is equal to one, and, if this predecessor
-is equal to zero, then all of its three successor nodes are also equal to zero.
-In effect, exactly one of the ``exterior nodes'' of this group of switches
-($y_1$, $y_4$, $y_7$, $y_{10}$, $y_{11}$, $y_{12}$, $y_9$, $y_6$, and $y_3$)
-is equal to one.  There is one path taken by any particular individual,
-from the initial node (marked 1) through these four multinomial dependence
-groups.
-
-The intended application for this graph \citep{aster-hornworm} is life history
-data for an insect.  As in our graphs without dependence groups,
-``columns'' of the graph are for different
-times (here days, there years).
-Nodes in the top ``row'' of this graph ($y_1$, $y_4$, $y_7$, and $y_{10}$)
-indicate death.
-Nodes in the second ``row'' of this graph ($y_2$, $y_5$, $y_8$, and $y_{11}$)
-indicate the individual is a larva (caterpillar).
-Nodes in the third ``row'' of this graph ($y_3$, $y_4$, $y_9$, and $y_{12}$)
-indicate the individual is an adult (moth, with wings, flying around trying
-to mate).
-Nodes in the fourth ``row'' of this graph ($y_{13}$ through $y_{16}$)
-indicate the mating success.
-Nodes in the bottom ``row'' of this graph ($y_{17}$ through $y_{20}$)
-count number of eggs laid.  So this graph is for female individuals.
-In \citet{aster-hornworm} the same graph with only the multinomial dependence
-groups (nodes 1 through $y_{12}$) is used for male individuals because
-the sex of individuals was not determined before they reached adulthood.
-
-So this graph illustrates two important points not seen before.
-It is not necessary for every individual to
-have the same graph (here females and males have different graphs).
-And we have non-singleton dependence groups,
-multinomial ``switches'' between different life history stages.
-
-Here is yet another graph illustrating normal dependence groups.
-\begin{equation} \label{gr:normal}
-\begin{tikzcd}
-   1
-   \arrow{r}{\text{Ber}}
-   & y_1
-   \arrow{d}[swap]{\mathcal{N}}
-   \arrow[bend left]{dd}{\mathcal{N}}
-   \arrow{r}{\text{Ber}}
-   & y_2
-   \arrow{d}[swap]{\mathcal{N}}
-   \arrow[bend left]{dd}{\mathcal{N}}
-   \arrow{r}{\text{Ber}}
-   & y_3
-   \arrow{d}[swap]{\mathcal{N}}
-   \arrow[bend left]{dd}{\mathcal{N}}
-   \arrow{r}{\text{Ber}}
-   & y_4
-   \arrow{d}[swap]{\mathcal{N}}
-   \arrow[bend left]{dd}{\mathcal{N}}
-   \\
-   \hphantom{1}
-   & y_5 \arrow[dash]{d}
-   & y_6 \arrow[dash]{d}
-   & y_7 \arrow[dash]{d}
-   & y_8 \arrow[dash]{d}
-   \\
-   \hphantom{1} & y_9 & y_{10} & y_{11} & y_{12}
-\end{tikzcd}
-\end{equation}
-Here the top ``row'' indicates survival.  And the next two rows are
-for normally distributed something or other given survival.  Here we
-model the normal as two-node dependence groups
-$\{ 5, 9 \}$,
-$\{ 6, 10 \}$.
-$\{ 7, 11 \}$, and
-$\{ 8, 12 \}$ because
-we do not want to assume variance is known.  As we shall see, this permits
-but does not require, modeling variance as a function of covariates.
-
-We see that the aster formalism suggests new possibilities.  In order to
-have a two-parameter normal distribution, we need two-node dependence groups.
+In general, the subgraphs for ``individuals'' are the minimal stochastically
+independent subvectors, in the sense that the data for an ``individual'' has
+no stochastically independent parts.  But when limiting conditional models
+%%%%%%%%%% NEED FORWARD REFERENCE to limiting conditional models %%%%%%%%%%
+come into play, this is no longer the case.
+Thus independence of data for ``individuals'' is an important property of
+aster models, but it does not (in general) characterize
+subgraphs for ``individuals.''
 
 \section{The Other Predecessor Function}
+\label{sec:other}
 
 It is useful to have not only the set-to-index predecessor function $q$
 defined in Section~\ref{sec:factorization} above but also the index-to-index
@@ -860,19 +666,19 @@ of estimation of population growth rate \citep{fisher,goodman,lenski-service}.
 But none of those models were regression models, nor did they have
 the generality of aster models in their graphical structure.
 They do have the basic relationship of conditional and unconditional means
-%%%%%%%%%% NEED FORWARD REFERENCE to xi and mu %%%%%%%%%%
-but nothing else of aster
-model theory.
+implied by this property (Section~\ref{sec:mu-and-xi} below)
+but nothing else of aster model theory.
 
 For one conditional distribution in the factorization \eqref{eq:factorize},
-say for the conditional distribution of $y_G$ given $y_{q(G)}$
+say for the conditional distribution of $y_G$ given $y_{q(G)}$,
 \begin{itemize}
 \item conditional on $y_{q(G)} = 0$, the distribution of $y_G$ is concentrated
-    at zero (the zero vector having the same length as $y_G$),
+    at zero (the zero vector having all components equal to zero), 
 \item conditional on $y_{q(G)} = 1$, the distribution of $y_G$ is whatever
     this distribution is designated to be, and
 \item conditional on $y_{q(G)} = n$ with the $n > 1$, the distribution
-    of $y_G$ is the $n$-fold convolution of the distribution with sample
+    of $y_G$ is the $n$-fold convolution of the distribution for sample
+    \index{convolution}
     size one.
 \end{itemize}
 In short, the conditional distribution of $y_G$ given $y_q(G)$ is the
@@ -893,9 +699,8 @@ This is an unusual practice.  It is not the way families are named for
 generalized linear models.
 And it can seem unnecessarily mysterious at first sight.
 
-\REVISED
-
-  For an arrow
+All of our example graphs in Section~\ref{sec:graphs} below
+have Bernoulli arrows.  For such an arrow
 $$
 \begin{CD}
    y_i @>\text{Ber}>> y_j
@@ -917,130 +722,638 @@ probability mass function has no closed-form expression.
 So we could not label this arrow with the name of the conditional distribution
 of $y_j$ given $y_i$ because there is no such name.
 
-A consequence of the predecessor-is-sample-size property is that $y_j$
+One consequence of the predecessor-is-sample-size property is that $y_j$
 that are predecessors (are at nonterminal nodes) must be
 nonnegative-integer-valued random variables.
+There is an exception to this requirement that will be discussed in
+Section~\ref{sec:infinitely-divisible} below, but that exception has
+never been used.
 
-\Citet{aster1} mention an exception to this
-policy.  If the conditional distribution for an arrow
-is infinitely divisible (for example, Poisson or normal
-with unknown mean and known variance), then the predecessor
-can be nonnegative-real-valued.  But this feature has never been used,
-as far as we know.
+Another consequence of the predecessor-is-sample-size property is
+the following section.
+
+\section{Conditional and Unconditional Mean Values}
+
+\subsection{Unconditional}
+
+Let $y$ be the response vector of an aster model.  We define a parameter
+vector $\mu = E(y)$.  This is the vector having components
+$$
+   \mu_j = E(y_j), \qquad j \in J,
+$$
+where, as usual, $J$ is the index set of the response vector (the set
+of non-initial nodes of the full aster graph).
+
+This is called the \emph{unconditional mean value parameter vector}.
+\index{parameter vector!mean value!unconditional}
+This name is getting us a little bit ahead of ourselves.
+At this point, we don't even know these means exist.
+(We will eventually find out they do exist.)
+%%%%%%%%%% NEED FORWARD REFERENCE to regular full and moments %%%%%%%%%%
+And, at this point, we don't know that means parameterize aster models,
+since we haven't yet even completely specified what the distribution
+of an aster model is.  We know the fundamental factorization
+\eqref{eq:factorize}, and we know each of those factors obeys the
+predecessor-is-sample-size property, but we don't yet know anything more.
+(We will eventually find out means do parameterize aster models.)
+%%%%%%%%%% NEED FORWARD REFERENCE to mean value parameterization %%%%%%%%%%
+
+For now we will just assume these means exist.
+
+\subsection{Conditional}
+
+We define another parameter vector $\xi$ having components
+$$
+   \xi_j = E(y_j \mid y_{p(j)} = 1), \qquad j \in J,
+$$
+if this expression makes sense.  It will not make sense when the
+conditioning event has probability zero (so the conditional expectation
+can be defined arbitrarily).  In that case we have to use a different
+definition that does not come with an equation.
+The predecessor-is-sample-size property says that $y_j$ is the sum
+of $y_{p(j)}$ IID random variables, and we say $\xi_j$ is the mean
+of those random variables.
+
+This is called the \emph{conditional mean value parameter vector}.
+\index{parameter vector!mean value!conditional}
+As in the preceding section, this name is getting us a little bit ahead
+of ourselves.
+At this point, we don't even know these means exist.
+(We will eventually find out they do exist.)
+%%%%%%%%%% NEED FORWARD REFERENCE to regular full and moments %%%%%%%%%%
+And, at this point, we don't know that means (conditional or unconditional)
+parameterize aster models.  But the next section will show the unconditional
+means determine conditional means and vice versa.  So if $\mu$ parameterizes,
+then so does $\xi$, and vice versa.
+
+\subsection{The Combination of the Two}
+\label{sec:mu-and-xi}
+
+It follows from the predecessor-is-sample-size property and linearity of
+expectation that
+\begin{equation} \label{eq:cond-exp}
+   E(y_j \mid y_{p(j)}) = \xi_j y_{p(j)}, \qquad j \in J.
+\end{equation}
+Then it follows from the iterated expectation axiom of conditional probability
+$$
+   E(y_j)
+   =
+   E\{E(y_j \mid y_{p(j)})\}
+$$
+that
+\begin{equation} \label{eq:mu-and-xi}
+   \mu_j = \xi_j \mu_{p(j)}, \qquad j \in J.
+\end{equation}
+This is the fundamental recursive relation that shows (as we examine in
+more detail presently) how $\mu$ is determined by $\xi$ and vice versa.
+
+To map from $\xi$ to $\mu$ we use \eqref{eq:mu-and-xi} recursively
+\begin{align*}
+   \mu_j
+   & =
+   \xi_j \mu_{p(j)}
+   \\
+   & =
+   \xi_j \xi_{p(j)} \mu_{p(p(j))}
+   \\
+   & =
+   \xi_j \xi_{p(j)} \xi_{p(p(j))} \mu_{p(p(p(j)))}
+\end{align*}
+and so forth, with as many recursive applications as necessary.  In practice,
+the computer traverses the graph in any order that visits predecessors before
+successors using \eqref{eq:mu-and-xi} to determine $\mu_j$ as a function of
+$\xi$ ($\mu_{p(j)}$ having already been determined when its node was visited
+previously).  To get the recursion started, we need the mean values at initial
+nodes, which are given by
+\begin{equation} \label{eq:xi-mu-initial}
+   \mu_j = y_j, \qquad j \in N \setminus J,
+\end{equation}
+because the mean value of a constant random variable is its constant value.
+
+Using the reflexive transistive closure of the predecessor relation $\preceq$
+we can rewrite the above as follows
+\begin{equation} \label{eq:xi-mu-prod}
+    \mu_j
+    =
+    \left( \prod_{\substack{i \in J \\ i \preceq j}} \xi_i \right)
+    \left( \prod_{\substack{i \in N \setminus J \\ i \preceq j}} \mu_i \right),
+    \qquad j \in J,
+\end{equation}
+where we note that the second product always has exactly one term: there
+is always exactly one initial node $i$ such that $i \preceq j$.
+We could also rewrite \eqref{eq:xi-mu-prod} as
+\begin{equation} \label{eq:xi-mu-prod-too}
+    \mu_j
+    =
+    \left( \prod_{\substack{i \in J \\ i \preceq j}} \xi_i \right)
+    \left( \prod_{\substack{i \in N \setminus J \\ i \preceq j}} y_i \right),
+    \qquad j \in J,
+\end{equation}
+by \eqref{eq:xi-mu-initial}.
+
+To map from $\mu$ to $\xi$, rewrite \eqref{eq:mu-and-xi} as
+\begin{equation} \label{eq:mu-to-xi}
+   \xi_j = \frac{\mu_j}{\mu_{p(j)}}
+\end{equation}
+but for this to make sense, we must know that $\mu_{p(j)}$ is never zero.
+
+We will eventually find out that $\mu_{p(j)}$ is never zero except in
+%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+limiting conditional models.  So we do not always have this property.
+Thus \eqref{eq:mu-to-xi} makes sense when $\mu_{p(j)}$ is never zero,
+but otherwise some components of $\xi$ are not determined by $\mu$.
+
+Conversely, multiplication by zero is not a problem (unlike division by zero),
+so \eqref{eq:xi-mu-prod} and \eqref{eq:xi-mu-prod-too} always determine
+$\mu$ as a function of $\xi$.
+
+Everything in this section up to this point is an elementary consequence
+of the laws of conditional and unconditional expectation and the
+predecessor-is-sample-size property.  Consequently,
+everything in this section up to this point is also true of all previous
+models in survival analysis and demography that have also had this property
+cited in Sections~\ref{sec:background} and~\ref{sec:piss} above.
+
+\subsection{Confession}
+
+\Citet{aster1} did not define $\xi$
+the way we do here.  Instead they used that Greek letter to denote
+\eqref{eq:cond-exp}.
+A referee said this definition is dumb.  It makes $\xi$ a function
+of both random variables and parameters, so it is not a parameter,
+and one shouldn't use Greek letters for things that aren't parameters.
+We didn't listen then and managed to get the
+paper published overriding this objection.  But now we agree with the referee.
+
+The vector $\xi$ as defined here is an important parameterization of
+aster models \citep[this has been realized since][]{aster-philosophical}.
+
+R package \texttt{aster} used the same dumb definition until version
+1.0-2 of the package, when a new optional argument \code{is.always.parameter}
+was added to the method of R generic function \code{predict} that handles
+aster model objects.  And, for reasons of backward compatibility,
+the dumb definition is still the default.
+One must use the optional argument \code{is.always.parameter = TRUE}
+to estimate $\xi$ as defined in this section.
+
+R package \texttt{aster2} and recent papers and technical reports use
+the definition presented here (the conditional mean value parameter vector
+is $\xi$ if they mention conditional mean value parameters at all).
+
+\section{Some Aster Graphs}
+\label{sec:graphs}
+
+The first published aster model \citep{aster1} had this graph
+\begin{equation} \label{gr:aster1}
+\begin{CD}
+   1
+   @>\text{Ber}>>
+   y_1
+   @>\text{Ber}>>
+   y_2
+   @>\text{Ber}>>
+   y_3
+   \\
+   @.
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   \\
+   \hphantom{1}
+   @.
+   y_4
+   @.
+   y_5
+   @.
+   y_6
+   \\
+   @.
+   @VV\text{0-Poi}V
+   @VV\text{0-Poi}V
+   @VV\text{0-Poi}V
+  \\
+   \hphantom{1}
+   @.
+   y_7
+   @.
+   y_8
+   @.
+   y_9
+\end{CD}
+\end{equation}
+which is for one individual.  There are 570 individuals in the data set,
+which is included in the R package \texttt{aster}.  So one can think of the
+full aster graph as 570 copies of this graph with the subscripts changed
+so the nodes (the $y_j$) are all different.
+
+Because this graph has only arrows, no lines, each node is
+a dependence group all by itself.
+
+The individuals are plants of the species \emph{Echinacea angustifolia},
+whose common name is narrow-leaved
+purple coneflower.  These data were collected by the Echinacea Project
+(\url{http://echinaceaproject.org/}), a long-running project funded by
+the National Science Foundation (the co-PI's are the second and third authors
+of \citet{aster1}).  The way \eqref{gr:aster1} is laid out,
+variables in the first column ($y_1$, $y_4$, and $y_7$) are for 2002,
+those in the second column are for 2003,
+those in the third column are for 2004,
+those in the first row ($y_1$, $y_2$, and $y_3$) measure survival
+(0 = dead, 1 = alive),
+those in the second row indicate flowering
+(0 = no flowers, 1 = some flowers),
+those in the third row are flower head counts
+(actual number of flower heads).
+
+Of course,
+the ``rows'' and ``columns'' are not part of the graphical structure.
+The only thing that matters is which nodes are connected by which arrows.
+
+Aster graphs can get a lot bigger than \eqref{gr:aster1}.
+The Echinacea Project now has data for years since 2004 (which extends
+the graph with many more ``columns'') and data for more life history
+stages (which extends the graph with more ``rows'').
+
+The node labels (the $y_j$) are random variables, components of the response
+vector.  The arrows indicate conditional distributions.
+An arrow
+\begin{equation} \label{gr:one-arrow-conditional}
+\begin{CD}
+   y_i @>>> y_j
+\end{CD}
+\end{equation}
+indicates the conditional distribution of $y_j$ given $y_i$.
+An arrow
+\begin{equation} \label{gr:one-arrow-marginal}
+\begin{CD}
+   1 @>>> y_i
+\end{CD}
+\end{equation}
+indicates the marginal distribution of $y_i$,
+because conditioning on a constant random variable is the same as not
+conditioning.
+
+Labels on the arrows name the distribution.
+Ber is for Bernoulli (any zero-or-one-valued random variable), and
+0-Poi is for zero-truncated Poisson (Poisson conditioned on being nonzero).
+This explanation of arrows and their distributions is incomplete and will
+be picked up again in Section~\ref{sec:piss}.
+%%%%%%%%%% NEED FORWARD REFERENCE to exponential family assumption %%%%%%%%%%
+
+Here is a more complicated aster graph from \citet{aster3}
+\begin{equation} \label{gr:aster3}
+\begin{CD}
+   1
+   @>\text{Ber}>>
+   y_1
+   @>\text{Ber}>>
+   y_2
+   @>\text{Ber}>>
+   y_3
+   @>\text{Ber}>>
+   y_4
+   \\
+   @.
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   \\
+   \hphantom{1}
+   @.
+   y_5
+   @.
+   y_6
+   @.
+   y_7
+   @.
+   y_8
+   \\
+   @.
+   @VV\text{0-Poi}V
+   @VV\text{0-Poi}V
+   @VV\text{0-Poi}V
+   @VV\text{0-Poi}V
+   \\
+   \hphantom{1}
+   @.
+   y_9
+   @.
+   y_{10}
+   @.
+   y_{11}
+   @.
+   y_{12}
+   \\
+   @.
+   @VV\text{Poi}V
+   @VV\text{Poi}V
+   @VV\text{Poi}V
+   @VV\text{Poi}V
+   \\
+   \hphantom{1}
+   @.
+   y_{13}
+   @.
+   y_{14}
+   @.
+   y_{15}
+   @.
+   y_{16}
+   \\
+   @.
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   @VV\text{Ber}V
+   \\
+   \hphantom{1}
+   @.
+   y_{17}
+   @.
+   y_{18}
+   @.
+   y_{19}
+   @.
+   y_{20}
+\end{CD}
+\end{equation}
+
+Again, because this graph has only arrows, no lines, each node is
+a dependence group all by itself.
+
+This graph is for simulated data, which \citet{aster3} used because
+at the time no data for aster models as complicated as \eqref{gr:aster3} had
+been collected by biologists, and it was important to give such
+an illustration of the possibilities of aster models.
+Like in \eqref{gr:aster1} the ``columns'' in \eqref{gr:aster3} are for
+data in successive years.  The first three ``rows'' of \eqref{gr:aster3}
+can be taken to be the same as those of \eqref{gr:aster1}: survival,
+flowering indicator variables, and flower counts.  The fourth row of
+\eqref{gr:aster3} is seed counts, and the fifth row is number of seeds
+that germinate (produce new plants).  Of course, since the data
+are simulated, the story about these variables is just a story.
+It could be told differently, and \citet{aster3} do have a story
+where the same graph could be for data about an animal rather than a plant.
+
+This graph did serve as a good example of what was possible.
+\citet*[in the on-line appendix]{stanton-geddes-tiffin-shaw}
+discuss an aster model with seven life history stages (one of which is
+artificial, modeling random sampling in the data collection process, hence
+only six are about life history of the organisms) and thus would be
+like the graph \eqref{gr:aster3} except with seven ``rows.''
+Because the organism in question (\emph{Chamaecrista fasciculata}, common
+name partridge pea) was an annual plant, there is only one ``column.''
+(As mentioned above, ``rows'' and ``columns'' are not part of the graphical
+structure --- the only thing that matters is which nodes are connected
+by which arrows --- and \citeauthor{stanton-geddes-tiffin-shaw} actually
+laid out their graph in a row.)
+
+Statistically, there are some important differences between these graphs.
+Graph \eqref{gr:aster3} has both Poisson (Poi) and zero-truncated Poisson
+(0-Poi) arrows and hence illustrates when to use which.
+In graph \eqref{gr:aster1} every predecessor node is Bernoulli,
+but in graph \eqref{gr:aster3} $y_{13}$ through $y_{16}$ are non-Bernoulli
+predecessor nodes.  So \eqref{gr:aster3} shows that predecessor values can
+be any nonnegative integer.
+
+The graph \eqref{gr:multi} comes from a still unpublished manuscript for a book
+about aster models.  It was the first graph for a model for an animal having
+life history stages like an insect's larva, pupa, and adult.  We present this
+graph for hypothetical data even though a similar model has been fit to real
+data by \citet{aster-hornworm}.  Those data are for the tobacco hornworm
+\emph{Manducca sexta}, which is an insect (a moth) that does have these life
+history stages.  These data were not collected with the intention of using
+an aster model (which were very new when the experiment was done) and so were
+not ideal for aster analysis.  Although an aster analysis was done by
+\citet{aster-hornworm}, it does not serve as quite as clean an example as
+the graph \eqref{gr:multi}.
+
+\begin{equation} \label{gr:multi}
+\begin{tikzcd}
+  \hphantom{1} & y_1 & y_4 & y_7 & y_{10}
+  \\
+  1
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_2
+  \arrow[dash]{u}
+  \arrow[dash]{d}
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_5
+  \arrow[dash]{u}
+  \arrow[dash]{d}
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_8
+  \arrow[dash]{u}
+  \arrow[dash]{d}
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_{11}
+  \arrow[dash]{u}
+  \arrow[dash]{d}
+  \\
+  \hphantom{1} & y_3 \arrow{d}{\text{Ber}} & y_6 \arrow{d}{\text{Ber}}
+  & y_9 \arrow{d}{\text{Ber}} & y_{12} \arrow{d}{\text{Ber}}
+  \\
+  \hphantom{1} & y_{13} \arrow{d}{\text{0-Poi}}
+  & y_{14} \arrow{d}{\text{0-Poi}}
+  & y_{15} \arrow{d}{\text{0-Poi}} & y_{16} \arrow{d}{\text{0-Poi}}
+  \\
+  \hphantom{1} & y_{17} & y_{18} & y_{19} & y_{20}
+\end{tikzcd}
+\end{equation}
+
+As always, the constant 1 at the initial node
+of the graph indicates that the graph is for one individual.
+In addition to the notations Ber = Bernoulli
+and 0-Poi = zero-truncated Poisson, which we have already met,
+we now also have $\mathcal{M}$ = multinomial.
+Lines without arrowheads are ``lines'' connecting nodes in the
+same dependence group.  Hence the dependence groups containing more than
+one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11, 12\}$.
+Other nodes are dependence groups all by themselves; $\{j\}$ is a dependence
+group for $j \ge 13$.
+
+As stated in Section~\ref{sec:exception-dependence-group-lines} above,
+this graph does not follow the theory, which requires a line connecting
+each pair of distinct elements of each dependence group and which would
+require us to add lines $y_1 \myline y_3$ and $y_4 \myline y_6$
+and $y_7 \myline y_9$ and $y_{10} \myline y_{12}$ to the graph.
+But, also as stated in Section~\ref{sec:exception-dependence-group-lines}
+above, we don't need these lines to infer the dependence groups from the
+graph.  The lines $y_1 \myline y_2$ and $y_2 \myline y_3$ that are in the
+graph say $y_1$ and $y_3$ are in the same dependence group as $y_2$,
+and since there are no other lines to these nodes, they must constitute
+a dependence group.  Since there doesn't seem to be any room in
+the picture \eqref{gr:multi} for these additional lines required by theory,
+we omit them.
+
+Each of the multi-node dependence groups has a conditional multinomial
+distribution with, as usual, predecessor as sample size.  Since each
+predecessor is zero-or-one-valued, if a predecessor (say $y_2$) is
+equal to one, then exactly one of its three successor nodes ($y_4$, $y_5$,
+and $y_6$) is equal to one, and, if this predecessor
+is equal to zero, then all of its three successor nodes are also equal to zero.
+In effect, exactly one of the ``exterior nodes'' of this group of switches
+($y_1$, $y_4$, $y_7$, $y_{10}$, $y_{11}$, $y_{12}$, $y_9$, $y_6$, and $y_3$)
+is equal to one.  There is one path taken by any particular individual,
+from the initial node (marked 1) through these four multinomial dependence
+groups.
+
+The intended application for this graph \citep{aster-hornworm} is life history
+data for an insect.  As in our graphs without dependence groups,
+``columns'' of the graph are for different
+times (here days, there years).
+Nodes in the top ``row'' of this graph ($y_1$, $y_4$, $y_7$, and $y_{10}$)
+indicate death.
+Nodes in the second ``row'' of this graph ($y_2$, $y_5$, $y_8$, and $y_{11}$)
+indicate the individual is a larva (caterpillar).
+Nodes in the third ``row'' of this graph ($y_3$, $y_4$, $y_9$, and $y_{12}$)
+indicate the individual is an adult (moth, with wings, flying around trying
+to mate).
+Nodes in the fourth ``row'' of this graph ($y_{13}$ through $y_{16}$)
+indicate the mating success.
+Nodes in the bottom ``row'' of this graph ($y_{17}$ through $y_{20}$)
+count number of eggs laid.  So this graph is for female individuals.
+In \citet{aster-hornworm} the same graph with only the multinomial dependence
+groups (nodes 1 through $y_{12}$) is used for male individuals because
+the sex of individuals was not determined before they reached adulthood.
+
+So this graph illustrates two important points not seen before.
+It is not necessary for every individual to
+have the same graph (here females and males have different graphs).
+And we have non-singleton dependence groups,
+multinomial ``switches'' between different life history stages.
+
+Here is yet another graph illustrating normal dependence groups.
+\begin{equation} \label{gr:normal}
+\begin{tikzcd}
+   1
+   \arrow{r}{\text{Ber}}
+   & y_1
+   \arrow{d}[swap]{\mathcal{N}}
+   \arrow[bend left]{dd}{\mathcal{N}}
+   \arrow{r}{\text{Ber}}
+   & y_2
+   \arrow{d}[swap]{\mathcal{N}}
+   \arrow[bend left]{dd}{\mathcal{N}}
+   \arrow{r}{\text{Ber}}
+   & y_3
+   \arrow{d}[swap]{\mathcal{N}}
+   \arrow[bend left]{dd}{\mathcal{N}}
+   \arrow{r}{\text{Ber}}
+   & y_4
+   \arrow{d}[swap]{\mathcal{N}}
+   \arrow[bend left]{dd}{\mathcal{N}}
+   \\
+   \hphantom{1}
+   & y_5 \arrow[dash]{d}
+   & y_6 \arrow[dash]{d}
+   & y_7 \arrow[dash]{d}
+   & y_8 \arrow[dash]{d}
+   \\
+   \hphantom{1} & y_9 & y_{10} & y_{11} & y_{12}
+\end{tikzcd}
+\end{equation}
+Here the top ``row'' indicates survival.  And the next two rows are
+for normally distributed something or other given survival.  Here we
+model the normal as two-node dependence groups
+$\{ 5, 9 \}$,
+$\{ 6, 10 \}$.
+$\{ 7, 11 \}$, and
+$\{ 8, 12 \}$ because
+we do not want to assume variance is known.  As we shall see, this permits
+but does not require, modeling variance as a function of covariates.
+
+We see that the aster formalism suggests new possibilities.  In order to
+have a two-parameter normal distribution, we need two-node dependence groups.
+%%%%%%%%%% NEED FORWARD REFERENCE to two-parameter normal %%%%%%%%%%
+
+\subsection{Not Really Missing Data}
+
+\subsection{Bernoulli versus Multinomial}
+
+Bernoulli arrows and multinomial dependence groups are closely related but
+work differently.  Bernoulli is related to multinomial but different.
+
+In \eqref{gr:multi} every arrow labled with an $\mathcal{M}$ is Bernoulli
+marginally, but the whole point of dependence groups is that the components
+of the response vector in a dependence group are not
+conditionally independent given their predecessors, unlike the Bernoulli
+arrows labeled Ber in \eqref{gr:multi} or in any of the graphs in this
+section (by Lemma~\ref{lem:markov}).
+
+Conversely, if
+$$
+\begin{CD}
+   y_i @>\text{Ber}>> y_j
+\end{CD}
+$$
+is a Bernoulli arrow, then we could replace this with a multinomial dependence
+group that does the same thing
+$$
+\begin{tikzcd}
+  \hphantom{1} & y_k
+  \\
+  1
+  \arrow{r}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_j
+  \arrow[dash]{u}
+\end{tikzcd}
+$$
+where $k$ is some index that hasn't been used in the rest of the graph.
+
+For example, we could change graph \eqref{gr:aster1} to
+\begin{equation} \label{gr:aster1-too}
+\begin{tikzcd}
+  \hphantom{1} & y_{10} & y_{11} & y_{12}
+  \\
+  1
+  \arrow{r}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_1
+  \arrow[dash]{u}
+  \arrow{d}{\text{Ber}}
+  \arrow{r}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_2
+  \arrow[dash]{u}
+  \arrow{d}{\text{Ber}}
+  \arrow{r}{\mathcal{M}}
+  \arrow{ru}{\mathcal{M}}
+  & y_3
+  \arrow[dash]{u}
+  \arrow{d}{\text{Ber}}
+  \\
+  \hphantom{1} & y_4 \arrow{d}{\text{0-Poi}}
+  & y_5 \arrow{d}{\text{0-Poi}}
+  & y_6 \arrow{d}{\text{0-Poi}}
+  \\
+  \hphantom{1} & y_7 & y_8 & y_9
+\end{tikzcd}
+\end{equation}
+and all of the components of the response vector that have the same indices
+would have the same interpretation and the same values in the same data
+in both graphs \eqref{gr:aster1} and \eqref{gr:aster1-too}.
+Then the additional nodes $y_{10}$, $y_{11}$, and $y_{12}$ are determined
+by the properties of the multinomial distribution
+\begin{align*}
+   y_{10} & = 1 - y_1
+   \\
+   y_{11} & = y_1 (1 - y_2)
+   \\
+   y_{12} & = y_2 (1 - y_3)
+\end{align*}
+(this is does not follow from what we have said so far, it also needs
+Section~\ref{sec:piss} below).
 
 \section{Exponential Families of Distributions}
-
-\section{Two Kinds of Aster Graphs}
-\label{sec:scare-quotes}
-
-The graphs for aster models are often very large with thousands or tens of
-thousands of nodes, but usually they are composed of isomorphic subgraphs.
-So drawing one of these isomorphic subgraphs is enough.
-If you've seen one, you've seen them all.
-(Graphs are isomorphic if a drawing of one can be laid on a drawing of the
-other with everything --- nodes, lines, and arrows --- matching up.)
-
-An aster graph need not be composed of all isomorphic subgraphs,
-but the only published example of that is, as far as I know,
-\citet{aster-hornworm}.
-
-To distinguish these two kinds of graphs, we call the aster graph described
-in the preceding section the \emph{full aster graph} (we consider the ``full''
-redundant but the emphasis may help avoid confusion).
-
-Certain subgraphs of the full aster graph, we then call graphs
-for ``individuals'' (in scare quotes for reasons to be explained presently).
-These are easier to recognize than describe.
-
-Current aster software (Section~\ref{sec:software} above) forces
-$q(G) \neq q(H)$ whenever $G \neq H$ and $q(G)$ and $q(H)$ are initial nodes.
-In this case, the graph for an ``individual'' (in scare quotes)
-consists of the subgraph consisting of one initial node and all of its
-successors or successors of successors or successors of successors
-of successors and so forth with arbitrarily many repetitions
-of ``successors of'' and all of the arrows and lines in the full graph
-connecting these nodes.  (This is where the term ``descendant'' in its
-graph-theoretic sense would
-come in handy if we allowed ourselves to use it.  The graph for an
-``individual'' consists of one initial node, all of its descendant nodes,
-and all of the lines and arrows going between these nodes.  But once we
-have the idea of the graph for an ``individual'' we no longer need the
-term ``descendant.'')
-
-But aster theory as described so far does not force this convention.
-If $y_j = 1$, for all initial nodes $j$, which is the case with most
-(but not all) aster applications, then it would do no harm if all initial
-nodes were fused into one initial node.  That would invalidate nothing but
-the way we just described graphs for ``individuals'' (in scare quotes).
-
-Thus we have to be a bit more careful.  If $G$ is a dependence group whose
-predecessor $q(G)$ is initial, then the graph for the ``individual''
-(in scare quotes) containing $G$ consists of $q(G)$, the nodes in $G$
-and their successors or successors of successors or successors of successors
-of successors and so forth with arbitrarily many repetitions
-of ``successors of'' and all of the arrows and lines in the full graph
-connecting these nodes.  (And it would make this definition a little shorter
-if we allowed ourselves to use the word ``descendant'' in its graph-theoretic
-sense.)
-
-There are two reasons why the scare quotes.
-\begin{itemize}
-\item In life history
-analysis, the graph for an ``individual'' ideally goes one or more times
-around the life cycle (exactly).  Thus it may involve data not only for
-one biological individual but also for its offspring and perhaps offspring
-of offspring (if the experiment goes twice around the life cycle) or even
-perhaps more remote descendants (where here ``descendants'' means real
-biological descendants, not the graphical models idea of descendants).
-\item If the value of the constant $y_j$ at the initial node of the
-graph for an ``individual'' is greater than one, then the data for this
-``individual'' is actually cumulative data for $y_j$ real biological
-individuals.
-\end{itemize}
-
-%%%%%%%%%% NEED FORWARD REFERENCE to example graphs %%%%%%%%%%
-
-If one does not like our terminology of ``individual'' in scare quotes,
-our advice is to just explain what data the graph is for.  It may actually
-be for a biological individual, for a biological individual
-and its offspring, or $n$ biological individuals.  Just say what it is.
-
-Or we could use the following characterization.
-\begin{theorem}
-Subgraphs for ``individuals'' are maximal stochastically independent
-subvectors of the response vector.
-\end{theorem}
-\begin{proof}
-Define
-$$
-   \mathcal{H} = \set{ G \in \mathcal{G} : q(G) \notin J }
-$$
-and for $H \in \mathcal{H}$
-$$
-   A_H = \set{ j \in J : (\exists k \in H)(j \succeq k) }.
-$$
-The elements of $\mathcal{H}$ are disjoint because the elements of
-$\mathcal{G}$ are disjoint.
-The elements of $\set{A_H : H \in \mathcal{H}}$ are disjoint
-because, if $i \in A_{H_1} \cap A_{H_2}$, then $p^{n_1}(i) \in H_1$
-and $p^{n_2}(i) \in H_2$ for some natural numbers $n_1$ and $n_2$
-using the notation defined in the proof of Theorem~\ref{th:transitive-closure}.
-But then $n_1 \le n_2$ implies $A_{H_1} \subset A_{H_2}$ hence $H_1 = H_2$,
-hence $A_{H_1} = A_{H_2}$ and the same with 1 and 2 swapped.
-Furthermore $\set{A_H : H \in \mathcal{H}}$ is a partition of $J$ because
-$J$ is a finite set (aster graphs are not allowed to be infinite).
-Hence for every $j \in J$ there exists a natural number $n$ such that
-$p^n(j)$ is an initial node.
-
-
-Furthermore each $G \in \mathcal{G}$ is contained some $A_H$.
-If $G \in \mathcal{H}$, then $G \subset A_G$.
-
-Now \eqref{eq:factorize} implies
-$$
-   \pr(y)
-   =
-   \prod_{G \in \mathcal{G}} \pr(y_G \mid y_{q(G)})
-$$
-\end{proof}
 

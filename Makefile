@@ -1,5 +1,5 @@
 
-TEXFILES = macros.tex intro.tex factorize.tex markov.tex
+TEXFILES = macros.tex intro.tex factorize.tex markov.tex notation.tex
 
 BIBFILES = tpa.bib
 

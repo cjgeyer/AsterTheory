@@ -40,7 +40,7 @@ being functions (Section~\ref{sec:subvector} above) says that $y_\emptyset$
 denotes the only function $\emptyset \to \real$, which is the empty function
 (which has the empty graph).  Hence $y_\emptyset$ has only one possible
 value (the empty function) and must be a constant random vector.
-Thus $\pr(y_\emptyset \mid y_j) = 1$ regardless of what $y_j$ is.
+Thus $\pr(y_\emptyset \mid y_B) = 1$ regardless of what $y_B$ is.
 
 This lemma does not say that the components of the random vectors $y_H$ are
 conditionally independent.  The components of $y_G$ are dependent given
@@ -339,7 +339,7 @@ $$
    \mathcal{H} = \set{ H_G : G \in \mathcal{G}_\text{initial} }.
 $$
 
-\begin{corollary}
+\begin{corollary} \label{cor:markov}
 The random vectors $y_H$, $H \in \mathcal{H}$ with $\mathcal{H}$ as
 defined above are (unconditionally) independent.
 \end{corollary}
