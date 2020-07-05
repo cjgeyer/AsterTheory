@@ -1283,14 +1283,113 @@ have a two-parameter normal distribution, we need two-node dependence groups.
 \subsection{Zero-Inflated Poisson}
 \label{sec:zero-inflated}
 
+Readers may have wondered why the graph \eqref{gr:aster1}
+has its middle ``row.''  The variables $y_4$, $y_5$, and $y_6$ are a function
+of the variables $y_7$, $y_8$, and $y_9$, respectively,
+($y_j = 1$ if and only if $y_{j + 3} > 0$, $j = 4,$ 5, 6).
+So why were these variables inserted in the graph?
+
+Consider just the subgraph
+\begin{equation} \label{gr:zero-inflated-poisson}
+\begin{CD}
+   y_1 @>\text{Ber}>> y_4 @>\text{0-Poi}>> y_7
+\end{CD}
+\end{equation}
+The conditional distribution of $y_7$ given $y_1$ (both arrows combined)
+is zero-inflated Poisson \citep{lambert}.
+Since $y_7 = 0$ if and only if $y_4 = 0$, and the probability of this event
+can be anything
+(because the Bernoulli arrow does not have any restrictions on its parameter),
+it is, strictly speaking, zero-inflated-or-deflated Poisson, but we will not
+be this fussy about this bit of terminology.
+
+So having arrows arranged like this is just the aster way of getting
+zero-inflated Poisson random variables into the model.
+
+Why can we not just have zero-inflated Poisson arrows?  Because
+zero-inflated Poisson is not an exponential family.  It can be factored
+into a product of two exponential families, like
+\eqref{gr:zero-inflated-poisson} does.  But it is not itself exponential
+family.  Hence we cannot have arrows like that in an aster model
+because of the exponential family assumption (Section~\ref{sec:aster-expfam}
+below).  If we want zero-inflated Poisson or zero-inflated negative binomial
+%%%%%%%%%% NEED FORWARD REFERENCE to zero-truncated negative binomial %%%%%%%%%%
+in aster models, then this is the way we have to do it.
+
+Although we have zero-inflated Poisson distributions in aster models,
+we do not give them their usual parameterization \citep{lambert}.
+No aster model parameterization
+%%%%%%%%%% NEED FORWARD REFERENCE to plethora of parameters %%%%%%%%%%
+is this usual parameterization.
+
+\subsection{On Not Overusing Zero-Truncated Poisson}
+
+The zero-truncated Poisson distribution is for when \emph{by definition
+of the model} a count of zero cannot occur unless the predecessor is zero.
+It is not for the case where expected count is so high
+that zeros occur infrequently.
+It is for the case where zeros are impossible (except when predecessors
+are zero).
+
+Some users have been confused about this, using zero-truncated distributions
+where they are not appropriate.
+
 \subsection{Not Really Missing Data}
+\label{sec:miss}
+
+The property that predecessor zero implies successor zero
+(because a sum having zero terms is zero by convention,
+Section~\ref{sec:piss} above)
+takes care of what people formerly conceived of as a missing data problem:
+when $y_{p(j)} = 0$ (for concreteness, say this means the ``individual''
+is dead), you cannot ``observe'' $y_j$.
+
+Nevertheless we can infer $y_j = 0$
+(if $y_j$ is flower count, then we are inferring that dead plants have
+no flowers; if $y_j$ is survival for the following year, then we are
+inferring that dead plants stay dead).
+
+So that is not a true missing data problem from the aster model perspective.
+Researchers do need to be aware of the need to code their data this way
+(dead individuals have 0 flowers not \code{NA} flowers, \code{NA} being
+the R value for missing data).
+
+Many researchers have been confused about this when first introduced to
+aster models.  If different individuals live different numbers of years,
+don't we need different graphs for individuals to reflect this?  No.
+We just have a long enough graph to accomodate all life spans.  After
+the individual is dead the data are just zero (not \code{NA}).
+
+If we did have truly missing data (not observable and not inferable),
+then we would have a problem that aster models are not equipped to solve.
+
+R function \code{aster} in R package \code{aster} does not allow \code{NA}
+values in the data it analyzes.  Its help page says
+\begin{quotation}
+     It was almost always wrong for aster model data to have \code{NA}
+     values. Although theoretically possible for the R formula
+     mini-language to do the right thing for an aster model with \code{NA}
+     values in the data, usually it does some wrong thing.  Thus, since
+     version 0.8-20, this function and the \code{reaster} function give
+     errors when used with data having \code{NA} values.  Users must remove
+     all \code{NA} values (or replace them with what they should be, perhaps
+     zero values) ``by hand''.
+\end{quotation}
+R function \code{asterdata} in R package \code{aster2} also does not
+allow \code{NA} values in aster data for analyses done by that package.
+
+As we shall see (Section~\ref{sec:aster-expfam} below)
+the property that predecessor zero implies successor zero
+makes likelihood inference automatically do the Right Thing.
+We do not have to go into contortions to get it to do the Right Thing.
+It just does the Right Thing automatically.
 
 \subsection{Bernoulli versus Multinomial}
 
 Bernoulli arrows and multinomial dependence groups are closely related but
 work differently.  Bernoulli is related to multinomial but different.
 
-In \eqref{gr:multi} every arrow labled with an $\mathcal{M}$ is Bernoulli
+In \eqref{gr:multi} every arrow labeled with an $\mathcal{M}$ is Bernoulli
 marginally, but the whole point of dependence groups is that the components
 of the response vector in a dependence group are not
 conditionally independent given their predecessors, unlike the Bernoulli
@@ -1309,7 +1408,7 @@ $$
 \begin{tikzcd}
   \hphantom{1} & y_k
   \\
-  1
+  y_i
   \arrow{r}{\mathcal{M}}
   \arrow{ru}{\mathcal{M}}
   & y_j
@@ -1352,15 +1451,189 @@ would have the same interpretation and the same values in the same data
 in both graphs \eqref{gr:aster1} and \eqref{gr:aster1-too}.
 Then the additional nodes $y_{10}$, $y_{11}$, and $y_{12}$ are determined
 by the properties of the multinomial distribution
-\begin{align*}
+and the predecessor-is-sample size property (Section~\ref{sec:piss} above)
+\begin{equation} \label{eq:bernoulli-multinomial-constraints}
+\begin{split}
    y_{10} & = 1 - y_1
    \\
    y_{11} & = y_1 (1 - y_2)
    \\
    y_{12} & = y_2 (1 - y_3)
-\end{align*}
-(this is does not follow from what we have said so far, it also needs
-Section~\ref{sec:piss} below).
+\end{split}
+\end{equation}
+The aster models with graphs \eqref{gr:aster1} and \eqref{gr:aster1-too}
+can be made equivalent if parameterized to make that so (I think, no proof
+%%%%%%%%%% NEED FORWARD REFERENCE to directions of constancy %%%%%%%%%%
+here), but they don't have to be equivalent (I think).
+Hence scientists have to decide which to use.  The argument of simplicity
+argues for \eqref{gr:aster1} (no dependence groups).
+But arguments can be made both ways.
+
+Not only can we replace Bernoulli arrows with multinomial dependence groups,
+we can, at least partially replace multinomial dependence groups with Bernoulli
+arrows.  We could replace the graph \eqref{gr:multi} with the graph
+shown in Figure~\ref{fig:gr:multi-too} (p.~\pageref{fig:gr:multi-too}).
+\begin{sidewaysfigure}
+\begin{equation*}
+\begin{tikzcd}
+  % \hphantom{1} & y_1 & y_4 & y_7 & y_{10}
+  % \\
+  1
+  \arrow{r}{\text{Ber}}
+  & y_1
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  & y_2
+  \arrow{r}{\text{Ber}}
+  \arrow[dash]{d}
+  & y_4
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  & y_5
+  \arrow[dash]{d}
+  \arrow{r}{\text{Ber}}
+  & y_7
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  & y_8
+  \arrow[dash]{d}
+  \arrow{r}{\text{Ber}}
+  & y_{10}
+  \arrow{r}{\mathcal{M}}
+  \arrow{rd}{\mathcal{M}}
+  & y_{11}
+  \arrow[dash]{d}
+  \\
+  \hphantom{1} & \hphantom{y_1}
+  & y_3 \arrow{d}{\text{Ber}}
+  & \hphantom{y_4}
+  & y_6 \arrow{d}{\text{Ber}}
+  & \hphantom{y_7}
+  & y_9 \arrow{d}{\text{Ber}}
+  & \hphantom{y_{10}}
+  & y_{12} \arrow{d}{\text{Ber}}
+  \\
+  \hphantom{1} & \hphantom{y_1}
+  & y_{13} \arrow{d}{\text{0-Poi}}
+  & \hphantom{y_4}
+  & y_{14} \arrow{d}{\text{0-Poi}}
+  & \hphantom{y_7}
+  & y_{15} \arrow{d}{\text{0-Poi}}
+  & \hphantom{y_{10}}
+  & y_{16} \arrow{d}{\text{0-Poi}}
+  \\
+  \hphantom{1} & \hphantom{y_1}
+  & y_{17} 
+  & \hphantom{y_4}
+  & y_{18}
+  & \hphantom{y_7}
+  & y_{19}
+  & \hphantom{y_{10}}
+  & y_{20}
+\end{tikzcd}
+\end{equation*}
+\caption{Alternative to Graph \eqref{gr:multi}.}
+\label{fig:gr:multi-too}
+\end{sidewaysfigure}
+In graph \eqref{gr:multi} and the graph in Figure~\ref{fig:gr:multi-too}
+all of the components of the response vector that have the same indices
+have the same interpretation and the same values in the same data \emph{except}
+for $y_1$,  $y_4$,  $y_7$, and $y_{10}$ which have the \emph{opposite}
+interpretation and opposite values in the two graphs.
+In graph \eqref{gr:multi} the value one
+for $y_1$,  $y_4$,  $y_7$, and $y_{10}$ means \emph{dead}.
+In the graph in Figure~\ref{fig:gr:multi-too} the value one
+for these variables means \emph{alive}.
+
+The aster models with the graph \eqref{gr:multi} and the graph
+in Figure~\ref{fig:gr:multi-too} cannot (I think) be made equivalent
+by some choice of parameterization.
+Hence scientists have to decide which to use.  Now the argument of simplicity
+seems to argue for \eqref{gr:multi}.  In either case we have dependence groups
+(we must have to track life history stages).  So as long as we have to have
+dependence groups, we might as well make them do as much work as possible,
+tracking mortality as well as progress through life history stages.
+But arguments can be made both ways.
+
+\subsection{Bernoulli versus Bernoulli}
+
+Any composition of Bernoulli arrows is another Bernoulli.  In the following
+graph
+\begin{equation} \label{gr:one-bernoulli-after-another}
+\begin{CD}
+   y_1 @>\text{Ber}>> y_2 @>\text{Ber}>> y_3 @>\text{Ber}>> y_4
+\end{CD}
+\end{equation}
+the conditional distribution of $y_4$ given $y_1 = 1$ is Bernoulli.
+If $y_1 = 1$, then $y_2$ is either zero or one, hence so is $y_3$,
+hence so is $y_4$, and any zero-or-one-valued random variable is Bernoulli.
+
+Hence, we can replace the subgraph \eqref{gr:one-bernoulli-after-another}
+by the single arrow
+\begin{equation} \label{gr:one-bernoulli}
+\begin{CD}
+   y_1 @>\text{Ber}>> y_4
+\end{CD}
+\end{equation}
+(deleting the components $y_2$ and $y_3$ from the response vector).
+
+And this change-of-data gives a model in which the conditional distribution
+of $y_4$ given $y_1 = 1$ is Bernoulli in either case.
+
+But when these are subgraphs of a larger graph,
+the corresponding aster models 
+cannot (I think) be made equivalent
+by some choice of parameterization.
+Hence scientists have to decide which to use.
+
+Of course, had \eqref{gr:one-bernoulli-after-another} been different
+\begin{equation*}
+\begin{CD}
+   y_1 @>\text{Ber}>> y_2 @>\text{Ber}>> y_3 @>\text{Ber}>> y_4
+   \\
+   @.
+   @VVV
+   \\
+   \hphantom{y_1}
+   @.
+   \vdots
+\end{CD}
+\end{equation*}
+so $y_2$ had a successor other than $y_3$ (or similarly for $y_3$)
+then $y_2$ and $y_3$ could not have been removed from the data.
+
+The observation of this section is only for when we have a straight line
+of Bernoullis like \eqref{gr:one-bernoulli-after-another} with no branches.
+But this case is seen surprisingly often in published aster analyses.
+Again, scientists have to decide which to use.
+
+\subsection{Thinned Poisson}
+
+A Poisson followed by a Bernoulli is Poisson (this is well known in spatial
+statistics).  In the graph
+\begin{equation} \label{gr:poisson-bernoulli}
+\begin{CD}
+   y_1 @>\text{Poi}>> y_2 @>\text{Ber}>> y_3
+\end{CD}
+\end{equation}
+the conditional distribution of $y_3$ given $y_1 = 1$ is Poisson.  Thus this
+graph can be replaced by the single arrow
+\begin{equation} \label{gr:poisson}
+\begin{CD}
+   y_1 @>\text{Poi}>> y_3
+\end{CD}
+\end{equation}
+(deleting the component $y_2$ from the response vector),
+
+And this change-of-data gives a model in which the conditional distribution
+of $y_4$ given $y_1 = 1$ is Poisson in either case.
+Again, scientists have to decide which to use.
+
+There are, as far as I can see no general principles for which aster graph
+is the one and only Right Thing for any particular data.  Multiple different
+aster models may have some rationale supporting them.
+
+
 
 \section{Exponential Families of Distributions}
 
