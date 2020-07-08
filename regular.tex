@@ -1,0 +1,267 @@
+
+\chapter{Regularity}
+
+As mentioned in Section~\ref{sec:aster-expfam} where the exponential
+family assumption for aster models was introduced, the cumulant function
+for the degenerate family concentrated at zero is the zero function
+that is everywhere equal to zero.  The family consisting of this distribution
+only is a regular full exponential family because $c_G$ is everywhere finite.
+So the full canonical parameter space of this family is $\real^G$.
+
+\begin{theorem} \label{th:regular}
+If $y_{q(G)} = 0$ almost surely for any dependence group $G$, replace
+the family for this dependence group by the degenerate family concentrated
+at zero so $c_G$ is the zero function.
+Then, if families for every dependence group of the aster model are regular full
+exponential families, then so is the (joint) distribution of the aster model.
+The full (unconditional) canonical parameter space of the aster model
+is the range of the aster transform.  The cumulant function of the
+aster model is given by \eqref{eq:aster-cumfun} for parameter values where
+it is finite.
+\end{theorem}
+
+Let $\Theta_G$ denote the full canonical parameter space of the exponential
+family for dependence group $G$, which is the set of points where $c_G$
+is finite.  The the set of all $\theta$ values that correspond to possible
+distributions in the aster model is
+\begin{equation} \label{eq:reg-prod}
+   \Theta = \prod_{G \in \mathcal{G}} \Theta_G
+\end{equation}
+where the product denotes Cartesian product: this is the set of all $\theta$
+such that $\theta_G \in \Theta_G$ for all $G$.
+If we temporarily give the aster transform a letter $f$, then
+the range of this function is denoted $\Phi = f(\Theta)$.
+This is the set of all vectors $\varphi$ that correspond to vectors $\theta$
+that parameterize distributions in the aster model.
+
+Note that we don't have an explicit description of $\Phi$.
+We don't even have a closed-form expression for $f$, only the recursive
+definition \eqref{eq:aster-transform}.  But we know that $f$ is a function
+having domain $\Theta$ and range $\Phi$, and the inverse aster transform
+is a function having domain $\Phi$ and range $\Theta$.
+
+One assertion of the theorem is that when we calculate the cumulant
+function of the (joint) distribution of the aster model
+using \eqref{eq:cumfun-expfam} the result is finite if and only if
+$\varphi \in \Phi$ and when it is finite the result agrees with
+\eqref{eq:aster-cumfun}.
+Another assertion of the theorem is that $\Phi$ is an open subset of
+the vector space where $\varphi$ takes values.
+
+\begin{proof}
+From \eqref{eq:cumfun-expfam}
+$$
+   c(\varphi)
+   =
+   c(\varphi^*) + \log\left\{
+   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr) \right\}
+$$
+or
+\begin{equation} \label{eq:cumfun-reg-one}
+   e^{c(\varphi) - c(\varphi^*)}
+   =
+   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+\end{equation}
+(what were $\theta$ and $\psi$ in \eqref{eq:cumfun-expfam} have
+become $\varphi$ and $\varphi^*$, respectively,
+here because we want to emphasize that they are both possible values
+of the unconditional canonical parameter vector).
+Let $\theta$ and $\theta^*$ denote the conditional canonical parameter
+vectors corresponding to $\varphi$ and $\varphi^*$, respectively.
+
+We also note that \eqref{eq:cumfun-expfam} holds for each dependence group
+\begin{equation} \label{eq:cumfun-reg-too}
+   e^{c_G(\theta_G) - c(\theta_G^*)}
+   =
+   E_{\varphi^*}\left(
+   e^{\inner{y_G, \theta_G - \theta_G^*}} \middle| y_{q(G)} = 1 \right)
+\end{equation}
+and since the cumulant function for sample size $n$ is $n$ times the cumulant
+function for sample size one
+\begin{equation} \label{eq:cumfun-reg-too-too}
+   e^{y_{q(G)} [c_G(\theta_G) - c(\theta_G^*)]}
+   =
+   E_{\varphi^*}\left(
+   e^{\inner{y_G, \theta_G - \theta_G^*}} \middle| y_{q(G)} \right)
+\end{equation}
+
+Use the total order on $\mathcal{G}$ guaranteed
+to exist by Theorem~\ref{th:factorize}
+to enumerate $\mathcal{G}$ as $G_1 < G_2 < \cdots < G_n$,
+and for $k = 0$, $\ldots,$ $n$ define
+$$
+   \mathcal{G}_k = \set{ G_1, \ldots, G_k }
+$$
+where the notation is intended to mean that $\mathcal{G}_0$ is another
+notation for the empty set.  We claim
+\begin{multline} \label{eq:reg-induction}
+   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   \\
+   =
+   E_{\varphi^*}\left(
+   \prod_{\substack{G \in \mathcal{G}_k \\ q(G) \notin \bigcup \mathcal{G}_k}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   \prod_{G \in \mathcal{G} \setminus \mathcal{G}_k}
+   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   \right)
+\end{multline}
+hold for $k = 0$, $\ldots,$ $n$ and we prove this by induction.
+
+The base of the induction is the case $k = 0$ in which case the
+first product is empty and by convention equal to one.
+Then \eqref{eq:reg-induction} is obviously equivalent
+to \eqref{eq:cumfun-reg-one}.
+
+To prove the induction step we assume \eqref{eq:reg-induction}
+and prove \eqref{eq:reg-induction} with $k$ replaced by $k + 1$.
+Note that \eqref{eq:aster-transform} says
+\begin{equation} \label{eq:reg-aster-transform}
+   \theta_j - \theta_j^*
+   =
+   \varphi_j - \varphi_j^*
+   +
+   \sum_{\substack{G \in \mathcal{G} \\ q(G) = j}}
+   [ c_G(\theta_G) - c_G(\theta_G^*) ]
+\end{equation}
+so
+\begin{multline*}
+   E_{\varphi^*}\left(
+   \prod_{\substack{G \in \mathcal{G}_k \\ q(G) \notin \bigcup \mathcal{G}_k}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   \prod_{G \in \mathcal{G} \setminus \mathcal{G}_k}
+   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   \right)
+   =
+   \\
+   E_{\varphi^*}\left(
+   \prod_{\substack{G \in \mathcal{G}_k \\
+       q(G) \notin \bigcup \mathcal{G}_{k + 1}}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   \prod_{G \in \mathcal{G} \setminus \mathcal{G}_{k + 1}}
+   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   \right)
+   \\
+   =
+   E_{\varphi^*}\left(
+   \prod_{\substack{G \in \mathcal{G}_k \\
+       q(G) \notin \bigcup \mathcal{G}_{k + 1}}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   \prod_{G \in \mathcal{G} \setminus \mathcal{G}_{k + 1}}
+   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   \right.
+   \\
+   \times
+   \left.
+   \vphantom{\prod_{\substack{G \in \mathcal{G}_{k + 1} \\
+       q(G) \notin \bigcup \mathcal{G}_{k + 1}}}}
+   E_{\varphi^*}\left\{
+   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   \middle| y_{\bigcup (\mathcal{G} \setminus \mathcal{G}_k)}
+   \right\}
+   \right)
+\end{multline*}
+and this is equal to \eqref{eq:reg-induction} with $k$ replaced by $k + 1$
+by the Markov property
+$$
+   E_{\varphi^*}\left\{
+   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   \middle| y_{\bigcup (\mathcal{G} \setminus \mathcal{G}_k)}
+   \right\}
+   =
+   E_{\varphi^*}\left\{
+   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   \middle| y_{q(G_k)}
+   \right\}
+$$
+and \eqref{eq:cumfun-reg-too-too}.
+That finishes the proof of the induction claim.
+
+The $k = n$ case of \eqref{eq:reg-induction} is
+$$
+   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   =
+   E_{\varphi^*}\left(
+   \prod_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   \right)
+$$
+and because every $y_{q(G)}$ appearing in the expectation is a constant
+random variable at an initial node, the expectation does nothing, so
+$$
+   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   =
+   \prod_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
+   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+$$
+so by \eqref{eq:cumfun-reg-one}
+$$
+   c(\varphi) = c(\varphi^*)
+   + \sum_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
+   y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]
+$$
+Now \eqref{eq:cumfun-expfam} only determines the cumulant function up
+to an arbitrary constant, and here all of the starred parameters are
+constant, so this does agree with \eqref{eq:aster-cumfun} up to an
+arbitrary constant (which is all it can do).
+
+We have now established that \eqref{eq:aster-cumfun} gives the
+cumulant function of the (unconditional, joint) distribution of the
+aster model when the parameter vectors in that formula are in the
+parameter space.
+
+To prove the assertion of the theorem about when the cumulant function
+of the (unconditional, joint) distribution of the aster model is infinite,
+we need all the cases of \eqref{eq:reg-induction} for $k = 1$, $\ldots,$ $n$.
+Since $\theta^*$ and $\varphi^*$ must be valid parameter vectors,
+$c_G(\theta_G^*)$ is always finite.
+In \eqref{eq:reg-induction} it is unclear which $G$ the first product
+runs over (it depends on the graph, or, alternatively, on the predecessor
+function), but we always know that $G_k \notin \bigcup \mathcal{G}_k$
+because that is the way the total order on $\mathcal{G}$ works:
+$q(G_k)$ must either be an initial node or must be in some $G_m$ with $k < m$.
+Thus case $k$ of \eqref{eq:reg-induction} tells us the expression is
+infinite if $c_{G_k}(\theta_{G_k}) = \infty$ and $y_{q(G_k)}$ is not
+zero almost surely.  But the former implies the latter cannot happen
+by the first sentence of the theorem statement: if $y_{q(G_k)} = 0$
+almost surely, then $c_{G_k}$ is the zero function.
+
+Putting these statements together for all $k$, we see that
+\eqref{eq:reg-induction} is infinite whenever $\theta \notin \Theta$,
+where $\Theta$ is given by \eqref{eq:reg-prod}.
+Putting together everything we have proved so far,
+the cumulant function for the (unconditional, joint) distribution of
+the aster model is finite and given by \eqref{eq:aster-cumfun} for
+$\theta$ in \eqref{eq:reg-prod} and is infinite for
+$\theta$ not in \eqref{eq:reg-prod}.
+
+Now letting $f$ denote the aster transform as in the comments immediately
+preceding the theorem statement, we have also shown that
+the cumulant function for the (unconditional, joint) distribution of
+the aster model is finite and given by \eqref{eq:aster-cumfun} for
+$\varphi$ in $\Phi = f(\Theta)$ and is infinite for
+$\varphi$ not in $\Phi = f(\Theta)$.
+
+By assumption every $\Theta_G$ is an open set in the vector space
+containing it.  Hence, a Cartesian product of open sets being an open set,
+$\Theta$ is an open set in the vector space containing it.
+We know that the aster transform and its inverse are (infinitely)
+differentiable hence continuous.  Hence for any $\varphi \in \Phi$
+the point $\theta = f^{-1}(\varphi)$ is in the interior of $\Theta$
+(because $\Theta$ is an open set), hence there is a neighborhood $W$
+of $\theta$ contained in $\Theta$, but then $f(W)$ is a neighborhood of
+$\varphi$ contained in $\Phi$.  Thus $\Phi$ is a neighborhood of each
+of its points, hence an open subset of the vector space containing it.
+
+Thus the (unconditional, joint) distribution of the aster model
+is a regular full exponential family.
+\end{proof}
+
+The first sentence of the theorem statement is for limiting conditional
+models.
+%%%%%%%%%% NEED CROSS REFERENCE to limiting conditional model %%%%%%%%%%
+An aster model in which no family is degenerate and no initial node is zero
+does not need this first sentence: we never have $y_j = 0$ almost surely
+for any $j$.  This is easily proved by induction, but we won't bother
+because limiting conditional models are a thing, so the theorem needs
+to be stated the way it is.

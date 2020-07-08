@@ -830,7 +830,7 @@ nodes, which are given by
 \end{equation}
 because the mean value of a constant random variable is its constant value.
 
-Using the reflexive transistive closure of the successor relation $\preceq$
+Using the reflexive transitive closure of the successor relation $\preceq$
 we can rewrite the above as follows
 \begin{equation} \label{eq:xi-mu-prod}
     \mu_j
@@ -1357,7 +1357,7 @@ the R value for missing data).
 Many researchers have been confused about this when first introduced to
 aster models.  If different individuals live different numbers of years,
 don't we need different graphs for individuals to reflect this?  No.
-We just have a long enough graph to accomodate all life spans.  After
+We just have a long enough graph to accommodate all life spans.  After
 the individual is dead the data are just zero (not \code{NA}).
 
 If we did have truly missing data (not observable and not inferable),
@@ -1633,7 +1633,602 @@ There are, as far as I can see no general principles for which aster graph
 is the one and only Right Thing for any particular data.  Multiple different
 aster models may have some rationale supporting them.
 
-
-
 \section{Exponential Families of Distributions}
+
+This is a brief overview of the theory
+of exponential families of distributions,
+just enough to allow us to finish the basic theory of aster models.
+We will do some more exponential family later as the need arises.
+
+\subsection{Definition}
+\label{sec:define-expfam}
+
+The usual definition of exponential families of distributions
+(\citealp[Chapter~8]{barndorff-nielsen}; \citealp[Chapter~1]{brown})
+involves probability mass-density functions (or measure-theoretic probability
+density functions with respect to an arbitrary positive measure).
+Here we give a simpler definition from \citet{geyer-gdor}.
+
+A statistical model is a family of probability distributions.
+A statistical model is an \emph{exponential family of distributions} if it has
+a log likelihood of the form
+\begin{equation} \label{eq:logl-expfam}
+   l(\theta) = \inner{y, \theta} - c(\theta)
+\end{equation}
+where
+\begin{itemize}
+\item $y$ is a vector-valued statistic, which is called
+   the \emph{canonical statistic},
+\item $\theta$ is a vector-valued parameter, which is called
+   the \emph{canonical parameter},
+\item $c$ is a real-valued function, which is called
+   the \emph{cumulant function}, and
+\item $\inner{\fatdot, \fatdot}$ is a bilinear form that places
+   the vector space where $y$ takes values and the vector
+   space where $\theta$ takes values in duality.
+\end{itemize}
+
+In equation \eqref{eq:logl-expfam} we have used the rule that additive terms
+in the log likelihood that do not contain the parameter may be dropped.
+Such terms have been dropped in \eqref{eq:logl-expfam}.
+
+In aster model theory, we always have
+$$
+   \inner{y, \theta} = \sum_{j \in J} y_j \theta_j
+$$
+where $J$ is the common index set for $y$ and $\theta$
+so both are vectors in $\real^J$.  But the angle brackets notation,
+which comes from functional analysis \citep{rudin}, is used to indicate
+that we don't think of the the vector space where $y$ takes values
+and the vector space where $\theta$ takes values as being the same.
+They are dual vector spaces, not the same.
+
+This means that $\inner{y, y}$ or $\inner{\theta, \theta}$ are
+glaring errors, unlike what would be the case if we said that
+$\inner{\fatdot, \fatdot}$ was an inner product on $\real^J$ or some such.
+In any event, your humble author has been using this notation since his
+thesis \citep{geyer-thesis} and is not going to stop now.
+Moreover, most aster papers also use this notation (if they discuss
+aster theory at all).
+
+Although we usually say ``the'' canonical statistic,
+``the'' canonical parameter, and ``the'' cumulant function,
+these are not uniquely defined:
+\begin{itemize}
+\item any one-to-one affine function of a canonical statistic vector is another
+   canonical statistic vector,
+\item any one-to-one affine function of a canonical parameter vector is another
+   canonical parameter vector, and
+\item any real-valued affine function plus a cumulant function is another
+   cumulant function.
+\end{itemize}
+(Affine functions are defined in Section~\ref{sec:canonical-affine-submodel}
+below.)
+These possible changes of statistic, parameter, or cumulant function are not
+algebraically independent.  Changes to one may require changes to the others
+to keep a log likelihood of the form \eqref{eq:logl-expfam} above.
+
+Usually no fuss is made about this nonuniqueness.  One fixes a choice
+of canonical statistic, canonical parameter, and cumulant function
+and leaves it at that.
+
+The cumulant function may not be defined by \eqref{eq:logl-expfam}
+on the whole vector space where $\theta$ takes values.  In that case
+it can be extended to this whole vector space by
+\begin{equation} \label{eq:cumfun-expfam}
+   c(\theta) = c(\psi) + \log\left\{
+   E_\psi\bigl( e^{\inner{y, \theta - \psi}} \bigr) \right\}
+\end{equation}
+where $\theta$ varies while $\psi$ is fixed at
+a possible value of the canonical parameter vector, and
+the expectation and hence $c(\theta)$ are assigned
+the value $\infty$ for $\theta$ such that the expectation does not exist.
+
+The family is \emph{full} if its canonical parameter space is
+\begin{equation} \label{eq:full-expfam}
+   \Theta = \{\, \theta : c(\theta) < \infty \,\}
+\end{equation}
+and a full family is \emph{regular} if its canonical parameter space is an open
+subset of the vector space where $\theta$ takes values.
+
+Almost all exponential families used in real applications are full and regular.
+So-called \emph{curved exponential families} (smooth non-affine submodels of
+full exponential families) are not full.
+Constrained exponential families \citep{geyer-constrained} are not full.
+A few exponential families used in spatial statistics are full but not regular
+\citep{geyer-moller}.
+
+Many people use ``natural'' everywhere this book uses ``canonical.''
+In this we are following \citet{barndorff-nielsen}.
+It also goes with our policy of avoiding terminology used in biology
+if alternatives are available.
+
+Many people also use an older terminology that says a statistical model
+is \emph{in the} exponential family, where we say a statistical model
+is \emph{an} exponential family.
+Thus the older terminology says \emph{the} exponential
+family is the collection of all of what the newer terminology calls
+exponential families.  The older terminology names a useless
+mathematical object, a heterogeneous collection of statistical models not
+used in any application.
+The newer terminology names an important property of statistical models.
+If a statistical model is a regular full exponential family, then it
+has all of the properties discussed here.
+If a statistical model is an exponential family (not necessarily full or
+regular), then it has many of the properties discussed here.
+Presumably, that is the reason for the newer terminology.
+In this we are again following \citet{barndorff-nielsen}.
+
+\subsection{Independent and Identically Distributed}
+\label{sec:iid}
+
+Suppose we have an exponential family with vector canonical statistic $z$,
+vector canonical parameter $\theta$, and log likelihood
+$$
+   l(\theta) = \inner{z, \theta} - c(\theta)
+$$
+And suppose we have an IID sample
+from this family with log likelihood
+\begin{equation} \label{eq:iid}
+\begin{split}
+   l_n(\theta)
+   & =
+   \sum_{i = 1}^n \left[ \inner{z_i, \theta} - c(\theta) \right]
+   \\
+   & =
+   \left\langle \sum_{i = 1}^n z_i, \theta \right\rangle - n c(\theta)
+\end{split}
+\end{equation}
+This tells us that IID sampling from an exponential family gives another
+exponential family with
+\begin{itemize}
+\item canonical statistic vector that is the sum of the canonical statistic
+    vectors for the elements of the sample,
+\item the same canonical parameter vector, and
+\item cumulant function that is $n$ times
+    the cumulant function for the elements of the sample.
+\end{itemize}
+
+A lot of ``addition rules'' for ``brand name distributions''
+are special cases.  For example, sum of IID Bernoulli is binomial, sum of
+IID Poisson is Poisson, sum of IID exponential is gamma.
+
+The simple math in this section is important for aster models.
+The predecessor-is-sample-size property (Section~\ref{sec:piss} above)
+requires us to know
+$n$-fold convolutions of the distributions associated with arrows at least
+well enough to write down the log likelihood.  This section tells how that
+is done.
+
+\subsection{Canonical Affine Submodels}
+\label{sec:canonical-affine-submodel}
+
+In this section we consider \emph{canonical affine submodels} of exponential
+families.  If $\theta$ is the canonical parameter vector, then these
+submodel parameterizations have the form
+\begin{equation} \label{eq:affine}
+   \theta = a + M \beta,
+\end{equation}
+where $a$ is a known vector and $M$ is a known matrix; $a$ is called the
+\emph{offset} vector and $M$ is called the \emph{model matrix} in the
+terminology of R functions \texttt{lm} and \texttt{glm}.
+$M$ is called the \emph{design matrix} by others.
+We use the terminology favored by R.
+The submodel parameter vector $\beta$ is called the \emph{coefficients}
+vector by R.  We will find another name for it in this section.
+
+The term ``canonical affine submodel'' was introduced by \citet{aster1}.
+Usually these are called linear models or generalized linear models or
+log-linear models in various settings.
+
+There are two notions of linear used in mathematics.  There is a
+sharp dividing line at the beginning of linear algebra.  In calculus
+and lower level mathematics (including pre-college) a linear function
+is one with a flat graph.  In linear algebra and all higher level mathematics
+a linear function is one that preserves the vector space operations.
+In particular, if $f$ is a linear function in this higher-level sense,
+then $f(0) = 0$.  If one needs the lower-level sense in higher-level
+mathematics, it is called an affine function.  An affine function
+between vector spaces is
+a linear function plus a constant function.  If $a \neq 0$
+in \eqref{eq:affine}, then this is a linear change-of-parameter in the
+lower-level sense but an affine change-of-parameter in the higher-level sense.
+It is unclear (to me) whether the ``linear'' in linear models, generalized
+linear models, and log linear models is the lower-level sense allowing
+$a \neq 0$ in \eqref{eq:affine} or the higher-level sense assuming $a = 0$
+in \eqref{eq:affine}, because $a = 0$ in most applications.
+We follow \citet{aster1} in calling these models affine.
+
+The log likelihood for the canonical affine submodel is
+\begin{align*}
+   l(\beta)
+   & =
+   \inner{y, a + M \beta} - c(a + M \beta)
+   \\
+   & =
+   \inner{y, a} + \inner{y, M \beta} - c(a + M \beta)
+\end{align*}
+and the term $\inner{y, a}$ that does not contain the parameter $\beta$
+can be dropped from the log likelihood giving
+$$
+   l(\beta)
+   =
+   \inner{y, M \beta} - c(a + M \beta)
+$$
+and, because
+$$
+   \inner{y, M \beta} = y^T (M \beta) = y^T M \beta = (M^T y)^T \beta
+   = \inner{M^T y, \beta}
+$$
+we can write the submodel log likelihood in exponential family form
+\begin{equation} \label{eq:submodel}
+   l(\beta)
+   =
+   \inner{M^T y, \beta} - c_\text{sub}(\beta)
+\end{equation}
+where
+\begin{equation} \label{eq:submodel-cumfun}
+   c_\text{sub}(\beta)
+   =
+   c(a + M \beta), \qquad \text{for all $\beta$}.
+\end{equation}
+This shows the canonical affine submodel is itself an exponential family with
+\begin{itemize}
+\item canonical statistic vector $M^T y$,
+\item canonical parameter vector $\beta$, and
+\item cumulant function $c_\text{sub}$.
+\end{itemize}
+
+\subsection{Moment and Cumulant Generating Functions}
+
+The \emph{moment generating function} (MGF) of a random vector $y$ is given by
+$$
+   M(t) = E\left(e^{\inner{y, t}}\right)
+$$
+provided that the function $M$ so defined is finite on a neighborhood of
+zero; otherwise we say the random vector $y$ does not have an MGF.
+Clearly, the MGF only depends on the distribution of $y$,
+so we also this is the MGF of this distribution.
+
+The MGF of the distribution of the canonical statistic of an exponential
+family corresponding to canonical parameter $\theta$ is given by
+\begin{align*}
+   M_\theta(t)
+   & =
+   E_\theta\left(e^{\inner{y, t}}\right)
+\end{align*}
+We rearrange \eqref{eq:cumfun-expfam} obtaining
+$$
+   e^{c(\theta) - c(\psi)}
+   =
+   E_\psi\bigl( e^{\inner{y, \theta - \psi}} \bigr)
+$$
+and then change $\theta$ to $\theta + t$ and $\psi$ to $\theta$ in that order
+obtaining
+$$
+   e^{c(\theta + t) - c(\theta)}
+   =
+   E_\theta\bigl( e^{\inner{y, t}} \bigr)
+$$
+so the MGF of the distribution of $y$ for parameter vector $\theta$ is
+$$
+   M_\theta(t)
+   =
+   e^{c(\theta + t) - c(\theta)}
+$$
+provided $M_\theta$ is finite on a neighborhood of zero,
+which is when $c$ is finite on a neighborhood of $\theta$,
+which is when $\theta$ is in the interior of the full canonical
+parameter space \eqref{eq:full-expfam}.
+Hence every distribution in a \emph{regular} full exponential
+family has an MGF.
+
+The \emph{cumulant generating function} (CGF) of a random vector $y$ is
+the log of the MGF provided the MGF exists.
+If a distribution has no MGF, then it has no CGF either.
+Hence the CGF of the distribution of $y$ for parameter vector $\theta$ is
+$$
+   K_\theta(t)
+   =
+   c(\theta + t) - c(\theta)
+$$
+provided $K_\theta$ is finite on a neighborhood of zero,
+which is when $\theta$ is in the interior of the full canonical
+parameter space \eqref{eq:full-expfam}.
+Hence every distribution in a \emph{regular} full exponential
+family has a CGF.
+
+The MGF is so called because its derivatives evaluated at zero give moments.
+The CGF is so called because its derivatives evaluated at zero give cumulants.
+Cumulants are polynomial functions of moments and vice versa.
+Thus a distribution that has an MGF or a CGF has moments and cumulants of
+all orders.
+But we will not use moments and cumulants higher than second order
+(next section) in our study of aster models.
+
+Observe that derivatives of $K_\theta$ evaluated at zero are derivatives
+of $c$ evaluated at $\theta$.  Hence the cumulant function is so called
+because its derivatives evaluated at $\theta$ give cumulants.
+(Of course, this is only valid when $\theta$ is in the full canonical
+parameter space \eqref{eq:full-expfam}).
+
+This also shows that cumulant functions are infinitely differentiable
+at every point in the interior of the full canonical
+parameter space \eqref{eq:full-expfam}), and
+cumulant functions of a regular full exponential are infinitely differentiable
+at every point of the full canonical
+parameter space \eqref{eq:full-expfam}).
+
+\subsection{Mean and Variance}
+
+First and second order cumulants are mean and variance
+\begin{subequations}
+\begin{align}
+   E_\theta(y) & = c'(\theta)
+   \label{eq:cumulant-one}
+   \\
+   \var_\theta(y) & = c''(\theta)
+   \label{eq:cumulant-two}
+\end{align}
+\end{subequations}
+\citep[Theorem~8.1]{barndorff-nielsen}.
+Of course, the formulas are valid only where $c$ is differentiable,
+which is when $\theta$ is in the interior of the full canonical
+parameter space \eqref{eq:full-expfam}.
+On the boundary of the full canonical parameter space, the derivatives
+on the right-hand sides of these formulas do not exist and the cumulants
+on the left-hand sides might or might not exist but in any case are not
+given by these formulas.
+In a \emph{regular} full exponential family these formulas are good
+for all values of $\theta$ in the full canonical
+parameter space \eqref{eq:full-expfam}.
+
+In \eqref{eq:cumulant-one} $y$ is a vector and its expectation is a vector
+having the same index set: $\mu = E_\theta(y)$ is the vector having components
+$\mu_j = E_\theta(y_j)$.
+The right-hand side of \eqref{eq:cumulant-one} must also be a vector having
+the same index set: its components are $\partial c(\theta) / \partial \theta_j$.
+
+In \eqref{eq:cumulant-two} $y$ is a vector and its variance is a square
+symmetric matrix having components $\cov_\theta(y_j, y_k)$.
+The right-hand side of \eqref{eq:cumulant-two} must also be a matrix having
+the same index set: its components are
+$\partial^2 c(\theta) / \partial \theta_j \partial \theta_k$.
+
+Many people do not like our terminology calling the left-hand side
+of \eqref{eq:cumulant-two} the \emph{variance} matrix of $y$.
+Names in common use are \emph{covariance} matrix (but this is horrible
+terminology because it uses up a name that should be used for the covariance
+of two random vectors), \emph{variance-covariance} matrix,
+and \emph{dispersion} matrix.
+We use our terminology, because it denotes the multivariate analog
+of the variance of a random variable.
+This can be seen everywhere in probability theory.
+If you can accept our notation $\var_\theta(y)$ for this mathematical
+object, then the same formulas work for univariate and multivariate $y$.
+
+\section{Aster Models and Exponential Families}
+\label{sec:aster-expfam}
+
+We finally get to the final axiom of aster models.
+Each conditional distribution in the factorization \eqref{eq:factorize}
+is actually stands for parametric family of distributions,
+and each of these is an exponential family of distributions.
+As explained in Section~\ref{sec:piss} above,
+the distribution for these conditional families is determined
+by the distribution for sample size one, and the distributions
+for dependence group $G$ for sample size one form an exponential family having
+\begin{itemize}
+\item canonical statistic $y_G$,
+\item canonical parameter $\theta_G$, and
+\item cumulant function $c_G$.
+\end{itemize}
+This notation means that $\theta$ is a vector with the same index set as
+the response vector $y$ and that $\theta_G$ are subvectors of $\theta$
+in the same way as $y_G$ are subvectors of $y$.
+The fact that the cumulant functions are subscripted means every
+dependence group may correspond to a different exponential family,
+and we saw this in the examples (Section~\ref{sec:graphs} above).
+
+Now Section~\ref{sec:iid} above tells us the cumulant function for sample
+size $n$ is $n$ times the cumulant function for sample size one.
+Note that this is valid for $n = 1$ and $n = 0$ too.
+For the latter we calculate using \eqref{eq:cumfun-expfam} in the case
+that $y$ is the random vector concentrated at zero
+$$
+   c(\theta) = c(\psi) + \log\left\{ E_\psi(1) \right\}
+   = c(\psi) + \log(1)
+   = c(\psi)
+$$
+so the cumulant function of the random vector concentrated at zero is
+a constant function ($c(\psi)$ is arbitrary but $\psi$ is a constant
+in this equation),
+and to obtain agreement with the assertion that the cumulant function for
+sample size $n$ is $n$ times the cumulant function for sample size one,
+we take this arbitrary constant to be zero, so the cumulant function for
+sample size zero is always the zero function, which always has the value zero.
+
+Now the predecessor-is-sample-size property says that the sample size
+for dependence group $G$ is $y_{q(G)}$, so the cumulant function for this
+sample size is $y_{q(G)}$ times the cumulant function for sample size one.
+
+Because the log of a product is the sum of the logs, the log likelihood
+for an aster model is the sum of terms, one term for each term in the
+factorization \eqref{eq:factorize}, and each term looks like
+\eqref{eq:logl-expfam} except with subscripts for the dependence groups,
+that is,
+\begin{equation} \label{eq:logl-aster-theta}
+   l(\theta)
+   =
+   \sum_{G \in \mathcal{G}}
+   \left[ \inner{y_G, \theta_G} - y_{q(G)} c_G(\theta_G) \right]
+\end{equation}
+(by the predecessor-is-sample-size property, the conditional distribution
+of $y_G$ given $y_{q(G)}$ is the sum of IID random vectors having cumulant
+function $c_G$, hence the cumulant function in each term is $y_{q(G)}$
+times the cumulant function for sample size one).
+
+As was mentioned in Section~\ref{sec:miss} above, probability theory
+just does the Right Thing in case $y_{q(G} = 0$.
+By the predecessor-is-sample-size property, this implies $y_G = 0$ too,
+so the whole contribution to the log likelihood of the term for dependence
+$G$ is zero (when, as we are discussing here, the predecessor is zero).
+And zero is the correct contribution because the conditional distribution
+of $y_G$ given $y_{q(G)} = 0$ is concentrated at zero,
+that is, it is zero with probability one, so the contribution to the
+log likelihood should be $\log(1) = 0$.
+
+So there is no need to do anything special about the case where predecessor
+equals zero.  All of our formulas are correct in this case too.
+
+\section{Infinitely Divisible Aster Families}
+\label{sec:infinitely-divisible}
+
+As stated in Section~\ref{sec:piss} above,
+one consequence of the predecessor-is-sample-size property is that
+components of the response vector
+that are predecessors must be
+nonnegative-integer-valued random variables.
+
+Except \citet{aster1} note an exception to this rule.  If the distribution
+in question is infinitely divisible, then $r$-fold convolution makes sense
+for any $r \ge 0$.  A distribution having moment generating function $m$
+is infinitely divisible if and only if $m(\fatdot)^r$ is a moment generating
+function for all real $r \ge 0$ \citep[Corollary~4.2.2]{cuppens}.
+Then the distribution having moment
+generating function $m(\fatdot)^r$ is defined to be the $r$-fold convolution
+of the distribution having moment generating function $m$.
+Hence a regular full exponential family having cumulant function $c$
+is infinitely divisible if and only if $r c(\fatdot)$ is a cumulant
+function for all real $r \ge 0$.
+R package \code{aster} \citep{aster-package} has several infinitely divisible
+families: Poisson, negative binomial, and normal-location
+(normal with unknown mean and known variance).
+Hence, if the conditional distribution of $y_G$ given $y_{q(G)}$
+is infinitely divisible, then
+the distribution of $y_{q(G)}$ can be nonnegative-real-valued.
+
+This observation, however, has played no role in applications of aster models
+because R packages \code{aster} and \code{aster2} do not implement any
+families of nonnegative-valued random variables that are not
+also integer-valued.  Such families exist (the gamma distribution,
+for example), so if they were implemented, there could be a role for this
+observation.
+
+\section{The Aster Transform}
+\label{sec:aster-transform}
+
+The aster log likelihood \eqref{eq:logl-aster-theta} does not have
+exponential family form \eqref{eq:logl-expfam}.
+But since \eqref{eq:logl-aster-theta} is linear in $y$, it must be an
+exponential family having canonical statistic vector $y$.  In order
+to figure out the canonical parameter and cumulant function for this family
+we rewrite \eqref{eq:logl-aster-theta} as follows
+\begin{equation} \label{eq:logl-rewrite}
+   l(\theta)
+   =
+   \left(
+   \sum_{j \in J} y_j
+   \left[ \theta_j - \sum_{\substack{G \in \mathcal{G} \\ q(G) = j}}
+   c_G(\theta_G) \right]
+   \right)
+   -
+   \left(
+   \sum_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
+   y_{q(G)} c_G(\theta_G) \right)
+\end{equation}
+and now we see we do have exponential family form with the canonical
+parameters (of the exponential family which is the joint distribution of $y$)
+being the terms in square brackets (the multipliers of the components of $y$)
+\begin{equation} \label{eq:aster-transform}
+   \varphi_j
+   =
+   \theta_j - \sum_{\substack{G \in \mathcal{G} \\ q(G) = j}} c_G(\theta_G),
+   \qquad j \in J,
+\end{equation}
+and the cumulant function being the terms left over
+\begin{equation} \label{eq:aster-cumfun}
+   c(\varphi)
+   =
+   \sum_{\substack{G \in \mathcal{G} \\ q(G) \notin J}} y_{q(G)} c_G(\theta_G)
+\end{equation}
+(the fact that we have $\varphi$ on one side of the equation and $\theta$
+on the other will be explained presently).
+Note that all of the $y_{q(G)}$ appearing in \eqref{eq:aster-cumfun}
+are constant random variables (because they are at initial nodes).
+Thus \eqref{eq:aster-cumfun} does define a deterministic (non-random)
+function of the parameter, as a cumulant function must be.
+
+This notation means that $\varphi$ is a vector with the same index set as
+the response vector $y$, that $\varphi_G$ are subvectors of $\varphi$
+in the same way as $y_G$ are subvectors of $y$, and
+that $\varphi_j$ are components of $\varphi$
+in the same way as $y_j$ are components of $y$.
+
+The map $\theta \mapsto \varphi$ is called the \emph{aster transform}.
+We claim this parameter transformation is invertible and both the
+transform and its inverse are infinitely differentiable.
+We invert the function very simply moving terms from the right-hand
+side to the left-hand side
+\begin{equation} \label{eq:inverse-aster-transform}
+   \theta_j
+   =
+   \varphi_j + \sum_{\substack{G \in \mathcal{G} \\ q(G) = j}} c_G(\theta_G),
+   \qquad j \in J.
+\end{equation}
+How can this define $\theta$ in terms of $\varphi$ when components of $\theta$
+appear on both sides of the equation?
+Simply use the equations \eqref{eq:inverse-aster-transform} in any order
+that visits successors before predecessors.  Theorem~\ref{th:factorize}
+guarantees there is such an order (it guarantees an order among dependence
+groups, but we can order components within a dependence group arbitrarily).
+Then when we are using \eqref{eq:inverse-aster-transform} to compute
+$\theta_j$ we will have already have computed $\theta_k$ for all $k$ that
+are successors, successors of successors, and so forth of $j$, and,
+in particular, we will already have computed $\theta_G$ for all $G$ such
+that $q(G) = j$.
+
+The map $\varphi \mapsto \theta$ is called the \emph{inverse aster transform}.
+The aster transform is clearly infinitely differentiable because cumulant
+functions are infinitely differentiable (when all of the families for
+the dependence groups are regular full exponential families).
+The inverse function theorem of real analysis says the inverse function
+is differentiable as many times as the function it is the inverse of.
+Hence the inverse aster transform is also infinitely differentiable.
+
+Now we see why it is OK for \eqref{eq:aster-cumfun} to have $\varphi$
+on the left-hand side and $\theta$ on the right-hand side: $\theta$
+is given as a function of $\varphi$ by the inverse aster transform
+so the right-hand side of \eqref{eq:aster-cumfun} can be considered
+a function of $\varphi$.
+
+Now we can express \eqref{eq:logl-rewrite} in exponential family form
+\begin{equation} \label{eq:logl-aster-phi}
+   l(\varphi) = \inner{y, \varphi} - c(\varphi)
+\end{equation}
+where the cumulant function $c$ of the joint distribution of the aster
+model is \eqref{eq:aster-cumfun}.
+
+We call
+\begin{itemize}
+\item $\theta$ the \emph{conditional canonical parameter vector} and
+\item $\varphi$ the \emph{unconditional canonical parameter vector}.
+\end{itemize}
+But this terminology makes these parameters more like two kinds of the
+same sort of thing than they really are.
+\begin{itemize}
+\item The subvectors $\theta_G$ are the canonical parameter vectors of
+    the conditional distributions of the dependence groups, but, as
+    we have seen (this is the whole point of the aster transform),
+    $\theta$ is not the canonical parameter vector of the (unconditional,
+    joint) distribution of the aster model.
+\item The vector $\varphi$ is the canonical parameter vector of the
+    (unconditional, joint)
+    distribution of the aster model, but the subvectors $\varphi_G$ or the
+    components $\varphi_j$ are not separately canonical for anything.
+\end{itemize}
+In short the subvectors of $\theta$ are groupwise canonical but
+$\theta$ is not vectorwise canonical, and, conversely,
+$\varphi$ is vectorwise canonical, but its subvectors are not groupwise
+canonical.
 
