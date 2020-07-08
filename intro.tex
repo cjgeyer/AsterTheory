@@ -8,6 +8,7 @@
 Aster models \citep*{aster1,aster2,reaster} \index{aster model}
 are parametric statistical models
 specifically designed for life history analysis.  They are exponential family
+\index{life history analysis|(}
 models that generalize generalized linear models (GLM) that are also
 exponential family models (for example, logistic regression and
 Poisson regression with log link) in two ways
@@ -24,7 +25,7 @@ They model the conditional distribution of the response vector given
 covariate data.  The marginal distribution of covariate data is not
 modeled.
 
-In life history analysis, \index{life history analysis}
+In life history analysis,
 the data are about survival and reproduction
 of biological organisms.  Thus aster models also generalize discrete time
 survival analysis (aster models model not only survival but also
@@ -53,6 +54,7 @@ that makes the joint distribution of the response vector an exponential
 family.  This property can be seen to generalize unnamed properties
 of survival analysis, life-table analysis, Leslie matrix analysis,
 and population growth rate analysis (Section~\ref{sec:mu-and-xi} below).
+\index{life history analysis|)}
 
 \section{Software}
 \label{sec:software}
@@ -92,7 +94,7 @@ Aster models combine three ideas
     which says the conditional distributions in the factorization are
     exponential families of distributions,
 \end{itemize}
-into one big idea.  Together the make the joint distribution of the
+into one big idea.  Together they make the joint distribution of the
 response vector also an exponential family.  And this makes aster models
 as well-behaved as generalized linear models or log-linear models for
 categorical data analysis, even though they are far more more complicated.
@@ -141,7 +143,8 @@ index sets $\{1, \ldots, k\}$ for some natural number $k$.  Then we could
 not distinguish different subvectors of the same length, or at least could
 not without ugly and cumbersome extra decoration of the notation.
 (It is hard to explain how elegant this notation is with simple examples,
-but a perusal of Appendix~\ref{app:markov} will show this notation is
+but a perusal of Appendices~\ref{app:markov} and~\ref{app:regular}
+will show this notation is
 extremely powerful, and that appendix would be much longer and more confusing
 if we had to use conventional notation with indices going from 1 to $k$.)
 
@@ -237,7 +240,8 @@ distributions and any of them will do.
       continuous or some components a mixture of discrete and continuous)
       then $\pr$ could denote probability mass-density functions.
 \item No matter what, $\pr$ could denote cumulative distribution functions.
-\item No matter what, $\pr$ could denote probability measures.
+\item No matter what, $\pr$ could denote probability measures and
+      regular conditional probability measures (also called Markov kernels).
 \end{itemize}
 In any of these cases the multiplication indicated in \eqref{eq:factorize}
 is actual multiplication of real-valued thingummies.
@@ -725,6 +729,7 @@ of $y_j$ given $y_i$ because there is no such name.
 One consequence of the predecessor-is-sample-size property is that $y_j$
 that are predecessors (are at nonterminal nodes) must be
 nonnegative-integer-valued random variables.
+\index{predecessor random variable!nonnegative integer valued}
 There is an exception to this requirement that will be discussed in
 Section~\ref{sec:infinitely-divisible} below, but that exception has
 never been used.
@@ -941,6 +946,8 @@ The first published aster model \citep{aster1} had this graph
    y_9
 \end{CD}
 \end{equation}
+\index{arrow!Bernoulli}
+\index{arrow!zero-truncated Poisson}
 which is for one individual.  There are 570 individuals in the data set,
 which is included in the R package \texttt{aster}.  So one can think of the
 full aster graph as 570 copies of this graph with the subscripts changed
@@ -950,8 +957,10 @@ Because this graph has only arrows, no lines, each node is
 a dependence group all by itself.
 
 The individuals are plants of the species \emph{Echinacea angustifolia},
+\index{Echinacea angustifolia@\emph{Echinacea angustifolia}}
 whose common name is narrow-leaved
 purple coneflower.  These data were collected by the Echinacea Project
+\index{Echinacea project}
 (\url{http://echinaceaproject.org/}), a long-running project funded by
 the National Science Foundation (the co-PI's are the second and third authors
 of \citet{aster1}).  The way \eqref{gr:aster1} is laid out,
@@ -996,6 +1005,7 @@ conditioning.
 Labels on the arrows name the distribution.
 Ber is for Bernoulli (any zero-or-one-valued random variable), and
 0-Poi is for zero-truncated Poisson (Poisson conditioned on being nonzero).
+\index{Poisson distribution!zero-truncated}
 This explanation of arrows and their distributions is incomplete and will
 be picked up again in Section~\ref{sec:piss}.
 %%%%%%%%%% NEED FORWARD REFERENCE to exponential family assumption %%%%%%%%%%
@@ -1078,6 +1088,9 @@ Here is a more complicated aster graph from \citet{aster3}
    y_{20}
 \end{CD}
 \end{equation}
+\index{arrow!Bernoulli}
+\index{arrow!zero-truncated Poisson}
+\index{arrow!Poisson}
 
 Again, because this graph has only arrows, no lines, each node is
 a dependence group all by itself.  The label Poi on arrows indicates
@@ -1172,6 +1185,9 @@ the graph \eqref{gr:multi}.
   \hphantom{1} & y_{17} & y_{18} & y_{19} & y_{20}
 \end{tikzcd}
 \end{equation}
+\index{arrow!Bernoulli}
+\index{arrow!zero-truncated Poisson}
+\index{dependence group!multinomial}
 
 As always, the constant 1 at the initial node
 of the graph indicates that the graph is for one individual.
@@ -1265,6 +1281,9 @@ Here is yet another graph illustrating normal dependence groups.
    \hphantom{1} & y_9 & y_{10} & y_{11} & y_{12}
 \end{tikzcd}
 \end{equation}
+\index{arrow!Bernoulli}
+\index{dependence group!normal}
+\index{dependence group|seealso{arrow}}
 Here the top ``row'' indicates survival.  And the next two rows are
 for normally distributed something or other given survival.  Here we
 model the normal as two-node dependence groups
@@ -1297,6 +1316,7 @@ Consider just the subgraph
 \end{equation}
 The conditional distribution of $y_7$ given $y_1$ (both arrows combined)
 is zero-inflated Poisson \citep{lambert}.
+\index{Poisson distribution!zero-inflated}
 Since $y_7 = 0$ if and only if $y_4 = 0$, and the probability of this event
 can be anything
 (because the Bernoulli arrow does not have any restrictions on its parameter),
@@ -1651,21 +1671,32 @@ Here we give a simpler definition from \citet{geyer-gdor}.
 
 A statistical model is a family of probability distributions.
 A statistical model is an \emph{exponential family of distributions} if it has
+\index{exponential family}
 a log likelihood of the form
 \begin{equation} \label{eq:logl-expfam}
    l(\theta) = \inner{y, \theta} - c(\theta)
 \end{equation}
+\index{exponential family!log likelihood}
+\index{log likelihood|seeunder{exponential family}}
 where
 \begin{itemize}
 \item $y$ is a vector-valued statistic, which is called
    the \emph{canonical statistic},
+\index{exponential family!canonical statistic}
+\index{canonical statistic|seeunder{exponential family}}
 \item $\theta$ is a vector-valued parameter, which is called
    the \emph{canonical parameter},
+\index{exponential family!canonical parameter}
+\index{canonical parameter|seeunder{exponential family}}
+\index{parameter vector!canonical|seeunder{exponential family}}
 \item $c$ is a real-valued function, which is called
    the \emph{cumulant function}, and
+\index{exponential family!cumulant function}
+\index{cumulant function|seeunder{exponential family}}
 \item $\inner{\fatdot, \fatdot}$ is a bilinear form that places
    the vector space where $y$ takes values and the vector
    space where $\theta$ takes values in duality.
+\index{dual vector spaces}
 \end{itemize}
 
 In equation \eqref{eq:logl-expfam} we have used the rule that additive terms
@@ -1697,11 +1728,16 @@ these are not uniquely defined:
 \begin{itemize}
 \item any one-to-one affine function of a canonical statistic vector is another
    canonical statistic vector,
+\index{affine function|(}
+\index{exponential family!canonical statistic}
 \item any one-to-one affine function of a canonical parameter vector is another
    canonical parameter vector, and
+\index{exponential family!canonical parameter}
 \item any real-valued affine function plus a cumulant function is another
    cumulant function.
+\index{exponential family!cumulant function}
 \end{itemize}
+\index{affine function|)}
 (Affine functions are defined in Section~\ref{sec:canonical-affine-submodel}
 below.)
 These possible changes of statistic, parameter, or cumulant function are not
@@ -1719,6 +1755,7 @@ it can be extended to this whole vector space by
    c(\theta) = c(\psi) + \log\left\{
    E_\psi\bigl( e^{\inner{y, \theta - \psi}} \bigr) \right\}
 \end{equation}
+\index{exponential family!cumulant function}
 where $\theta$ varies while $\psi$ is fixed at
 a possible value of the canonical parameter vector, and
 the expectation and hence $c(\theta)$ are assigned
@@ -1728,11 +1765,15 @@ The family is \emph{full} if its canonical parameter space is
 \begin{equation} \label{eq:full-expfam}
    \Theta = \{\, \theta : c(\theta) < \infty \,\}
 \end{equation}
+\index{exponential family!full}
+\index{exponential family!canonical parameter!space}
 and a full family is \emph{regular} if its canonical parameter space is an open
+\index{exponential family!regular}
 subset of the vector space where $\theta$ takes values.
 
 Almost all exponential families used in real applications are full and regular.
 So-called \emph{curved exponential families} (smooth non-affine submodels of
+\index{exponential family!curved}
 full exponential families) are not full.
 Constrained exponential families \citep{geyer-constrained} are not full.
 A few exponential families used in spatial statistics are full but not regular
@@ -1762,6 +1803,7 @@ In this we are again following \citet{barndorff-nielsen}.
 \subsection{Independent and Identically Distributed}
 \label{sec:iid}
 
+\index{exponential family!independent and identically distributed|(}
 Suppose we have an exponential family with vector canonical statistic $z$,
 vector canonical parameter $\theta$, and log likelihood
 $$
@@ -1799,10 +1841,13 @@ requires us to know
 $n$-fold convolutions of the distributions associated with arrows at least
 well enough to write down the log likelihood.  This section tells how that
 is done.
+\index{exponential family!independent and identically distributed|)}
 
 \subsection{Canonical Affine Submodels}
 \label{sec:canonical-affine-submodel}
 
+\index{canonical affine submodel|seeunder{exponential family}}
+\index{exponential family!canonical affine submodel|(}
 In this section we consider \emph{canonical affine submodels} of exponential
 families.  If $\theta$ is the canonical parameter vector, then these
 submodel parameterizations have the form
@@ -1821,6 +1866,7 @@ The term ``canonical affine submodel'' was introduced by \citet{aster1}.
 Usually these are called linear models or generalized linear models or
 log-linear models in various settings.
 
+\index{affine function|(}
 There are two notions of linear used in mathematics.  There is a
 sharp dividing line at the beginning of linear algebra.  In calculus
 and lower level mathematics (including pre-college) a linear function
@@ -1838,6 +1884,7 @@ linear models, and log linear models is the lower-level sense allowing
 $a \neq 0$ in \eqref{eq:affine} or the higher-level sense assuming $a = 0$
 in \eqref{eq:affine}, because $a = 0$ in most applications.
 We follow \citet{aster1} in calling these models affine.
+\index{affine function|)}
 
 The log likelihood for the canonical affine submodel is
 \begin{align*}
@@ -1875,12 +1922,17 @@ where
 This shows the canonical affine submodel is itself an exponential family with
 \begin{itemize}
 \item canonical statistic vector $M^T y$,
+\index{exponential family!canonical statistic!submodel}
 \item canonical parameter vector $\beta$, and
+\index{exponential family!canonical parameter!submodel}
 \item cumulant function $c_\text{sub}$.
+\index{exponential family!cumulant function!submodel}
 \end{itemize}
+\index{exponential family!canonical affine submodel|)}
 
 \subsection{Moment and Cumulant Generating Functions}
 
+\index{generating function|seeunder{exponential family}}
 The \emph{moment generating function} (MGF) of a random vector $y$ is given by
 $$
    M(t) = E\left(e^{\inner{y, t}}\right)
@@ -1891,6 +1943,7 @@ Clearly, the MGF only depends on the distribution of $y$,
 so we also this is the MGF of this distribution.
 
 The MGF of the distribution of the canonical statistic of an exponential
+\index{exponential family!moment generating function}
 family corresponding to canonical parameter $\theta$ is given by
 \begin{align*}
    M_\theta(t)
@@ -1924,6 +1977,7 @@ Hence every distribution in a \emph{regular} full exponential
 family has an MGF.
 
 The \emph{cumulant generating function} (CGF) of a random vector $y$ is
+\index{exponential family!cumulant generating function}
 the log of the MGF provided the MGF exists.
 If a distribution has no MGF, then it has no CGF either.
 Hence the CGF of the distribution of $y$ for parameter vector $\theta$ is
@@ -1948,6 +2002,7 @@ But we will not use moments and cumulants higher than second order
 
 Observe that derivatives of $K_\theta$ evaluated at zero are derivatives
 of $c$ evaluated at $\theta$.  Hence the cumulant function is so called
+\index{exponential family!cumulant function}
 because its derivatives evaluated at $\theta$ give cumulants.
 (Of course, this is only valid when $\theta$ is in the full canonical
 parameter space \eqref{eq:full-expfam}).
@@ -1972,6 +2027,8 @@ First and second order cumulants are mean and variance
 \end{align}
 \end{subequations}
 \citep[Theorem~8.1]{barndorff-nielsen}.
+\index{exponential family!canonical statistic!mean vector}
+\index{exponential family!canonical statistic!variance matrix}
 Of course, the formulas are valid only where $c$ is differentiable,
 which is when $\theta$ is in the interior of the full canonical
 parameter space \eqref{eq:full-expfam}.
@@ -2010,6 +2067,10 @@ object, then the same formulas work for univariate and multivariate $y$.
 \section{Aster Models and Exponential Families}
 \label{sec:aster-expfam}
 
+\index{canonical affine submodel|seeunder{aster model}}
+\index{canonical statistic|seeunder{aster model}}
+\index{canonical parameter|seeunder{aster model}}
+\index{cumulant function|seeunder{aster model}}
 We finally get to the final axiom of aster models.
 Each conditional distribution in the factorization \eqref{eq:factorize}
 is actually stands for parametric family of distributions,
@@ -2018,10 +2079,14 @@ As explained in Section~\ref{sec:piss} above,
 the distribution for these conditional families is determined
 by the distribution for sample size one, and the distributions
 for dependence group $G$ for sample size one form an exponential family having
+\index{dependence group|seeunder{aster model}}
 \begin{itemize}
 \item canonical statistic $y_G$,
+\index{aster model!dependence group!canonical statistic}
 \item canonical parameter $\theta_G$, and
+\index{aster model!dependence group!canonical parameter}
 \item cumulant function $c_G$.
+\index{aster model!dependence group!cumulant function}
 \end{itemize}
 This notation means that $\theta$ is a vector with the same index set as
 the response vector $y$ and that $\theta_G$ are subvectors of $\theta$
@@ -2063,6 +2128,8 @@ that is,
    \sum_{G \in \mathcal{G}}
    \left[ \inner{y_G, \theta_G} - y_{q(G)} c_G(\theta_G) \right]
 \end{equation}
+\index{aster model!log likelihood}
+\index{log likelihood|seeunder{aster model}}
 (by the predecessor-is-sample-size property, the conditional distribution
 of $y_G$ given $y_{q(G)}$ is the sum of IID random vectors having cumulant
 function $c_G$, hence the cumulant function in each term is $y_{q(G)}$
@@ -2090,10 +2157,12 @@ components of the response vector
 that are predecessors must be
 nonnegative-integer-valued random variables.
 
+\index{predecessor random variable!real valued|(}
 Except \citet{aster1} note an exception to this rule.  If the distribution
 in question is infinitely divisible, then $r$-fold convolution makes sense
 for any $r \ge 0$.  A distribution having moment generating function $m$
 is infinitely divisible if and only if $m(\fatdot)^r$ is a moment generating
+\index{infinitely divisible}
 function for all real $r \ge 0$ \citep[Corollary~4.2.2]{cuppens}.
 Then the distribution having moment
 generating function $m(\fatdot)^r$ is defined to be the $r$-fold convolution
@@ -2114,6 +2183,7 @@ families of nonnegative-valued random variables that are not
 also integer-valued.  Such families exist (the gamma distribution,
 for example), so if they were implemented, there could be a role for this
 observation.
+\index{predecessor random variable!real valued|)}
 
 \section{The Aster Transform}
 \label{sec:aster-transform}
@@ -2140,6 +2210,7 @@ we rewrite \eqref{eq:logl-aster-theta} as follows
 and now we see we do have exponential family form with the canonical
 parameters (of the exponential family which is the joint distribution of $y$)
 being the terms in square brackets (the multipliers of the components of $y$)
+\index{aster transform|(}
 \begin{equation} \label{eq:aster-transform}
    \varphi_j
    =
@@ -2166,6 +2237,8 @@ that $\varphi_j$ are components of $\varphi$
 in the same way as $y_j$ are components of $y$.
 
 The map $\theta \mapsto \varphi$ is called the \emph{aster transform}.
+\index{aster transform|)}
+\index{aster transform!inverse|(}
 We claim this parameter transformation is invertible and both the
 transform and its inverse are infinitely differentiable.
 We invert the function very simply moving terms from the right-hand
@@ -2195,6 +2268,7 @@ the dependence groups are regular full exponential families).
 The inverse function theorem of real analysis says the inverse function
 is differentiable as many times as the function it is the inverse of.
 Hence the inverse aster transform is also infinitely differentiable.
+\index{aster transform!inverse|)}
 
 Now we see why it is OK for \eqref{eq:aster-cumfun} to have $\varphi$
 on the left-hand side and $\theta$ on the right-hand side: $\theta$
@@ -2212,7 +2286,9 @@ model is \eqref{eq:aster-cumfun}.
 We call
 \begin{itemize}
 \item $\theta$ the \emph{conditional canonical parameter vector} and
+\index{aster model!canonical parameter!conditional}
 \item $\varphi$ the \emph{unconditional canonical parameter vector}.
+\index{aster model!canonical parameter!unconditional}
 \end{itemize}
 But this terminology makes these parameters more like two kinds of the
 same sort of thing than they really are.
