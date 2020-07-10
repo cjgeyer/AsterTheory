@@ -4,6 +4,8 @@
 
 \index{exponential family!full}
 \index{exponential family!regular}
+\index{aster model!property!full}
+\index{aster model!property!regular}
 As mentioned in Section~\ref{sec:aster-expfam} where the exponential
 family assumption for aster models was introduced, the cumulant function
 for the degenerate family concentrated at zero is the zero function
@@ -268,3 +270,57 @@ does not need this first sentence: we never have $y_j = 0$ almost surely
 for any $j$.  This is easily proved by induction, but we won't bother
 because limiting conditional models are a thing, so the theorem needs
 to be stated the way it is.
+
+\begin{theorem} \label{th:regular-submodel}
+If the saturated aster model is a regular full exponential family,
+then so is any unconditional canonical affine submodel.
+\end{theorem}
+Conditions for the saturated model to be a regular full exponential family
+are the subject of Theorem~\ref{th:regular}.
+\begin{proof}
+Applying \eqref{eq:cumfun-expfam} to the saturated model and a submodel give
+\begin{align*}
+   c(\varphi)
+   & =
+   c(\varphi^*) + \log\left\{
+   E_{\varphi^*}\Bigl( e^{\inner{y, \varphi - \varphi^*}} \Bigr) \right\}
+   \\
+   c_\text{sub}(\beta)
+   & =
+   c_\text{sub}(\beta^*) + \log\left\{
+   E_{\beta^*}\Bigl( e^{\inner{M^T y, \beta - \beta^*}} \Bigr) \right\}
+\end{align*}
+and
+\begin{align*}
+   E_{\beta^*}\Bigl( e^{\inner{M^T y, \beta - \beta^*}} \Bigr)
+   & =
+   E_{\beta^*}\Bigl( e^{\inner{y, M (\beta - \beta^*)}} \Bigr)
+   \\
+   & =
+   E_{\beta^*}\Bigl( e^{\inner{y, a + M \beta - (a + M \beta^*)}} \Bigr)
+   \\
+   & =
+   E_{\varphi^*}\Bigl( e^{\inner{y, \varphi - \varphi^*}} \Bigr)
+\end{align*}
+where $\varphi$ and $\varphi^*$ are the saturated model unconditional
+canonical parameter vectors corresponding to $\beta$ and $\beta^*$.
+Hence
+$$
+   c(\varphi) - c(\varphi^*) = c_\text{sub}(\beta) - c_\text{sub}(\beta^*)
+$$
+so the two cumulant functions agree up to constants
+(which is all \eqref{eq:cumfun-expfam} can give us.
+In particular, they are both finite or both infinite for corresponding
+arguments.  Thus the full canonical parameter space for the unconditional
+canonical affine submodel is
+$$
+   B = \set{ \beta \in \real^K : a + M \beta \in \Phi },
+$$
+where $K$ is the index set of the parameter $\beta$ and $\Phi$ is the
+full unconditional canonical parameter space of the saturated model
+characterized by Theorem~\ref{th:regular}.  If $\Phi$ is an open subset
+of $\real^J$, then $B$ is an open subset of $\real^K$ because the pre-image
+of an open subset is open when the mapping is continuous, and every affine
+mapping is continuous.
+\end{proof}
+

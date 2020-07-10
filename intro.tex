@@ -738,19 +738,22 @@ Another consequence of the predecessor-is-sample-size property is
 the following section.
 
 \section{Conditional and Unconditional Mean Values}
+\label{sec:conditional-and-unconditional-mean-values}
 
 \subsection{Unconditional}
 
 Let $y$ be the response vector of an aster model.  We define a parameter
 vector $\mu = E(y)$.  This is the vector having components
-$$
+\begin{equation} \label{eq:unconditional-mean-values}
    \mu_j = E(y_j), \qquad j \in J,
-$$
+\end{equation}
 where, as usual, $J$ is the index set of the response vector (the set
 of non-initial nodes of the full aster graph).
 
 This is called the \emph{unconditional mean value parameter vector}.
-\index{parameter vector!mean value!unconditional}
+\index{parameter vector!mean value|seeunder{aster model}}
+\index{parameter vector!mean value|seeunder{exponential family}}
+\index{aster model!mean value parameter!unconditional}
 This name is getting us a little bit ahead of ourselves.
 At this point, we don't even know these means exist.
 (We will eventually find out they do exist.)
@@ -768,9 +771,9 @@ For now we will just assume these means exist.
 \subsection{Conditional}
 
 We define another parameter vector $\xi$ having components
-$$
+\begin{equation} \label{eq:conditional-mean-values}
    \xi_j = E(y_j \mid y_{p(j)} = 1), \qquad j \in J,
-$$
+\end{equation}
 if this expression makes sense.  It will not make sense when the
 conditioning event has probability zero (so the conditional expectation
 can be defined arbitrarily).  In that case we have to use a different
@@ -780,7 +783,7 @@ of $y_{p(j)}$ IID random variables, and we say $\xi_j$ is the mean
 of those random variables.
 
 This is called the \emph{conditional mean value parameter vector}.
-\index{parameter vector!mean value!conditional}
+\index{aster model!mean value parameter!conditional}
 As in the preceding section, this name is getting us a little bit ahead
 of ourselves.
 At this point, we don't even know these means exist.
@@ -1688,6 +1691,7 @@ where
    the \emph{canonical parameter},
 \index{exponential family!canonical parameter}
 \index{canonical parameter|seeunder{exponential family}}
+\index{parameter vector!canonical|seeunder{aster model}}
 \index{parameter vector!canonical|seeunder{exponential family}}
 \item $c$ is a real-valued function, which is called
    the \emph{cumulant function}, and
@@ -2265,7 +2269,8 @@ The map $\varphi \mapsto \theta$ is called the \emph{inverse aster transform}.
 The aster transform is clearly infinitely differentiable because cumulant
 functions are infinitely differentiable (when all of the families for
 the dependence groups are regular full exponential families).
-The inverse function theorem of real analysis says the inverse function
+The inverse function theorem of real analysis \citep[Theorem~8.27]{browder}
+says the inverse function
 is differentiable as many times as the function it is the inverse of.
 Hence the inverse aster transform is also infinitely differentiable.
 \index{aster transform!inverse|)}
@@ -2308,3 +2313,837 @@ $\theta$ is not vectorwise canonical, and, conversely,
 $\varphi$ is vectorwise canonical, but its subvectors are not groupwise
 canonical.
 
+\section{More On Exponential Families}
+
+\subsection{Directions of Constancy, Identifiability}
+\label{sec:direction-of-constancy}
+
+A direction $\delta$ in the vector space where the canonical parameter vector
+of an exponential family takes values is called a \emph{direction of constancy}
+if $\inner{y, \delta}$ is constant almost surely, where $y$ is the canonical
+statistic.  Because all of the distributions in an exponential family have
+the same support (this follows from the log likelihood being finite for
+all all data values when the canonical parameter value is in the full
+canonical parameter space \eqref{eq:full-expfam}) we don't have to say
+which distribution in the family almost surely refers to: if a property
+holds almost surely for one distribution in the exponential family,
+then it holds almost surely for all distributions in the exponential family.
+
+\citet[Theorem~1]{geyer-gdor} gives many equivalent
+characterizations of this concept.  Here are some of them.
+In these we use the notation $y$ is the canonical statistic vector,
+$\theta$ is the canonical parameter vector, $\delta$ is a vector in
+the vector space where $\theta$ takes values, $l$ is the log likelihood
+\eqref{eq:logl-expfam}, and $\Theta$ is the full canonical space
+\eqref{eq:full-expfam}.
+\begin{enumerate}
+\item[(a)] For some $\theta \in \Theta$,
+    the function $s \mapsto l(\theta + s \delta)$ is finite on some open
+    interval and is not strictly concave on that interval.
+\item[(b)] For all $\theta \in \Theta$,
+    the function $s \mapsto l(\theta + s \delta)$ is constant on the
+    whole real line.
+\item[(c)] The parameter vectors $\theta$ and $\theta + s \delta$ correspond
+    to the same distribution for some $\theta \in \Theta$ and some $s \neq 0$.
+\item[(d)] The parameter vectors $\theta$ and $\theta + s \delta$ correspond
+    to the same distribution for all $\theta \in \Theta$ and all real $s$.
+\item[(e)] The random variable $\inner{y, \delta}$ is almost surely constant
+    for some distribution in the exponential family.
+\item[(f)] The random variable $\inner{y, \delta}$ is almost surely constant
+    for all distributions in the exponential family.
+\end{enumerate}
+We arbitrarily picked (e) to serve as the definition,
+but, because they are all equivalent \citep[Theorem~1]{geyer-gdor},
+we could have picked any of these to serve as the definition.
+
+Condition (b) explains the terminology; these are directions of
+constancy of the log likelihood function as defined in \citet{rockafellar}.
+They obviously imply, if $\hat{\theta}$ is a maximum likelihood estimate,
+then so is $\hat{\theta} + s \delta$ for all real $s$.
+Condition (a) gives a uniqueness condition for maximum likelihood.
+If $\delta$ is not a direction of constancy and $s \neq 0$,
+then $\theta$ and $\theta + s \delta$ cannot both be maximum likelihood
+estimates because (a) would imply the log likelihood is higher somewhere
+between these points.  Thus the maximum likelihood estimate for a full
+exponential family is unique (if it exists) if and only if there are
+no nonzero directions of constancy.
+
+Conditions (c) and (d) connect this concept with identifiability.
+If there exist two distinct canonical parameter vectors $\theta$ and $\theta^*$
+that correspond to the same distribution, then $\theta - \theta^*$ is a
+direction of constancy.  Thus this concept characterizes the only form
+of nonidentifiability the canonical parameterization of an exponential
+family can have.  Conversely, if there are no nonzero directions of constancy,
+then the canonical parameterization is identifiable.
+
+However, we do not insist on identifiability for three reasons.
+\begin{itemize}
+\item
+As \citet{geyer-gdor} says, non-identifiability ``is, at worst, merely
+a computational nuisance'' so it is a big mistake to contort theory
+and applications to achieve identifiability too early.  The computer
+can put it in at the end with no help from humans
+(for how see Section~\ref{sec:dealing} below).
+\item Multinomial dependence groups require non-identifiable parameterization.
+%%%%%%%%%% NEED FORWARD REFERENCE multinomial family %%%%%%%%%%
+\item Limiting conditional models require non-identifiable parameterization
+if they are to use the same parameterization as the original model.
+%%%%%%%%%% NEED FORWARD REFERENCE multinomial family %%%%%%%%%%
+\end{itemize}
+
+Conditions (e) and (f) connect this concept with multivariate degeneracy.
+The vector $\delta$ is a direction of constancy if an only if the random
+variable $\inner{y, \delta}$ is almost surely constant, which is the
+same thing as saying the canonical statistic vector $y$ is concentrated
+on a hyperplane.  So the canonical parameterization of a full exponential
+family is identifiable if and only if $y$ is not concentrated on a hyperplane.
+A random variable is constant almost surely if and only if its variance
+is zero.  Hence we can also characterize directions of constancy in
+terms of the variance matrix of the canonical statistic
+\eqref{eq:cumulant-two}.  In a regular full exponential family, let
+$$
+   I(\theta) = \var_\theta(y).
+$$
+(we need a regular full exponential family to guarantee the variance exists).
+This is the Fisher information matrix as well as the variance matrix
+\index{Fisher information|seeunder{exponential family}}
+\index{exponential family!Fisher information}
+of the canonical statistic because differentiating the log likelihood
+\eqref{eq:logl-expfam} twice gives
+$$
+   l''(\theta) = - c''(\theta) = - \var_\theta(y).
+$$
+Then clearly, $\delta$ is a direction of recession if and only if
+$$
+   \var_\theta(\inner{y, \delta}) = \delta^T I(\theta) \delta
+$$
+is equal to zero.  And by the spectral theorem
+\citet[Section~79]{halmos-vector-spaces} this holds if and only if
+$I(\theta) \delta = 0$, in words, if and only if $\delta$ is a null
+eigenvector of the Fisher information matrix.
+
+\subsection{Mean Value Parameters}
+
+\index{exponential family!mean value parameter|(}
+\begin{theorem} \label{th:mean-value}
+For a regular full exponential family, every distribution has a mean
+value (for the canonical statistic vector), and different distributions
+have different mean values.  Hence mean values parameterize a regular
+full exponential family, and the mean value parameterization is always
+identifiable, whether or not the canonical parameterization is identifiable.
+\end{theorem}
+\begin{proof}
+We already know that mean values exist and are given by \eqref{eq:cumulant-one}.
+Let us temporarily adopt a notation for the map from canonical to mean value
+parameters: $f : \theta \mapsto c'(\theta)$.
+This map is differentiable with derivative matrix
+$$
+   f'(\theta) = c''(\theta) = I(\theta).
+$$
+Consider distinct distributions in the exponential family having
+canonical parameter vectors $\theta$ and $\theta^*$.
+Then $\theta - \theta^*$ is not a direction of constancy.
+Define a function $g$ by
+$$
+   g(s) = f\bigl(s \theta + (1 - s) \theta^*\bigr).
+$$
+Then the corresponding mean values are
+\begin{align*}
+   \mu & = g(1) = f(\theta)
+   \\
+   \mu^* & = g(0) = f(\theta^*)
+\end{align*}
+Differentiating $g$ gives
+\begin{align*}
+   g'(s)
+   & =
+   f'\bigl(s \theta + (1 - s) \theta^*\bigr) (\theta - \theta^*)
+   \\
+   & =
+   I\bigl(s \theta + (1 - s) \theta^*\bigr) (\theta - \theta^*)
+\end{align*}
+Since $I\bigl(s \theta + (1 - s) \theta^*\bigr)$ is a variance matrix,
+it is positive semi-definite.
+Since $\theta - \theta^*$ is not a direction of constancy,
+\begin{equation} \label{eq:identifiable-foo}
+   (\theta - \theta^*)^T
+   I\bigl(s \theta + (1 - s) \theta^*\bigr) (\theta - \theta^*)
+\end{equation}
+is strictly positive for all $s$ in some open interval of the real line
+containing 0 and 1 (because $\theta$ and $\theta^*$ are interior points
+of the full canonical parameter space).
+We note that \eqref{eq:identifiable-foo} is the
+derivative of the function $h$ defined by
+$$
+   h(s) = \inner{g(s), \theta - \theta^*}
+$$
+Since the derivative of this function is strictly positive it is strictly
+increasing on some open interval containing 0 and 1, hence
+$$
+   h(1) - h(0) = \inner{g(1) - g(0), \theta - \theta^*}
+   = \inner{\mu - \mu^*, \theta - \theta^*}
+$$
+is strictly positive.  Hence $\mu \neq \mu^*$.
+\end{proof}
+\index{exponential family!mean value parameter|)}
+
+The parameter vector $\mu = c'(\theta)$ is called
+the \emph{mean value parameter} of the regular full exponential family.
+(A full exponential family that is not regular need not have a mean
+value for every distribution.  It must have a mean value for every
+distribution whose canonical parameter vector $\theta$ in the interior
+of the full canonical parameter space $\Theta$,
+but it need not have mean values for distributions whose $\theta$ is
+on the boundary of $\Theta$.)
+
+\subsection{Calculating the Inverse Transformation}
+\label{sec:calculating-inverse-transformation}
+
+Discussed in the proof of the preceding theorem was the transformation
+$\theta \mapsto c'(\theta)$, which the theorem says maps from a not
+necessarily identifiable parameter ($\theta$) to a necessarily identifiable
+parameter ($\mu$).  In this section we find out this parameter transformation
+is invertible if and only if the canonical parameterization is identifiable,
+and we also find out how to calculate the inverse if it exists.
+
+Define a function $\tilde{l}$ that is just like the log likelihood
+of the exponential family \eqref{eq:logl-expfam} except that we replace
+the observed value of the canonical statistic vector $y$ with a possible
+mean value
+\begin{equation} \label{eq:logl-expfam-expected}
+   \tilde{l}(\theta) = \inner{\mu, \theta} - c(\theta),
+\end{equation}
+where $\mu = E_\theta(y)$ for some $\theta$.
+
+\begin{lemma}
+The cumulant function of a full exponential family is a convex function.
+It is strictly convex if and only if the exponential family has no
+nonzero directions of constancy.
+\end{lemma}
+This is Theorem~{7.1} in \citet{barndorff-nielsen}.
+An alternative proof for regular full exponential families can
+use the second derivative test in Theorem~{2.14} in \citet{rockafellar-wets}.
+The function $c$ is convex because $c''(\theta)$ is a variance matrix,
+hence positive semi-definite for all $\theta$.
+When there are no nonzero directions of constancy,
+$c''(\theta)$ is positive definite for all $\theta$,
+so $c$ is strictly convex.
+
+The derivatives of \eqref{eq:logl-expfam-expected} are
+\begin{subequations}
+\begin{align}
+   \tilde{l}'(\theta) & = \mu - c'(\theta)
+   \\
+   \tilde{l}''(\theta) & = - c''(\theta)
+\end{align}
+\end{subequations}
+Applying the second derivative test
+in Theorem~{2.14} in \citet{rockafellar-wets} gives
+\begin{lemma}
+The function $\tilde{l}$ defined by \eqref{eq:logl-expfam-expected}
+is a concave function.
+It is strictly concave if and only if the exponential family has no
+nonzero directions of constancy.
+\end{lemma}
+\begin{lemma} \label{lem:concave-maximizer}
+For a differentiable convex function, any point where the derivative
+is zero is a global minimizer.
+For a differentiable strictly convex function, any point where the derivative
+is zero is a unique global minimizer.
+
+For a differentiable concave function, any point where the derivative
+is zero is a global maximizer.
+For a differentiable strictly concave function, any point where the derivative
+is zero is a unique global maximizer.
+\end{lemma}
+This is part of Theorem~{10.1} in \citet{rockafellar-wets}.
+
+\begin{theorem} \label{th:mean-value-inversion}
+Global maximizers of the function $\tilde{l}$ exist, and any global maximizer
+$\theta$ satisfies $\mu = c'(\theta)$ and hence is a canonical parameter
+vector corresponding to the mean value parameter $\mu$.
+
+In case the canonical parameterization is identifiable, which is when there
+are no nonzero directions of constancy, the function $\tilde{l}$ has
+a unique global maximizer.
+\end{theorem}
+\begin{proof}
+By assumption $\mu = E_\theta(y) = c'(\theta)$ for some $\theta$,
+hence by Lemma~\ref{lem:concave-maximizer} this $\theta$ is a global maximizer
+of $\tilde{l}$.  If there are other global maximizers $\theta^*$,
+then they also satisfy $\mu = c'(\theta^*)$.  Hence,
+such $\theta$ and $\theta^*$ correspond to the same $\mu$.
+Hence by Theorem~\ref{th:mean-value} $\theta$ and $\theta^*$ correspond
+to the same distribution.
+Hence, if the canonical parameterization is identifiable,
+then $\theta = \theta^*$.
+\end{proof}
+
+\section{Aster Mean Value Parameters}
+
+We have already met the mean value parameters of aster models in
+Section~\ref{sec:conditional-and-unconditional-mean-values} above.
+They are
+\begin{itemize}
+\item the \emph{unconditional mean value parameter vector} $\mu$ defined by
+\index{aster model!mean value parameter!unconditional}
+\eqref{eq:unconditional-mean-values} and
+\item the \emph{conditional mean value parameter vector} $\xi$ defined by
+\index{aster model!mean value parameter!conditional}
+\eqref{eq:conditional-mean-values} when the conditioning event in that
+equation makes sense and by the discussion following that equation otherwise.
+\end{itemize}
+
+In Section~\ref{sec:conditional-and-unconditional-mean-values} above
+we were getting ahead of ourselves in two ways.  We didn't yet know
+that these mean values existed, and we didn't yet know that they
+parameterized the model.  Now we do.  So we fill in the details on that.
+
+\subsection{Unconditional}
+
+Theorem~\ref{th:regular} in Appendix~\ref{app:regular} says, if each
+family for a dependence group is a regular full exponential family,
+then the (unconditional, joint) distribution of the aster model is
+a regular full exponential family.  All of the families for dependence
+groups (or arrows for dependence groups that are single nodes) that
+have ever been implemented in aster software are regular full exponential
+families.
+%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+Thus all aster models that have ever been implemented are
+regular full exponential families.
+
+And hence we know how to map from aster model canonical parameter vectors
+to mean value parameter vectors and vice versa.  The maps from canonical
+to mean value are
+\begin{equation} \label{eq:aster-phi-to-mu}
+   \mu = c'(\varphi) = E_\varphi(y),
+\end{equation}
+where $c$ is the cumulant function of the (unconditional, joint) aster
+model \eqref{eq:aster-cumfun}, and $y$ is the response vector of the
+aster model, and
+\begin{equation} \label{eq:aster-theta-to-xi}
+   \xi_G = c_G'(\theta) = E_\theta(y_G),
+   \qquad G \in \mathcal{G},
+\end{equation}
+where $c_G$ is the cumulant function of dependence group $G$.
+
+The inverse mappings to these mappings do not have closed form expression
+but are described in Section~\ref{sec:calculating-inverse-transformation}
+above.  Define $\tilde{l}$ by
+\begin{equation} \label{eq:logl-aster-expected}
+   \tilde{l}(\varphi) = \inner{\mu, \varphi} - c(\varphi)
+\end{equation}
+where $\mu$ is a possible value of the unconditional mean value parameter
+vector of the aster model and $c$ is the cumulant function of the aster
+model \eqref{eq:aster-cumfun}.  Then any point $\varphi$
+where the first derivative of $\tilde{l}$ is zero is a global maximizer
+of $\tilde{l}$ and is an unconditional canonical parameter vector $\varphi$
+that corresponds to $\mu$.  Such a global maximizer always exists.
+If the canonical parameterization is identifiable (if there are
+no nonzero directions of constancy), then this global maximizer is unique.
+All of the above follows from Theorems~\ref{th:mean-value-inversion}
+and~\ref{th:regular}.
+
+When the canonical parameterization is identifiable, this process allows
+us to calculate the map $\mu \mapsto \varphi$ that is the inverse to
+to the map $\varphi \mapsto \mu$ given by $\varphi \mapsto c'(\varphi)$.
+We know the forward transformation $\varphi \mapsto \mu$
+is infinitely differentiable (because cumulant functions of regular
+full exponential families are infinitely differentiable).
+Hence it follows from the inverse function theorem of real analysis
+\citep[Theorem~8.27]{browder} that the inverse function is infinitely
+differentiable if it exists (we are not using the inverse function theorem
+to prove the existence of a local inverse; we know a global inverse function
+exists if and only if the unconditional canonical parameterization
+is identifiable; we are using the assertion of the inverse function theorem
+about differentiability of this inverse function).
+
+In summary, we know the inverse mapping $\mu \mapsto \varphi$ exists
+and is infinitely differentiable when $\varphi$ is identifiable,
+but we generally have no closed-form expression for this mapping and
+must calculate it by maximizing $\tilde{l}$ defined
+by \eqref{eq:logl-aster-expected}.
+
+Another conclusion of the inverse function theorem is that the derivative
+of the inverse is the inverse of the derivative (this is not always
+stated in the theorem statement, but does appear in the proof).
+In our case, the derivative of the forward mapping $\varphi \to \mu$
+is $c''(\varphi) = I(\varphi)$.  We know this matrix is invertible
+if and only if the $\varphi$ is identifiable.  And when it is invertible
+(when there are no nonzero directions of constancy, when $y$ is not
+concentrated on a hyperplane) the derivative of the inverse mapping
+$\mu \to \varphi$ is $c''(\varphi)^{- 1}$.
+In more detail, if we temporarily give this inverse mapping a notation
+$f : \mu \to \varphi$ given by $\varphi$ is the unique global maximizer
+of $\tilde{l}$ defined by \eqref{eq:logl-aster-expected}
+(assuming the inverse mapping exists, that is, assuming identifiablilty).
+Then
+$$
+   f'(\mu) = I(\varphi)^{-1}, \qquad \text{when $\varphi = f(\mu)$},
+$$
+or
+$$
+   f'(\mu) = I\bigl(f(\mu)\bigr)^{-1}.
+$$
+
+\subsection{Conditional}
+
+Now we go over all of this section again for conditional mean values and
+dependence groups.  We fuss less about the details because they are the
+same \emph{mutatis mutandis}.
+For dependence group $G$, define $\tilde{l}_G$ by
+\begin{equation} \label{eq:logl-aster-expected-g}
+   \tilde{l}_G(\theta_G) = \inner{\xi_G, \theta_G} - c_G(\theta_G)
+\end{equation}
+where $\xi_G$ is a possible value of the conditional mean value parameter
+vector for $G$ and $c_G$ is the cumulant function for $G$.
+Then any point $\theta_G$
+where the first derivative of $\tilde{l}_G$ is zero is a global maximizer
+of $\tilde{l}_G$.  Such a global maximizer always exists.
+If the canonical parameterization is identifiable (if there are
+no nonzero directions of constancy of the family for dependence group $G$),
+then this global maximizer is unique.
+
+When we do this procedure for each dependence group $G$ this defines
+a mapping $\xi \to \theta$ if each dependence group has identifiable
+canonical parameterization.  This mapping is infinitely differentiable
+if it exists, and the derivative is given by inverting the derivative
+of the forward mapping.  The forward mapping has block diagonal derivative
+with components
+\begin{alignat*}{2}
+   \frac{\partial \xi_j}{\partial \theta_k}
+   & =
+   \frac{\partial^2 c_G(\theta_G)}{\partial \theta_j \partial \theta_k},
+   & \qquad & j, k \in G,
+   \\
+   \frac{\partial \xi_j}{\partial \theta_k}
+   & =
+   0, & & \text{otherwise}.
+\end{alignat*}
+If we denote the matrix with these components by $I(\theta)$, then
+$I(\theta)^{-1}$ is the derivative of the inverse mapping at a point
+$\xi$ that corresponds to $\theta$.
+
+\subsection{Dealing with Non-Identifiability}
+\label{sec:dealing}
+
+We are used to the computer dealing with non-identifiability, also called
+collinearity automatically.  R function \code{lm} and \code{glm} in core R
+\citep{r-core}, which fit linear and generalized linear models automatically
+handle it by dropping regressor vectors (columns of the model matrix) until
+identifiability is obtained.  They signal this by reporting \code{NA} for
+coefficient estimates corresponding to these dropped regressor vectors.
+
+R package \code{aster} does more or less the same thing as R functions
+\code{lm} and \code{glm} except that it simply does not mention regression
+coefficients for dropped regressors (it does say which regressors these are
+in the component \code{dropped} of the object returned by R function
+\code{aster}).
+
+In aster models fit by R package \code{aster} (which cannot have dependence
+groups corresponding to more than one component of the response vector)
+the only way that nonidentifiability of the canonical parameterization
+can arise is if the model matrix does not have full column rank,
+which is getting ahead of ourselves because we have not discussed
+canonical affine submodels of aster models yet (next section).
+
+In aster models fit by R package \code{aster2} the aster model can
+have nonidentifiable canonical parameterizations ($\theta$ is nonidentifiable
+if and only if $\varphi$ is nonidentifiable because the aster transform
+is one-to-one) when the model has multinomial dependence groups or when
+we are analyzing a limiting conditional model of the aster model.
+%%%%%%%%%% NEED FORWARD REFERENCE multinomial %%%%%%%%%%
+%%%%%%%%%% NEED FORWARD REFERENCE limiting conditional model %%%%%%%%%%
+
+R package \code{aster2} does more or less the same thing as R functions
+\code{lm} and \code{glm} except that it returns zero for certain
+coefficients on the theory that constraining a parameter to be equal to zero
+is equivalent to dropping the corresponding regressor. 
+
+From a theoretical point of view there is just one issue: directions of
+constancy (Section~\ref{sec:direction-of-constancy} above).
+Suppose we have an exponential family in which the canonical parameter
+is $\beta$ (this includes canonical affine submodels but also the models
+they are submodels of).  If $\delta$ is a direction of constancy, then
+$\beta$ and $\beta + s \delta$ correspond to the same distribution for
+all $s$.  If $\delta \neq 0$, then we do not have identifiability, and
+need to decide how to regain it.  The way to do so that R users (at least)
+have been trained to expect is to constrain some $\beta_j$ to be equal
+to zero.
+
+If $\delta \neq 0$, then it has a nonzero component, say $\delta_i$.
+Then we can constrain $\beta_i$ to be equal to zero, because for any
+$\beta$, the parameter vector $\beta + s \delta$ with
+$$
+   \beta_i + s \delta_i = 0
+$$
+or
+$$
+   s = - \beta_i / \delta_i
+$$
+has $i$-th component zero and corresponds to the same distribution as $\beta$.
+
+So this procedure of obtaining identifiability by constraining some
+parameter to be equal to zero works for any exponential family
+(and works for GLM that are not exponential families by them being
+close enough to exponential families in the theoretical aspects that
+are necessary for this to work).
+
+This procedure can always be implemented by the computer provided it has
+a way of determining directions of constancy.
+It is clear from the definition in Section~\ref{sec:direction-of-constancy}
+above that the set of all directions of constancy is a subset of the
+vector space where the canonical parameter takes values.
+Since that vector space is finite-dimensional, so is the subspace.
+The set of all directions of constancy is called the \emph{constancy space}.
+Hence the set of all directions of constancy can be characterized by
+providing a basis for the constancy space.
+
+So long as aster software has a function like R function \code{constancy}
+in R package \code{aster2} that provides a basis for the constancy space,
+the computer can do the rest of dealing with non-identifiability.
+
+\section{A Plethora of Parameters}
+\label{sec:plethora}
+
+We now have the parameterizations $\theta$, $\varphi$, $\xi$, and $\mu$
+for aster models.  We now know that
+\begin{itemize}
+\item $\mu$ is always identifiable,
+\item $\xi$ is always identifiable unless some $\mu_{q(G)} = 0$,
+\item $\varphi$ is identifiable if and only if there are no nonzero
+    directions of constancy, and
+\item $\theta$ is identifiable if and only if $\varphi$ is identifiable.
+\end{itemize}
+
+
+The simple closed-form expressions we have
+for these parameter transformations are shown below.
+% in tikzcd apostrophe label option means label on opposite side of arrow
+% woot!
+\begin{equation} \label{eq:plethora-four}
+\begin{tikzcd}[column sep=9em]
+   \theta
+   \arrow[r, "\text{aster transform}", shift left]
+   \arrow[d, "\xi_G = c_G'(\theta_G)"', shift right]
+   &
+   \varphi
+   \arrow[l, "\text{inverse aster transform}", shift left]
+   \arrow[d, "\mu = c'(\varphi)", shift left]
+   \\
+   \xi
+   \arrow[u, shift right]
+   \arrow[r, "\text{multiplication}", shift left]
+   &
+   \mu
+   \arrow[l, "\text{division}", shift left]
+   \arrow[u, shift left]
+\end{tikzcd}
+\end{equation}
+where (of course) ``aster transform'' is \eqref{eq:aster-transform} above,
+``inverse aster transform'' is \eqref{eq:inverse-aster-transform} above,
+``multiplication'' is \eqref{eq:mu-and-xi} or \eqref{eq:xi-mu-prod} or
+\eqref{eq:xi-mu-prod-too} above,
+``division'' is \eqref{eq:mu-to-xi}, and the equations labeling downwards
+arrows refer to \eqref{eq:aster-theta-to-xi} and \eqref{eq:aster-phi-to-mu}
+above.
+
+Both upward arrows being unlabeled indicates no closed-form expressions
+for going from mean value parameters to canonical parameters.
+There is an algorithm (Section~\ref{sec:calculating-inverse-transformation}
+above) but (in general) no closed-form expression.
+All of the arrows do, however, indicate smooth (infinitely differentiable)
+changes of parameter, if they correspond to a change of parameter at all.
+
+The arrows that may not correspond to a change of parameter arrow are
+\begin{itemize}
+\item the arrow $\mu \mapsto \xi$ labeled ``division'' fails to be a map
+    when there is division by zero, in which case $\xi$ is not identifiable,
+\item the arrows $\xi \mapsto \theta$ and $\mu \mapsto \varphi$, which
+    are unlabled fail to be maps when the canonical parameterizations
+    are not identifiable (and either both are identifiable or neither are).
+\end{itemize}
+
+As explained in Section~\ref{sec:dealing} above identifiability of either
+canonical parameterization can be recovered by constraining certain parameters
+to be equal to zero.  When we do this we need to be careful to not mess up
+the other parameter transformations.
+\begin{itemize}
+\item If we constrain some components of $\varphi$ to be equal to zero in
+    order to make $\varphi$ identifiable and the transformation
+    $\mu \to \varphi$ a map, then this also makes $\theta$ identifiable,
+    but since the inverse aster transform is nonlinear this does not
+    correspond to setting any components of $\theta$ to be equal to zero.
+\item Conversely, if we constrain some components of $\theta$ to be equal
+    to zero in order to make $\theta$ identifiable and the transformation
+    $\xi \to \theta$ a map, then this also makes $\varphi$ identifiable,
+    but since the aster transform is nonlinear this does not
+    correspond to setting any components of $\varphi$ to be equal to zero.
+\item When some components of the response vector that are predecessors
+    are equal to zero almost surely $\xi$ is not identifiable:
+    if $\mu_{q(G)} = 0$, then $\xi_G$ can be chosen arbitrarily,
+    but then $\theta_G$ will be determined by this arbitrary choice,
+    and then $\varphi$ will be determined by $\theta$.
+    Since $\mu$ is always identifiable, it is unchanged when $\xi_G$
+    is allowed to be chosen arbitrarily (the arbitrary choice is multiplied
+    by zero in the conversion to $\mu$).
+\end{itemize}
+
+All of these parameterizations are important.  Any may be crucial in
+some applications and irrelevant to other applications.  From this point
+forward we now call the statistical model we have been discussing the
+\emph{saturated aster model}.  No matter which parameterization we choose,
+\index{aster model!saturated}
+the length of the parameter vector is the same as the length of the response
+vector (both have the same index set $J$).
+
+The saturated aster model has too many parameters chasing too little data.
+More parsimonious models are used in applications.
+
+The next few sections introduce these more parsimonius models and
+even more parameters,
+and Sections~\ref{sec:revisited} and~\ref{sec:re-revisited} below
+discuss their transformations similar to how this section does.
+
+\section{Aster Canonical Affine Submodels}
+
+It may come as a shock to the reader that all of the work done so far
+concerns models that are of no interest in applications.
+
+\subsection{Unconditional}
+
+\index{aster model!unconditional|(}
+\index{aster model!canonical affine submodel!unconditional|(}
+In this section we straightforwardly apply the theory
+of Section~\ref{sec:canonical-affine-submodel} above,
+which describes canonical affine submodels of general exponential families,
+to aster models.  In Section~\ref{sec:canonical-affine-submodel} the canonical
+parameter vector of the exponential family was denoted $\theta$.
+The canonical parameter vector of the (unconditional, joint) aster model
+is the \emph{unconditional} canonical parameter vector $\varphi$.
+Thus we parameterize an aster \emph{unconditional canonical affine submodel}
+\begin{equation} \label{eq:affine-unconditional}
+   \varphi = a + M \beta,
+\end{equation}
+where, as stated in Section~\ref{sec:canonical-affine-submodel} above,
+$a$ is the offset vector and $M$ is the model matrix.
+Either $a$ or $M$ may depend on covariate data since aster analyses,
+like all regression analyses are done conditional on covariate data.
+Usually $a$ does not depend on covariate data and $M$ does depend
+on covariate data.
+This is the only place where covariate data enters
+an unconditional aster model (for short we refer to such models
+as \emph{unconditional aster models} rather than
+\emph{unconditional canonical affine submodels of aster models}).
+
+From the theory in Section~\ref{sec:canonical-affine-submodel} above,
+an unconditional aster model is itself a regular full exponential family
+with
+\begin{itemize}
+\item canonical statistic vector $M^T y$,
+\item canonical parameter vector $\beta$,
+\item cumulant function $c_\text{sub}$ defined by
+$$
+   c_\text{sub}(\beta) = c(a + M \beta)
+$$
+where $c$ is the cumulant function of the saturated aster model given by
+\eqref{eq:aster-cumfun} above, and
+\item mean value parameter
+$$
+   \tau = c_\text{sub}'(\beta) = E_\beta(M^T y) = M^T \mu,
+$$
+where $\mu$ is the saturated model mean value parameter.
+\end{itemize}
+
+Theorem~\ref{th:regular-submodel} in Appendix~\ref{app:regular} says
+that every unconditional aster model is a regular full exponential family
+if the saturated model is a regular full exponential.
+Theorem~\ref{th:regular} in Appendix~\ref{app:regular} says the latter
+happens when every family for every dependence group is a regular full
+exponential family, which is the case for all families currently implemented
+in aster software.
+\index{aster model!unconditional|)}
+\index{aster model!canonical affine submodel!unconditional|)}
+
+\subsection{A Plethora of Parameters Revisited}
+\label{sec:revisited}
+
+With unconditional canonical afffine submodels (preceding section) we get
+two more parameters, so we can change our picture to
+\begin{equation} \label{eq:plethora-six}
+\begin{tikzcd}[column sep=9em]
+   \theta
+   \arrow[r, "\text{aster transform}", shift left]
+   \arrow[d, "\xi_G = c_G'(\theta_G)"', shift right]
+   &
+   \varphi
+   \arrow[l, "\text{inverse aster transform}", shift left]
+   \arrow[d, "\mu = c'(\varphi)", shift left]
+   \arrow[r, shift right]
+   &
+   \beta
+   \arrow[l, "\varphi = a + M \beta"', shift right]
+   \arrow[d, "\tau = c_\text{sub}'(\beta)", shift left]
+   \\
+   \xi
+   \arrow[u, shift right]
+   \arrow[r, "\text{multiplication}", shift left]
+   &
+   \mu
+   \arrow[l, "\text{division}", shift left]
+   \arrow[u, shift left]
+   \arrow[r, "\tau = M^T \mu"', shift right]
+   &
+   \tau
+   \arrow[l, shift right]
+   \arrow[u, shift left]
+\end{tikzcd}
+\end{equation}
+where (of course) all of the parameters and arrows for the ``left square''
+are the same as in \eqref{eq:plethora-four}, where the three of the arrows
+for the ``right square'' give parameter transformations discussed in the
+preceding section, and the three unlabled arrows are parameter transformations
+that have no closed-form expression.
+
+The inverse mappings to the the mapping $\beta \mapsto \tau$ is calculated
+just like the other upward arrows in the diagram.
+Define
+\begin{equation} \label{eq:logl-aster-expected-submodel}
+   \tilde{l}_\text{sub}(\beta) = \inner{\tau, \beta} - c_\text{sub}(\beta)
+\end{equation}
+as with the other $\tilde{l}$ functions, $\tilde{l}_\text{sub}$ is concave
+and strictly concave when the canonical parameter $\beta$ of the unconditional
+canonical affine submodel is identifiable, which is when there does not
+exist a nonzero direction of constancy, a nonzero vector $\eta$ such that
+$\inner{M^T y, \eta}$ is almost surely constant.
+Whenever $\tau$ is a possible value of the mean value parameter vector,
+that is, $\tau = E_\beta(M^T y)$ for some $\beta$, then that $\beta$
+is a global maximizer of \eqref{eq:logl-aster-expected-submodel}.
+That $\beta$ is the unique maximizer if and only if $\beta$ is identifiable
+(no nonzero directions of constancy exist).
+
+As discussed in Section~\ref{sec:dealing} above, we can always deal with
+non-uniqueness (non-identifiability) by constraining some components of
+$\beta$ to be equal to zero.
+
+The other labeled arrows on the ``right square'' in the diagram are the
+inverses of linear transformations, but these generally do not have solutions.
+
+The mapping $\varphi = a + M \beta$ need be neither one-to-one nor onto.
+In applications, it is never onto.  That is the whole point of submodels,
+to be a \emph{proper} submodel.  It will not be one-to-one if there is
+``collinearity'' (if $M$ does not have full column rank).  Let $B$ denote
+the full canonical parameter space for the parameter $\beta$ described in
+the Theorem~\ref{th:regular-submodel} in Appendix~\ref{app:regular} and its
+proof.  Temporarily, let $f$ denote the mapping defined
+by $f(\beta) = a + M \beta$.  As we just said, $f$ is one-to-one if and only
+if $M$ has full column rank, but $f$ is never onto (in applications).
+Thus $f$ is invertible (if one-to-one) only when it is considered a mapping
+$B \to f(B)$, that is, its codomain is its range.  Then (assuming one-to-one)
+the inverse $f^{-1}$ exists and is a mapping $f(B) \to B$.
+
+But this is a triviality.  It says that if $\varphi = f(\beta)$, then we
+know that $\varphi$ is in the domain of the inverse mapping
+and $\beta = f^{-1}(\varphi)$.  But otherwise, when just given a $\varphi$
+in the saturated model unconditional canonical parameter space, we don't know
+whether it is in $f(B)$ or not, since the only way we can know is if we know
+it is $f(\beta)$ for some $\beta$.
+
+The mapping $\tau = M^T \mu$ need be neither one-to-one nor onto.
+In applications, it is never one-to-one.  Again, that is the whole
+point of submodels.  If $M$ is not onto, then $M^T$ is not one-to-one
+(considered as the linear transformations these matrices represent).
+Thus the equation $\tau = M^T \mu$ never has a unique solution for $\mu$.
+The only way to find a $\mu$ that corresponds to a given $\tau$ is to go
+the other way around
+the square $\tau \mapsto \beta \mapsto \varphi \mapsto \mu$.
+
+For an unconditional canonical affine submodel
+\begin{itemize}
+\item $\tau$ is always identifiable,
+\item $\beta$ may or may not be identifiable, if not, identifiability can
+    be forced by constraining some components of $\beta$ to be equal to zero,
+\item the set of allowed $\varphi = a + M \beta$ values is either an affine
+    subspace of $\real^J$ or an open subset of such an affine subspace,
+\item the set of allowed $\mu$ values is a smooth manifold having the same
+    dimension as $\beta$, but is a curved manifold since the mapping
+    $\varphi \to \mu$ is nonlinear,
+\item similarly, the set of allowed $\theta$ values is a smooth manifold
+    having the same dimension as $\beta$, and
+\item similarly, the set of allowed $\xi$ values is a smooth manifold
+    having the same dimension as $\beta$.
+\end{itemize}
+
+\subsection{Conditional}
+
+Since all of the theory in the preceding two sections works so smoothly,
+it may be surprising that we have a competing view of how to do submodels.
+We almost don't have a competing view.  As far as I know, there are only
+two published examples of conditional aster analyses.  Example~{1} in
+\citet{aster2} was done as a conditional aster analysis but can easily
+be redone as an unconditional aster analysis
+\citep[Slide Deck~4, slides 47ff.]{geyer-8931-aster}.
+The analysis in \citet{aster-aphid} titled
+``Relating Plant Fitness to Aphid-Load'' was done as a conditional aster
+analysis and had to be so done because time-dependent covariates (in this
+case aphid load) do not mesh well with unconditional aster models.
+%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+
+So in rare cases (one so far published, as far as I know) conditional
+aster models are necessary.  But in the vast majority of applications
+unconditional aster models (which are the default for aster software)
+are the ones used and the only ones users consider.
+
+\index{aster model!unconditional|(}
+\index{aster model!canonical affine submodel!unconditional|(}
+Nevertheless, if we have conditional aster models at all, then we need their
+theory.  In \emph{conditional canonical affine submodels} of aster models
+we do not use the submodel parameterization \eqref{eq:affine-unconditional}.
+Instead we use
+\begin{equation} \label{eq:affine-conditional}
+   \theta = a + M \beta,
+\end{equation}
+This is undeniably a TTD (thing to do) but has no theoretical justification.
+It does not connect with exponential family theory except, as a smooth
+submodel of a regular full exponential family (the saturated model),
+this is a \emph{curved exponential family}.
+As we shall see, there are a few good properties that are shared by
+conditional and unconditional aster models, but only a few.
+%%%%%%%%%% NEED FORWARD REFERENCE to likelihood inference %%%%%%%%%%
+The theory of conditional aster models is impovrished compared to that
+of unconditional aster models.
+\index{aster model!unconditional|)}
+\index{aster model!canonical affine submodel!unconditional|)}
+
+\subsection{A Plethora of Parameters Re-Revisited}
+\label{sec:re-revisited}
+
+The analog of \eqref{eq:plethora-four} or \eqref{eq:plethora-six}
+for conditional aster models is
+\begin{equation} \label{eq:plethora-five}
+\begin{tikzcd}[column sep=9em]
+   \beta
+   \arrow[r, "\theta = a + M \beta", shift left]
+   &
+   \theta
+   \arrow[r, "\text{aster transform}", shift left]
+   \arrow[d, "\xi_G = c_G'(\theta_G)"', shift right]
+   \arrow[l, shift left]
+   &
+   \varphi
+   \arrow[l, "\text{inverse aster transform}", shift left]
+   \arrow[d, "\mu = c'(\varphi)", shift left]
+   \\
+   &
+   \xi
+   \arrow[u, shift right]
+   \arrow[r, "\text{multiplication}", shift left]
+   &
+   \mu
+   \arrow[l, "\text{division}", shift left]
+   \arrow[u, shift left]
+\end{tikzcd}
+\end{equation}
+There is no analog of the submodel mean value parameter $\tau$
+for a conditional aster model (because a conditional aster model is not
+a regular full exponential family).
