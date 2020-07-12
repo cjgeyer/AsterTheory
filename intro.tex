@@ -164,18 +164,18 @@ is conditional on covariate data, at least on the part of the covariate data
 that is considered random rather than fixed by the design of the experiment.
 Thus to be hyperpedantic, we should always write
 \begin{gather*}
-   E(y_A \mid \text{the part of covariate data that is random})
+   E(Y_A \mid \text{the part of covariate data that is random})
    \\
-   \Pr(y_A \in B \mid \text{the part of covariate data that is random})
+   \Pr(Y_A \in B \mid \text{the part of covariate data that is random})
 \end{gather*}
-rather than $E(y_A)$ or $\Pr(y_A \in B)$.  But, like most regression books,
+rather than $E(Y_A)$ or $\Pr(Y_A \in B)$.  But, like most regression books,
 we will not do this.  The dependence of probabilities and expectations on
 covariates is usually not made explicit in the notation.
 
 This is especially important in aster models when components of the response
 vector depend on the values of other components, so we frequently write
 \begin{gather*}
-   E(y_A \mid y_j)
+   E(Y_A \mid y_j)
    \\
    \pr(y_A \mid y_j)
 \end{gather*}
@@ -743,9 +743,9 @@ the following section.
 \subsection{Unconditional}
 
 Let $y$ be the response vector of an aster model.  We define a parameter
-vector $\mu = E(y)$.  This is the vector having components
+vector $\mu = E(Y)$.  This is the vector having components
 \begin{equation} \label{eq:unconditional-mean-values}
-   \mu_j = E(y_j), \qquad j \in J,
+   \mu_j = E(Y_j), \qquad j \in J,
 \end{equation}
 where, as usual, $J$ is the index set of the response vector (the set
 of non-initial nodes of the full aster graph).
@@ -772,7 +772,7 @@ For now we will just assume these means exist.
 
 We define another parameter vector $\xi$ having components
 \begin{equation} \label{eq:conditional-mean-values}
-   \xi_j = E(y_j \mid y_{p(j)} = 1), \qquad j \in J,
+   \xi_j = E(Y_j \mid Y_{p(j)} = 1), \qquad j \in J,
 \end{equation}
 if this expression makes sense.  It will not make sense when the
 conditioning event has probability zero (so the conditional expectation
@@ -800,13 +800,13 @@ then so does $\xi$, and vice versa.
 It follows from the predecessor-is-sample-size property and linearity of
 expectation that
 \begin{equation} \label{eq:cond-exp}
-   E(y_j \mid y_{p(j)}) = \xi_j y_{p(j)}, \qquad j \in J.
+   E(Y_j \mid y_{p(j)}) = \xi_j y_{p(j)}, \qquad j \in J.
 \end{equation}
 Then it follows from the iterated expectation axiom of conditional probability
 $$
-   E(y_j)
+   E(Y_j)
    =
-   E\{E(y_j \mid y_{p(j)})\}
+   E\{E(Y_j \mid Y_{p(j)})\}
 $$
 that
 \begin{equation} \label{eq:mu-and-xi}
@@ -1757,7 +1757,7 @@ on the whole vector space where $\theta$ takes values.  In that case
 it can be extended to this whole vector space by
 \begin{equation} \label{eq:cumfun-expfam}
    c(\theta) = c(\psi) + \log\left\{
-   E_\psi\bigl( e^{\inner{y, \theta - \psi}} \bigr) \right\}
+   E_\psi\bigl( e^{\inner{Y, \theta - \psi}} \bigr) \right\}
 \end{equation}
 \index{exponential family!cumulant function}
 where $\theta$ varies while $\psi$ is fixed at
@@ -1937,13 +1937,13 @@ This shows the canonical affine submodel is itself an exponential family with
 \subsection{Moment and Cumulant Generating Functions}
 
 \index{generating function|seeunder{exponential family}}
-The \emph{moment generating function} (MGF) of a random vector $y$ is given by
+The \emph{moment generating function} (MGF) of a random vector $Y$ is given by
 $$
-   M(t) = E\left(e^{\inner{y, t}}\right)
+   M(t) = E\left(e^{\inner{Y, t}}\right)
 $$
 provided that the function $M$ so defined is finite on a neighborhood of
-zero; otherwise we say the random vector $y$ does not have an MGF.
-Clearly, the MGF only depends on the distribution of $y$,
+zero; otherwise we say the random vector $Y$ does not have an MGF.
+Clearly, the MGF only depends on the distribution of $Y$,
 so we also this is the MGF of this distribution.
 
 The MGF of the distribution of the canonical statistic of an exponential
@@ -1952,22 +1952,22 @@ family corresponding to canonical parameter $\theta$ is given by
 \begin{align*}
    M_\theta(t)
    & =
-   E_\theta\left(e^{\inner{y, t}}\right)
+   E_\theta\left(e^{\inner{Y, t}}\right)
 \end{align*}
 We rearrange \eqref{eq:cumfun-expfam} obtaining
 $$
    e^{c(\theta) - c(\psi)}
    =
-   E_\psi\bigl( e^{\inner{y, \theta - \psi}} \bigr)
+   E_\psi\bigl( e^{\inner{Y, \theta - \psi}} \bigr)
 $$
 and then change $\theta$ to $\theta + t$ and $\psi$ to $\theta$ in that order
 obtaining
 $$
    e^{c(\theta + t) - c(\theta)}
    =
-   E_\theta\bigl( e^{\inner{y, t}} \bigr)
+   E_\theta\bigl( e^{\inner{Y, t}} \bigr)
 $$
-so the MGF of the distribution of $y$ for parameter vector $\theta$ is
+so the MGF of the distribution of $Y$ for parameter vector $\theta$ is
 $$
    M_\theta(t)
    =
@@ -1980,11 +1980,11 @@ parameter space \eqref{eq:full-expfam}.
 Hence every distribution in a \emph{regular} full exponential
 family has an MGF.
 
-The \emph{cumulant generating function} (CGF) of a random vector $y$ is
+The \emph{cumulant generating function} (CGF) of a random vector $Y$ is
 \index{exponential family!cumulant generating function}
 the log of the MGF provided the MGF exists.
 If a distribution has no MGF, then it has no CGF either.
-Hence the CGF of the distribution of $y$ for parameter vector $\theta$ is
+Hence the CGF of the distribution of $Y$ for parameter vector $\theta$ is
 $$
    K_\theta(t)
    =
@@ -2023,10 +2023,10 @@ parameter space \eqref{eq:full-expfam}).
 First and second order cumulants are mean and variance
 \begin{subequations}
 \begin{align}
-   E_\theta(y) & = c'(\theta)
+   E_\theta(Y) & = c'(\theta)
    \label{eq:cumulant-one}
    \\
-   \var_\theta(y) & = c''(\theta)
+   \var_\theta(Y) & = c''(\theta)
    \label{eq:cumulant-two}
 \end{align}
 \end{subequations}
@@ -2044,20 +2044,20 @@ In a \emph{regular} full exponential family these formulas are good
 for all values of $\theta$ in the full canonical
 parameter space \eqref{eq:full-expfam}.
 
-In \eqref{eq:cumulant-one} $y$ is a vector and its expectation is a vector
-having the same index set: $\mu = E_\theta(y)$ is the vector having components
-$\mu_j = E_\theta(y_j)$.
+In \eqref{eq:cumulant-one} $Y$ is a vector and its expectation is a vector
+having the same index set: $\mu = E_\theta(Y)$ is the vector having components
+$\mu_j = E_\theta(Y_j)$.
 The right-hand side of \eqref{eq:cumulant-one} must also be a vector having
 the same index set: its components are $\partial c(\theta) / \partial \theta_j$.
 
-In \eqref{eq:cumulant-two} $y$ is a vector and its variance is a square
-symmetric matrix having components $\cov_\theta(y_j, y_k)$.
+In \eqref{eq:cumulant-two} $Y$ is a vector and its variance is a square
+symmetric matrix having components $\cov_\theta(Y_j, Y_k)$.
 The right-hand side of \eqref{eq:cumulant-two} must also be a matrix having
 the same index set: its components are
 $\partial^2 c(\theta) / \partial \theta_j \partial \theta_k$.
 
 Many people do not like our terminology calling the left-hand side
-of \eqref{eq:cumulant-two} the \emph{variance} matrix of $y$.
+of \eqref{eq:cumulant-two} the \emph{variance} matrix of $Y$.
 Names in common use are \emph{covariance} matrix (but this is horrible
 terminology because it uses up a name that should be used for the covariance
 of two random vectors), \emph{variance-covariance} matrix,
@@ -2065,8 +2065,8 @@ and \emph{dispersion} matrix.
 We use our terminology, because it denotes the multivariate analog
 of the variance of a random variable.
 This can be seen everywhere in probability theory.
-If you can accept our notation $\var_\theta(y)$ for this mathematical
-object, then the same formulas work for univariate and multivariate $y$.
+If you can accept our notation $\var_\theta(Y)$ for this mathematical
+object, then the same formulas work for univariate and multivariate $Y$.
 
 \section{Aster Models and Exponential Families}
 \label{sec:aster-expfam}
@@ -2320,8 +2320,9 @@ canonical.
 
 A direction $\delta$ in the vector space where the canonical parameter vector
 of an exponential family takes values is called a \emph{direction of constancy}
-if $\inner{y, \delta}$ is constant almost surely, where $y$ is the canonical
-statistic.  Because all of the distributions in an exponential family have
+if $\inner{Y, \delta}$ is constant almost surely, where $Y$ is the canonical
+statistic vector.
+Because all of the distributions in an exponential family have
 the same support (this follows from the log likelihood being finite for
 all all data values when the canonical parameter value is in the full
 canonical parameter space \eqref{eq:full-expfam}) we don't have to say
@@ -2347,9 +2348,9 @@ the vector space where $\theta$ takes values, $l$ is the log likelihood
     to the same distribution for some $\theta \in \Theta$ and some $s \neq 0$.
 \item[(d)] The parameter vectors $\theta$ and $\theta + s \delta$ correspond
     to the same distribution for all $\theta \in \Theta$ and all real $s$.
-\item[(e)] The random variable $\inner{y, \delta}$ is almost surely constant
+\item[(e)] The random variable $\inner{Y, \delta}$ is almost surely constant
     for some distribution in the exponential family.
-\item[(f)] The random variable $\inner{y, \delta}$ is almost surely constant
+\item[(f)] The random variable $\inner{Y, \delta}$ is almost surely constant
     for all distributions in the exponential family.
 \end{enumerate}
 We arbitrarily picked (e) to serve as the definition,
@@ -2393,16 +2394,16 @@ if they are to use the same parameterization as the original model.
 
 Conditions (e) and (f) connect this concept with multivariate degeneracy.
 The vector $\delta$ is a direction of constancy if an only if the random
-variable $\inner{y, \delta}$ is almost surely constant, which is the
-same thing as saying the canonical statistic vector $y$ is concentrated
+variable $\inner{Y, \delta}$ is almost surely constant, which is the
+same thing as saying the canonical statistic vector $Y$ is concentrated
 on a hyperplane.  So the canonical parameterization of a full exponential
-family is identifiable if and only if $y$ is not concentrated on a hyperplane.
+family is identifiable if and only if $Y$ is not concentrated on a hyperplane.
 A random variable is constant almost surely if and only if its variance
 is zero.  Hence we can also characterize directions of constancy in
 terms of the variance matrix of the canonical statistic
 \eqref{eq:cumulant-two}.  In a regular full exponential family, let
 $$
-   I(\theta) = \var_\theta(y).
+   I(\theta) = \var_\theta(Y).
 $$
 (we need a regular full exponential family to guarantee the variance exists).
 This is the Fisher information matrix as well as the variance matrix
@@ -2411,11 +2412,11 @@ This is the Fisher information matrix as well as the variance matrix
 of the canonical statistic because differentiating the log likelihood
 \eqref{eq:logl-expfam} twice gives
 $$
-   l''(\theta) = - c''(\theta) = - \var_\theta(y).
+   l''(\theta) = - c''(\theta) = - \var_\theta(Y).
 $$
 Then clearly, $\delta$ is a direction of recession if and only if
 $$
-   \var_\theta(\inner{y, \delta}) = \delta^T I(\theta) \delta
+   \var_\theta(\inner{Y, \delta}) = \delta^T I(\theta) \delta
 $$
 is equal to zero.  And by the spectral theorem
 \citet[Section~79]{halmos-vector-spaces} this holds if and only if
@@ -2513,7 +2514,7 @@ mean value
 \begin{equation} \label{eq:logl-expfam-expected}
    \tilde{l}(\theta) = \inner{\mu, \theta} - c(\theta),
 \end{equation}
-where $\mu = E_\theta(y)$ for some $\theta$.
+where $\mu = E_\theta(Y)$ for some $\theta$.
 
 \begin{lemma}
 The cumulant function of a full exponential family is a convex function.
@@ -2568,7 +2569,7 @@ are no nonzero directions of constancy, the function $\tilde{l}$ has
 a unique global maximizer.
 \end{theorem}
 \begin{proof}
-By assumption $\mu = E_\theta(y) = c'(\theta)$ for some $\theta$,
+By assumption $\mu = E_\theta(Y) = c'(\theta)$ for some $\theta$,
 hence by Lemma~\ref{lem:concave-maximizer} this $\theta$ is a global maximizer
 of $\tilde{l}$.  If there are other global maximizers $\theta^*$,
 then they also satisfy $\mu = c'(\theta^*)$.  Hence,
@@ -2616,13 +2617,13 @@ And hence we know how to map from aster model canonical parameter vectors
 to mean value parameter vectors and vice versa.  The maps from canonical
 to mean value are
 \begin{equation} \label{eq:aster-phi-to-mu}
-   \mu = c'(\varphi) = E_\varphi(y),
+   \mu = c'(\varphi) = E_\varphi(Y),
 \end{equation}
 where $c$ is the cumulant function of the (unconditional, joint) aster
-model \eqref{eq:aster-cumfun}, and $y$ is the response vector of the
+model \eqref{eq:aster-cumfun}, and $Y$ is the response vector of the
 aster model, and
 \begin{equation} \label{eq:aster-theta-to-xi}
-   \xi_G = c_G'(\theta) = E_\theta(y_G),
+   \xi_G = c_G'(\theta) = E_\theta(Y_G),
    \qquad G \in \mathcal{G},
 \end{equation}
 where $c_G$ is the cumulant function of dependence group $G$.
@@ -2670,7 +2671,7 @@ stated in the theorem statement, but does appear in the proof).
 In our case, the derivative of the forward mapping $\varphi \to \mu$
 is $c''(\varphi) = I(\varphi)$.  We know this matrix is invertible
 if and only if the $\varphi$ is identifiable.  And when it is invertible
-(when there are no nonzero directions of constancy, when $y$ is not
+(when there are no nonzero directions of constancy, when $Y$ is not
 concentrated on a hyperplane) the derivative of the inverse mapping
 $\mu \to \varphi$ is $c''(\varphi)^{- 1}$.
 In more detail, if we temporarily give this inverse mapping a notation
@@ -2950,7 +2951,7 @@ where $c$ is the cumulant function of the saturated aster model given by
 \eqref{eq:aster-cumfun} above, and
 \item mean value parameter
 $$
-   \tau = c_\text{sub}'(\beta) = E_\beta(M^T y) = M^T \mu,
+   \tau = c_\text{sub}'(\beta) = E_\beta(M^T Y) = M^T \mu,
 $$
 where $\mu$ is the saturated model mean value parameter.
 \end{itemize}
@@ -3015,9 +3016,9 @@ as with the other $\tilde{l}$ functions, $\tilde{l}_\text{sub}$ is concave
 and strictly concave when the canonical parameter $\beta$ of the unconditional
 canonical affine submodel is identifiable, which is when there does not
 exist a nonzero direction of constancy, a nonzero vector $\eta$ such that
-$\inner{M^T y, \eta}$ is almost surely constant.
+$\inner{M^T Y, \eta}$ is almost surely constant.
 Whenever $\tau$ is a possible value of the mean value parameter vector,
-that is, $\tau = E_\beta(M^T y)$ for some $\beta$, then that $\beta$
+that is, $\tau = E_\beta(M^T Y)$ for some $\beta$, then that $\beta$
 is a global maximizer of \eqref{eq:logl-aster-expected-submodel}.
 That $\beta$ is the unique maximizer if and only if $\beta$ is identifiable
 (no nonzero directions of constancy exist).
@@ -3147,3 +3148,49 @@ for conditional aster models is
 There is no analog of the submodel mean value parameter $\tau$
 for a conditional aster model (because a conditional aster model is not
 a regular full exponential family).
+
+\section{Maximum Likelihood}
+
+\subsection{Exponential Families}
+
+Maximum likelihood estimation in a regular full exponential family is
+much like the problem of inverting the parameter transformation from
+canonical to mean value parameters discussed in
+Section~\ref{sec:calculating-inverse-transformation} above.
+We simply maximize $l$ given by \eqref{eq:logl-expfam} rather than
+$\tilde{l}$ given by \eqref{eq:logl-expfam-expected}.
+Both of these functions are always concave and strictly concave if and
+only if the canonical parameterization is identifiable.
+
+A point is a global maximizer of $l$ or $\tilde{l}$ if an only if the first
+derivative is equal to zero.  Hence $\theta$ is a maximum likelihood estimate
+if and only if it satisfies the \emph{observed equals expected property}
+\begin{equation} \label{eq:observed-equals-expected-expfam}
+   y = E_\theta(Y)
+\end{equation}
+where the left~hand side is the observed value of the canonical statistic
+and the right-hand side is the expected value corresponding to parameter
+value $\theta$.  If the canonical parameterization is identifiable (if the
+canonical statistic is not concentrated on a hyperplane, if there are no
+nonzero directions of constancy), the solution $\theta$
+of \eqref{eq:observed-equals-expected-expfam}.
+
+The only difference between the problem of this section and
+Section~\ref{sec:calculating-inverse-transformation} above is that
+there we \emph{assumed} there was a solution, that is, we assumed
+that the $\mu$ in \eqref{eq:logl-expfam-expected} satisfied the
+expected equals expected condition (which is a triviality) $\mu = E_\theta(Y)$.
+Here we do not assume \eqref{eq:observed-equals-expected} has a solution.
+The data are what they are.  We assume they are possible data under the
+statistical model, but we do not assume anything else.
+
+\subsection{Directions of Recession, Existence}
+\label{sec:direction-of-recession}
+
+A direction $\delta$ in the vector space where the canonical parameter vector
+of an exponential family takes values is called a \emph{direction of recession}
+of the log likelihood
+
+\subsection{Unconditional Aster Models}
+
+\subsection{Conditional Aster Models}

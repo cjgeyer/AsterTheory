@@ -14,7 +14,7 @@ only is a regular full exponential family because $c_G$ is everywhere finite.
 So the full canonical parameter space of this family is $\real^G$.
 
 \begin{theorem} \label{th:regular}
-If $y_{q(G)} = 0$ almost surely for any dependence group $G$, replace
+If $Y_{q(G)} = 0$ almost surely for any dependence group $G$, replace
 the family for this dependence group by the degenerate family concentrated
 at zero so $c_G$ is the zero function.
 Then, if families for every dependence group of the aster model are regular full
@@ -59,13 +59,13 @@ $$
    c(\varphi)
    =
    c(\varphi^*) + \log\left\{
-   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr) \right\}
+   E_{\varphi^*}\bigl( e^{\inner{Y, \varphi - \varphi^*}} \bigr) \right\}
 $$
 or
 \begin{equation} \label{eq:cumfun-reg-one}
    e^{c(\varphi) - c(\varphi^*)}
    =
-   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   E_{\varphi^*}\bigl( e^{\inner{Y, \varphi - \varphi^*}} \bigr)
 \end{equation}
 (what were $\theta$ and $\psi$ in \eqref{eq:cumfun-expfam} have
 become $\varphi$ and $\varphi^*$, respectively,
@@ -79,7 +79,7 @@ We also note that \eqref{eq:cumfun-expfam} holds for each dependence group
    e^{c_G(\theta_G) - c(\theta_G^*)}
    =
    E_{\varphi^*}\left(
-   e^{\inner{y_G, \theta_G - \theta_G^*}} \middle| y_{q(G)} = 1 \right)
+   e^{\inner{Y_G, \theta_G - \theta_G^*}} \middle| Y_{q(G)} = 1 \right)
 \end{equation}
 and since the cumulant function for sample size $n$ is $n$ times the cumulant
 function for sample size one
@@ -87,7 +87,7 @@ function for sample size one
    e^{y_{q(G)} [c_G(\theta_G) - c(\theta_G^*)]}
    =
    E_{\varphi^*}\left(
-   e^{\inner{y_G, \theta_G - \theta_G^*}} \middle| y_{q(G)} \right)
+   e^{\inner{Y_G, \theta_G - \theta_G^*}} \middle| y_{q(G)} \right)
 \end{equation}
 
 Use the total order on $\mathcal{G}$ guaranteed
@@ -100,14 +100,14 @@ $$
 where the notation is intended to mean that $\mathcal{G}_0$ is another
 notation for the empty set.  We claim
 \begin{multline} \label{eq:reg-induction}
-   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   E_{\varphi^*}\bigl( e^{\inner{Y, \varphi - \varphi^*}} \bigr)
    \\
    =
    E_{\varphi^*}\left(
    \prod_{\substack{G \in \mathcal{G}_k \\ q(G) \notin \bigcup \mathcal{G}_k}}
-   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   e^{Y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
    \prod_{G \in \mathcal{G} \setminus \mathcal{G}_k}
-   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   e^{\inner{Y_G, \varphi_G - \varphi_G^*}}
    \right)
 \end{multline}
 hold for $k = 0$, $\ldots,$ $n$ and we prove this by induction.
@@ -132,28 +132,28 @@ so
 \begin{multline*}
    E_{\varphi^*}\left(
    \prod_{\substack{G \in \mathcal{G}_k \\ q(G) \notin \bigcup \mathcal{G}_k}}
-   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   e^{Y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
    \prod_{G \in \mathcal{G} \setminus \mathcal{G}_k}
-   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   e^{\inner{Y_G, \varphi_G - \varphi_G^*}}
    \right)
    =
    \\
    E_{\varphi^*}\left(
    \prod_{\substack{G \in \mathcal{G}_k \\
        q(G) \notin \bigcup \mathcal{G}_{k + 1}}}
-   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   e^{Y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
    \prod_{G \in \mathcal{G} \setminus \mathcal{G}_{k + 1}}
-   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
-   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   e^{\inner{Y_G, \varphi_G - \varphi_G^*}}
+   e^{\inner{Y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
    \right)
    \\
    =
    E_{\varphi^*}\left(
    \prod_{\substack{G \in \mathcal{G}_k \\
        q(G) \notin \bigcup \mathcal{G}_{k + 1}}}
-   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   e^{Y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
    \prod_{G \in \mathcal{G} \setminus \mathcal{G}_{k + 1}}
-   e^{\inner{y_G, \varphi_G - \varphi_G^*}}
+   e^{\inner{Y_G, \varphi_G - \varphi_G^*}}
    \right.
    \\
    \times
@@ -161,8 +161,8 @@ so
    \vphantom{\prod_{\substack{G \in \mathcal{G}_{k + 1} \\
        q(G) \notin \bigcup \mathcal{G}_{k + 1}}}}
    E_{\varphi^*}\left\{
-   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
-   \middle| y_{\bigcup (\mathcal{G} \setminus \mathcal{G}_k)}
+   e^{\inner{Y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   \middle| Y_{\bigcup (\mathcal{G} \setminus \mathcal{G}_k)}
    \right\}
    \right)
 \end{multline*}
@@ -170,12 +170,12 @@ and this is equal to \eqref{eq:reg-induction} with $k$ replaced by $k + 1$
 by the Markov property
 $$
    E_{\varphi^*}\left\{
-   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   e^{\inner{Y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
    \middle| y_{\bigcup (\mathcal{G} \setminus \mathcal{G}_k)}
    \right\}
    =
    E_{\varphi^*}\left\{
-   e^{\inner{y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
+   e^{\inner{Y_{G_k}, \theta_{G_k} - \theta_{G_k}^*}}
    \middle| y_{q(G_k)}
    \right\}
 $$
@@ -184,17 +184,17 @@ That finishes the proof of the induction claim.
 
 The $k = n$ case of \eqref{eq:reg-induction} is
 $$
-   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   E_{\varphi^*}\bigl( e^{\inner{Y, \varphi - \varphi^*}} \bigr)
    =
    E_{\varphi^*}\left(
    \prod_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
-   e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
+   e^{Y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
    \right)
 $$
-and because every $y_{q(G)}$ appearing in the expectation is a constant
+and because every $Y_{q(G)}$ appearing in the expectation is a constant
 random variable at an initial node, the expectation does nothing, so
 $$
-   E_{\varphi^*}\bigl( e^{\inner{y, \varphi - \varphi^*}} \bigr)
+   E_{\varphi^*}\bigl( e^{\inner{Y, \varphi - \varphi^*}} \bigr)
    =
    \prod_{\substack{G \in \mathcal{G} \\ q(G) \notin J}}
    e^{y_{q(G)} [c_G(\theta_G) - c_G(\theta_G^*)]}
@@ -226,9 +226,9 @@ function), but we always know that $G_k \notin \bigcup \mathcal{G}_k$
 because that is the way the total order on $\mathcal{G}$ works:
 $q(G_k)$ must either be an initial node or must be in some $G_m$ with $k < m$.
 Thus case $k$ of \eqref{eq:reg-induction} tells us the expression is
-infinite if $c_{G_k}(\theta_{G_k}) = \infty$ and $y_{q(G_k)}$ is not
+infinite if $c_{G_k}(\theta_{G_k}) = \infty$ and $Y_{q(G_k)}$ is not
 zero almost surely.  But the former implies the latter cannot happen
-by the first sentence of the theorem statement: if $y_{q(G_k)} = 0$
+by the first sentence of the theorem statement: if $Y_{q(G_k)} = 0$
 almost surely, then $c_{G_k}$ is the zero function.
 
 Putting these statements together for all $k$, we see that
@@ -266,7 +266,7 @@ The first sentence of the theorem statement is for limiting conditional
 models.
 %%%%%%%%%% NEED CROSS REFERENCE to limiting conditional model %%%%%%%%%%
 An aster model in which no family is degenerate and no initial node is zero
-does not need this first sentence: we never have $y_j = 0$ almost surely
+does not need this first sentence: we never have $Y_j = 0$ almost surely
 for any $j$.  This is easily proved by induction, but we won't bother
 because limiting conditional models are a thing, so the theorem needs
 to be stated the way it is.
@@ -283,24 +283,24 @@ Applying \eqref{eq:cumfun-expfam} to the saturated model and a submodel give
    c(\varphi)
    & =
    c(\varphi^*) + \log\left\{
-   E_{\varphi^*}\Bigl( e^{\inner{y, \varphi - \varphi^*}} \Bigr) \right\}
+   E_{\varphi^*}\Bigl( e^{\inner{Y, \varphi - \varphi^*}} \Bigr) \right\}
    \\
    c_\text{sub}(\beta)
    & =
    c_\text{sub}(\beta^*) + \log\left\{
-   E_{\beta^*}\Bigl( e^{\inner{M^T y, \beta - \beta^*}} \Bigr) \right\}
+   E_{\beta^*}\Bigl( e^{\inner{M^T Y, \beta - \beta^*}} \Bigr) \right\}
 \end{align*}
 and
 \begin{align*}
-   E_{\beta^*}\Bigl( e^{\inner{M^T y, \beta - \beta^*}} \Bigr)
+   E_{\beta^*}\Bigl( e^{\inner{M^T Y, \beta - \beta^*}} \Bigr)
    & =
-   E_{\beta^*}\Bigl( e^{\inner{y, M (\beta - \beta^*)}} \Bigr)
+   E_{\beta^*}\Bigl( e^{\inner{Y, M (\beta - \beta^*)}} \Bigr)
    \\
    & =
-   E_{\beta^*}\Bigl( e^{\inner{y, a + M \beta - (a + M \beta^*)}} \Bigr)
+   E_{\beta^*}\Bigl( e^{\inner{Y, a + M \beta - (a + M \beta^*)}} \Bigr)
    \\
    & =
-   E_{\varphi^*}\Bigl( e^{\inner{y, \varphi - \varphi^*}} \Bigr)
+   E_{\varphi^*}\Bigl( e^{\inner{Y, \varphi - \varphi^*}} \Bigr)
 \end{align*}
 where $\varphi$ and $\varphi^*$ are the saturated model unconditional
 canonical parameter vectors corresponding to $\beta$ and $\beta^*$.
