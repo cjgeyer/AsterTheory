@@ -2359,13 +2359,13 @@ we could have picked any of these to serve as the definition.
 
 Condition (b) explains the terminology; these are directions of
 constancy of the log likelihood function as defined in \citet{rockafellar}.
-They obviously imply, if $\hat{\theta}$ is a maximum likelihood estimate,
+They obviously imply, if $\hat{\theta}$ is a maximum likelihood estimate (MLE),
 then so is $\hat{\theta} + s \delta$ for all real $s$.
 Condition (a) gives a uniqueness condition for maximum likelihood.
 If $\delta$ is not a direction of constancy and $s \neq 0$,
 then $\theta$ and $\theta + s \delta$ cannot both be maximum likelihood
 estimates because (a) would imply the log likelihood is higher somewhere
-between these points.  Thus the maximum likelihood estimate for a full
+between these points.  Thus the MLE for a full
 exponential family is unique (if it exists) if and only if there are
 no nonzero directions of constancy.
 
@@ -2861,7 +2861,7 @@ The arrows that may not correspond to a change of parameter arrow are
 \item the arrow $\mu \mapsto \xi$ labeled ``division'' fails to be a map
     when there is division by zero, in which case $\xi$ is not identifiable,
 \item the arrows $\xi \mapsto \theta$ and $\mu \mapsto \varphi$, which
-    are unlabled fail to be maps when the canonical parameterizations
+    are unlabeled fail to be maps when the canonical parameterizations
     are not identifiable (and either both are identifiable or neither are).
 \end{itemize}
 
@@ -2901,7 +2901,7 @@ vector (both have the same index set $J$).
 The saturated aster model has too many parameters chasing too little data.
 More parsimonious models are used in applications.
 
-The next few sections introduce these more parsimonius models and
+The next few sections introduce these more parsimonious models and
 even more parameters,
 and Sections~\ref{sec:revisited} and~\ref{sec:re-revisited} below
 discuss their transformations similar to how this section does.
@@ -2969,7 +2969,7 @@ in aster software.
 \subsection{A Plethora of Parameters Revisited}
 \label{sec:revisited}
 
-With unconditional canonical afffine submodels (preceding section) we get
+With unconditional canonical affine submodels (preceding section) we get
 two more parameters, so we can change our picture to
 \begin{equation} \label{eq:plethora-six}
 \begin{tikzcd}[column sep=9em]
@@ -3003,7 +3003,7 @@ two more parameters, so we can change our picture to
 where (of course) all of the parameters and arrows for the ``left square''
 are the same as in \eqref{eq:plethora-four}, where the three of the arrows
 for the ``right square'' give parameter transformations discussed in the
-preceding section, and the three unlabled arrows are parameter transformations
+preceding section, and the three unlabeled arrows are parameter transformations
 that have no closed-form expression.
 
 The inverse mappings to the the mapping $\beta \mapsto \tau$ is calculated
@@ -3111,7 +3111,7 @@ this is a \emph{curved exponential family}.
 As we shall see, there are a few good properties that are shared by
 conditional and unconditional aster models, but only a few.
 %%%%%%%%%% NEED FORWARD REFERENCE to likelihood inference %%%%%%%%%%
-The theory of conditional aster models is impovrished compared to that
+The theory of conditional aster models is impoverished compared to that
 of unconditional aster models.
 \index{aster model!unconditional|)}
 \index{aster model!canonical affine submodel!unconditional|)}
@@ -3163,7 +3163,7 @@ Both of these functions are always concave and strictly concave if and
 only if the canonical parameterization is identifiable.
 
 A point is a global maximizer of $l$ or $\tilde{l}$ if an only if the first
-derivative is equal to zero.  Hence $\theta$ is a maximum likelihood estimate
+derivative is equal to zero.  Hence $\theta$ is an MLE
 if and only if it satisfies the \emph{observed equals expected property}
 \begin{equation} \label{eq:observed-equals-expected-expfam}
    y = E_\theta(Y)
@@ -3180,17 +3180,363 @@ Section~\ref{sec:calculating-inverse-transformation} above is that
 there we \emph{assumed} there was a solution, that is, we assumed
 that the $\mu$ in \eqref{eq:logl-expfam-expected} satisfied the
 expected equals expected condition (which is a triviality) $\mu = E_\theta(Y)$.
-Here we do not assume \eqref{eq:observed-equals-expected} has a solution.
+Here we do not assume \eqref{eq:observed-equals-expected-expfam} has a solution.
 The data are what they are.  We assume they are possible data under the
 statistical model, but we do not assume anything else.
+
+All of the same arguments apply to canonical affine submodels,
+only the notation changes.  Replace $y$ by $M^T y$ and replace $\theta$ by
+$\beta$.  Thus $\beta$ is a global maximizer of the submodel log likelihood
+if and only if
+\begin{equation} \label{eq:observed-equals-expected-expfam-submodel}
+   M^T y = M^T E_\beta(Y)
+\end{equation}
 
 \subsection{Directions of Recession, Existence}
 \label{sec:direction-of-recession}
 
 A direction $\delta$ in the vector space where the canonical parameter vector
 of an exponential family takes values is called a \emph{direction of recession}
-of the log likelihood
+of the log likelihood if
+\begin{equation} \label{eq:direction-of-recession}
+   \inner{Y, \delta} \le \inner{y, \delta}, \qquad \text{almost surely},
+\end{equation}
+where $y$ is the observed value of the canonical statistic vector
+and $Y$ is a random value of the canonical statistic vector.
+
+Suppose $\delta$ is a nonzero direction of recession that is not a direction
+of constancy.  By monotonicity of expectation we have
+$$
+   E_\theta\{ \inner{Y, \delta} \} < \inner{y, \delta}
+$$
+for all parameter values $\theta$, because we know $\inner{y - Y, \delta}$
+is nonnegative almost surely, so if it had zero expectation, it would have
+to be zero almost surely (which would imply that $\delta$ is a direction
+of constancy).  Consequently, if $\delta$ is a nonzero
+direction of recession that is not a direction of constancy, then
+\eqref{eq:observed-equals-expected-expfam} has no solutions and maximum
+likelihood estimates for $\theta$ do not exist.
+It turns out this is the only way the MLE for an exponential family
+can fail to exist.
+
+\citet[Theorem~3]{geyer-gdor} gives many equivalent
+characterizations of this concept.  Here are some of them.
+In these we use the notation $y$ is the observed value of the
+canonical statistic vector, $Y$ is a random value of the
+canonical statistic vector,
+$\theta$ is the canonical parameter vector, $\delta$ is a vector in
+the vector space where $\theta$ takes values, $l$ is the log likelihood
+\eqref{eq:logl-expfam}, and $\Theta$ is the full canonical space
+\eqref{eq:full-expfam}.
+\begin{enumerate}
+\item[(a)] For some $\theta \in \Theta$,
+    $$
+        \limsup_{s \to \infty} l(\theta + s \delta) > - \infty.
+    $$
+\item[(b)] For all $\theta \in \Theta$,
+    the function $s \mapsto l(\theta + s \delta)$ is nondecreasing on the
+    whole real line.
+\item[(c)] $\inner{Y - y, \delta} \le 0$ almost surely
+    for some distribution in the exponential family.
+\item[(d)] $\inner{Y - y, \delta} \le 0$ almost surely
+    for every distribution in the exponential family.
+\end{enumerate}
+We arbitrarily picked (c) to serve as the definition,
+but, because they are all equivalent
+we could have picked any of these to serve as the definition
+of direction of recession.
+All of these equivalences are a consequence of Theorem~{3} in
+\citet{geyer-gdor}, except the implication that (a) implies the others
+uses Theorem~{8.6} in \citet{rockafellar}.
+
+By Theorem~{4} in \citet{geyer-gdor} the MLE exists if and only if
+every direction of recession is a direction of constancy.
+(It is clear from the definitions that every direction of constancy is
+a direction of recession.)
+
+By Theorem~{5} in \citet{geyer-gdor} if $\delta$ is a direction of recession
+that is not a direction of constancy, then the function
+$$
+   s \mapsto l(\theta + s \delta)
+$$
+is strictly increasing on the interval where it is finite, and this is
+true for all $\theta \in \Theta$.  This gives us another argument,
+besides the argument given above why a direction of recession that is
+not a direction of constancy implies nonexistence of an MLE.
+But we need Theorem~{4} in \citet{geyer-gdor} for the reverse conclusion
+that nonexistence of the MLE cannot occur for any other reason.
+
+All of the same arguments apply to canonical affine submodels,
+only the notation changes.  Replace $y$ by $M^T y$ and replace $\theta$ by
+$\beta$.  Thus a direction $\delta$ in the vector space where the submodel
+canonical parameter $\beta$ takes values is a direction of recession if and
+only if $\inner{y - Y, M \beta} \ge 0$ almost surely (for any one distribution
+in the submodel and hence for all distributions).  And MLE for $\beta$ exist
+if and only if $\inner{y - Y, M \beta} \ge 0$ almost surely
+implies $\inner{y - Y, M \beta} = 0$ almost surely.
+Moreover, $\beta$ is an MLE if and only if
+\eqref{eq:observed-equals-expected-expfam-submodel} holds.
+
+A lot more can be said and will be said on this subject.
+%%%%%%%%%% NEED FORWARD REFERENCE to chapter on solutions at infinity %%%%%%%%%%
 
 \subsection{Unconditional Aster Models}
 
+Almost nothing needs to be said in this section that hasn't already been said.
+Unconditional canonical affine submodels of aster models are regular full
+exponential families (under the conditions of Theorems~\ref{th:regular}
+and~\ref{th:regular-submodel} in Appendix~\ref{app:regular}).  So the
+penultimate paragraph of the preceding section says it all.
+
 \subsection{Conditional Aster Models}
+\label{sec:conditional-aster-model-mle}
+
+Conditional aster models are not regular full exponential families
+(only curved exponential families).  At least, they are not when
+considered statistically, probabilistically.
+
+But if we play a trick, they are when considered numerically, algebraically.
+Rewrite \eqref{eq:logl-aster-theta} as
+\begin{equation} \label{eq:logl-aster-theta-tricky}
+   l(\theta)
+   =
+   \sum_{G \in \mathcal{G}}
+   \left[ \inner{y_G, \theta_G} - n_{q(G)} c_G(\theta_G) \right]
+\end{equation}
+and pretend that all of the $n_{q(G)}$ are constants.  This makes no
+sense statistically, probabilistically because those $n_{q(G)}$ are actually
+$y_{q(G)}$ and some of them are the same variables some components of the
+$y_G$ that also appear in this expression.  But if we are just treating
+this log likelihood as a numerical, algebraic function to maximize to find
+MLE, then this doesn't matter.
+
+We call this the \emph{associated independence model} of the conditional
+aster model.  In this model $y$ factorizes as
+\begin{equation} \label{eq:factorize-tricky}
+   \pr(y) = \prod_{G \in \mathcal{G}} \pr(y_G \mid n_{q(G)})
+\end{equation}
+where all of the $n_{q(G)}$ are considered constants and not components of $y$.
+Then of course, we have the parameter transformation
+\eqref{eq:affine-conditional} of the canonical affine submodel.
+This is a regular full exponential family (Theorem~\ref{th:regular-tricky}
+in Appendix~\ref{app:regular}).
+
+So now we can apply the theory of \citet{geyer-gdor} to the associated
+independence model.
+\begin{theorem} \label{th:aim-mle}
+If $y_{q(G)} = 0$ for any dependence group $G$, replace
+the family for this dependence group by the degenerate family concentrated
+at zero so $c_G$ is the zero function.
+Then $\eta$ is a direction of recession of the associated independence model
+if and only if, writing $\delta = M \eta$,
+$$
+   E_\beta\{ \inner{y_G - Y_G, \delta_G} \mid y_{q(G)} \} \ge 0,
+   \qquad \text{for all $G \in \mathcal{G}$ such that $y_{q(G)} > 0$},
+$$
+and $\eta$ is a direction of constancy of the associated independence model
+if and only if
+$$
+   E_\beta\{ \inner{y_G - Y_G, \delta_G} \mid y_{q(G)} \} = 0,
+   \qquad \text{for all $G \in \mathcal{G}$ such that $y_{q(G)} > 0$}.
+$$
+Then the MLE for $\beta$ exists if and only if every direction of recession
+is a direction of constancy, and the MLE is unique if and only if no nonzero
+directions of constancy exist.
+\end{theorem}
+Note that the theorem ignores $\delta_G$ for $G$ such that $y_{q(G)} = 0$,
+hence unless the model matrix $M$ is such that $\delta_G = 0$ for all such $G$
+there will be non-uniqueness whenever there are such $G$.
+
+\subsection{Fisher Information}
+
+\subsubsection{Exponential Family}
+
+Differentiating twice the log likelihood \eqref{eq:logl-expfam} of
+an exponential family we get
+$$
+   l''(\theta) = - c''(\theta)
+$$
+and minus this is observed Fisher information, and the expectation is
+expected Fisher information.  Since the right-hand side is constant,
+observed and expected Fisher information are the same and are given by
+either side of \eqref{eq:cumulant-two}.
+
+\subsubsection{Unconditional}
+
+The Fisher information matrix for the saturated model unconditional
+canonical parameter $\varphi$ is given by either side
+of \eqref{eq:cumulant-two} with $\theta$ replaced by $\varphi$ (because
+$\varphi$ is the canonical parameter vector of the (unconditional, joint)
+aster model).   Following \citet{aster1}, their equations (17) and (18)
+we choose to calculate Fisher information using probability theory
+(calculating covariances) rather than calculus (calculating derivatives).
+
+This is done using the factorization and the iterated covariance theorem,
+which says for any random variables $X$, $Y$, and $Z$
+$$
+   \cov(X, Y) = E\{ \cov(X, Y \mid Z) \} + \cov\{E(X \mid Z), E(Y \mid Z)\}
+$$
+From this, for $i$ and $j$ in the same dependence group $G$
+\begin{equation}
+\begin{split} \label{eq:variance-unconditional-same-g}
+   \cov_\varphi(Y_i, Y_j)
+   & =
+   E_\varphi\{ \cov_\varphi(Y_i, Y_j \mid Y_{q(G)}) \}
+   \\
+   & \quad
+   + \cov_\varphi\{E_\varphi(Y_i \mid Y_{q(G)}), E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   E_\varphi\{ Y_{q(G)} \sigma_{i j} \}
+   + \cov_\varphi\{ Y_{q(G)} \xi_i, Y_{q(G)} \xi_j\}
+   \\
+   & =
+   \mu_{q(G)} \sigma_{i j} + \var_\varphi(Y_{q(G}) \xi_i \xi_j
+\end{split}
+\end{equation}
+where $\mu$ and $\xi$ are the unconditional and conditional mean value
+parameter vectors, respectively, corresponding to $\varphi$ and we introduce
+the notation
+$$
+   \sigma_{i j}
+   =
+   \frac{\partial^2 c_G(\theta_G)}{\partial \theta_i \partial \theta_j}
+$$
+which can also be written
+\begin{equation} \label{eq:sigma}
+   \sigma_{i j}
+   =
+   \cov_\varphi(Y_i, Y_j \mid Y_{q(G)} = 1)
+\end{equation}
+provided the conditioning event does not have probability zero (so the
+latter equation makes no sense) but we always have
+$$
+   \cov_\varphi(Y_i, Y_j \mid Y_{q(G)} ) = Y_{q(G)} \sigma_{i j}
+$$
+by the predecessor-is-sample-size property
+(this was used in deriving \eqref{eq:variance-unconditional-same-g}).
+
+For future use we also define $\sigma_{i j} = 0$ when $i$ and $j$ are
+not in the same dependence group.  This makes sense because if $i \in G$
+and $j \in H$ and $G \neq H$
+$$
+   \frac{\partial^2 c_G(\theta)}{\partial \theta_i \partial \theta_j}
+   =
+   \frac{\partial^2 c_H(\theta)}{\partial \theta_i \partial \theta_j}
+   =
+   0
+$$
+
+And, for $i$ and $j$ not in the same dependence group, say $i \in G$
+and $j \in H$ and $G < H$ in the order on $\mathcal{G}$ asserted to exist
+by Theorem~\ref{th:factorize},
+\begin{equation}
+\begin{split} \label{eq:variance-unconditional-not-same-g}
+   \cov_\varphi(Y_i, Y_j)
+   & =
+   E_\varphi\{ \cov_\varphi(Y_i, Y_j \mid Y_{q(G)}) \}
+   \\
+   & \quad
+   + \cov_\varphi\{E_\varphi(Y_i \mid Y_{q(G)}), E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   \cov_\varphi\{E_\varphi(Y_i \mid Y_{q(G)}), E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   \cov_\varphi\{\xi_i Y_{q(G)}, E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   \xi_i \cov_\varphi\{Y_{q(G)}, E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   \xi_i E_\varphi\{[Y_{q(G)} - \mu_{q(G)}] E_\varphi(Y_j \mid Y_{q(G)})\}
+   \\
+   & =
+   \xi_i E_\varphi\{[Y_{q(G)} - \mu_{q(G)}] Y_j \}
+   \\
+   & =
+   \xi_i \cov_\varphi(Y_{q(G)}, Y_j)
+   \\
+   & =
+   \xi_i \cov_\varphi(Y_{p(i)}, Y_j)
+\end{split}
+\end{equation}
+where the second equality is the Markov property (Theorem~\ref{th:markov}
+in Appendix~\ref{app:markov}); $Y_i$ and $Y_j$ are conditionally independent
+given $Y_{q(G)}$.
+
+Because covariances are symmetric in their arguments, we do not need to
+do the case $G > H$.
+
+It should be clear that we can calculate the whole
+Fisher information matrix using \eqref{eq:variance-unconditional-same-g}
+and \eqref{eq:variance-unconditional-not-same-g} traversing the full
+aster graph in any order that visits predecessors before successors
+(the inverse of the order in Theorem~\ref{th:factorize}).
+
+For computational efficiency, we should note that if $i$ and $j$ are
+nodes of the full aster graph for different ``individuals'' in scare quotes
+(defined in Section~\ref{sec:scare-quotes} above), then they are
+unconditionally independent by Corollary~\ref{cor:markov}
+in Appendix~\ref{app:markov}, so
+$$
+   \cov(Y_i, Y_j) = 0
+$$
+in this case.  The Fisher information matrix for $\varphi$ is block diagonal
+with the blocks being for ``individuals'' (in scare quotes).
+
+Now we revert to calculus to find the Fisher information matrix for the
+unconditional submodel canonical parameter $\beta$.
+The map $\beta \mapsto \varphi$ given by \eqref{eq:affine-unconditional}
+has derivative $M$ the model matrix, that is, if $m_{i j}$ are components
+of $M$, then
+$$
+   \frac{\partial{\varphi_i}}{\partial \beta_j} = m_{i j}.
+$$
+It follows from the chain rule that
+$$
+   c_\text{sub}''(\beta) = M^T c''(\varphi) M
+$$
+or
+$$
+   I(\beta) = M^T I(\varphi) M
+$$
+where we abuse notation using $I$ for both Fisher information for $\beta$
+and Fisher information for $\varphi$.
+
+\subsubsection{Conditional}
+
+Differentiating twice the log likelihood \eqref{eq:logl-aster-theta} for
+the conditional canonical parameter vector $\theta$ of
+an aster model we get
+$$
+   \frac{\partial^2 l(\theta)}{\partial \theta_i \partial \theta_j}
+   =
+   - \sum_{G \in \mathcal{G}} y_{q(G)}
+   \frac{\partial^2 c_G(\theta_G)}{\partial \theta_i \partial \theta_j}
+   =
+   - \sum_{G \in \mathcal{G}} y_{q(G)} \sigma_{i j}
+$$
+Since this is random, observed and expected Fisher information are not
+the same.  Also noting that $\sigma_{i j} = 0$ unless $i, j \in G$ we have
+the following.
+\begin{itemize}
+\item The observed Fisher information matrix for $\theta$ is block diagonal
+    with nonzero blocks corresponding to the dependence groups.  The $i, j$
+    component is $y_{q(G)} \sigma_{i j}$ for $G$ such that $i, j \in G$ and
+    zero otherwise.
+\item The expected Fisher information matrix for $\theta$ is similarly
+    block diagonal.  The $i, j$
+    component is $\mu_{q(G)} \sigma_{i j}$ for $G$ such that $i, j \in G$ and
+    zero otherwise.
+\end{itemize}
+
+If in either case we denote this matrix by $I(\theta)$, then
+the Fisher information matrix for $\beta$ is
+$$
+   I(\beta) = M^T I(\theta) M
+$$
+for the same reason as in the preceding section (and $I$ denotes the observed
+Fisher information matrix in both instances or the expected
+Fisher information matrix in both instances).
+

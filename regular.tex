@@ -324,3 +324,55 @@ of an open subset is open when the mapping is continuous, and every affine
 mapping is continuous.
 \end{proof}
 
+\begin{theorem} \label{th:regular-tricky}
+If $n_{q(G)} = 0$ for any dependence group $G$, replace
+the family for this dependence group by the degenerate family concentrated
+at zero so $c_G$ is the zero function.
+Then, if the saturated aster model is a regular full exponential family,
+then so is the associated independence model of a conditional aster model.
+\end{theorem}
+\begin{proof}
+This is just a combination of bits of earlier proofs.  First,
+\eqref{eq:logl-aster-theta-tricky} has exponential family form
+(pretending the $n_{q(G)}$ therein are nonrandom).  Denoting $\Theta_G$
+and $\Theta$ as in \eqref{eq:reg-prod}, this is clearly the full canonical
+parameter space of this exponential family.  And $\Theta$ is open because
+the Cartesian product of open sets is open.
+
+We can also write the saturated associated independence model log likelihood
+\eqref{eq:logl-aster-theta-tricky} as
+\begin{align*}
+   l(\theta)
+   & =
+   \left( \sum_{j \in J} y_j \theta_j \right)
+   -
+   \sum_{G \in \mathcal{G}} n_{q(G)} c_G(\theta_G)
+   \\
+   & =
+   \inner{y, \theta} - \tilde{c}(\theta)
+\end{align*}
+where
+$$
+   \tilde{c}(\theta)
+   =
+   \sum_{G \in \mathcal{G}} n_{q(G)} c_G(\theta_G)
+$$
+so the submodel associated independence model log likelihood can be written
+$$
+   l(\beta) = \inner{M^T y, \beta} - \tilde{c}_\text{sub}(\beta)
+$$
+where
+$$
+   \tilde{c}_\text{sub}(\beta)
+   =
+   \tilde{c}(a + M \beta)
+$$
+so this (submodel) associated independence model is an exponential family
+and its full canonical parameter space is, by an argument similar to the
+preceding proof
+$$
+   B = \set{ \beta \in \real^K : a + M \beta \in \Theta }.
+$$
+Since affine functions are continuous, $B$ is an open subset of the vector
+space where $\beta$ takes values.
+\end{proof}
