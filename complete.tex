@@ -1,0 +1,159 @@
+
+\chapter{Completion}
+
+In this chapter we deal with what to do when maximum likelihood estimates
+do not exist in the exponential family or aster model we are initially given.
+There may, and usually do, exist maximum likelihood estimates in the
+\emph{completion} of the family.  It is a bit unclear what we should call
+the statistical models studied in this chapter.
+\begin{itemize}
+\item \citet[Sections~9.3 and~9.4]{barndorff-nielsen} calls this concept
+    \emph{completion}.
+\item \citet[Chapter~6]{brown} calls this concept
+    an \emph{aggregate exponential family} for reasons that will be explained
+    presently.
+\item \citet[Chapters~2 and~4]{geyer-thesis} calls this concept
+    \emph{closure}.
+\item \citet{geyer-gdor} calls this concept
+    \emph{Barndorff-Nielsen completion}.
+\end{itemize}
+\citeauthor[personal communication]{brown} pointed out that the eponym chosen
+in \citet{geyer-gdor} was not quite correct, since \citet{barndorff-nielsen}
+works under more restrictive regularity conditions than \citet{brown}, and
+\citet{brown} works under more restrictive regularity conditions than
+\citet{geyer-thesis}.  The choice in \citet{geyer-gdor} follows
+Stigler's law of eponomy.  At least in this case \citeauthor{barndorff-nielsen}
+had the concept first if not in the most generality.
+The reason why \citet{geyer-thesis} chose ``closure'' rather than ``completion''
+is that when one works under the weakest regularity conditions, the topological
+space that is the statistical model being ``completed'' is not metrizable,
+hence ``complete'' (every Cauchy sequence converges) doesn't make any sense
+(the definition of Cauchy sequence requires a metric).  Thus we have only
+the more general topological concept of closure.
+We won't fuss about any of this and will continue use Barndorff-Nielsen
+completion or just completion.
+
+\section{Binomial Example}
+
+For this simplest example of the phenomenon of interest, we consider the
+binomial distribution.  We know from the discussion
+in Section~\ref{sec:direction-of-recession} above that the MLE does not exist
+when the observed value of the canonical statistic, which for the binomial
+distribution is the number of successes, is an extreme value, either as small
+as it can be or as large as it can be, in this case either 0 or $n$, where
+$n$ is the sample size.
+
+Usually, we think the MLE for the usual parameter $p$, the success probability,
+does exist for all data and is $\hat{p} = x / n$.  But when $x = 0$ or $x = n$,
+so $\hat{p}$ is zero or one, the MLE for the canonical parameter
+$\theta = \logit(p)$
+%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+does not exist because the domain of the logit function is the open interval
+$(0, 1)$ and does not include the endpoints.  Since
+\begin{align*}
+   \lim_{p \downarrow 0} \logit(p) & = - \infty
+   \\
+   \lim_{p \uparrow 0} \logit(p) & = \infty
+\end{align*}
+we could try to identify these endpoints with infinite values of the canonical
+parameter, but that is not the way exponential family theory works,
+and, as we shall see, it does not generalize to multiparameter problems.
+
+So instead of trying to complete the parameter space, we try to complete the
+family of distributions.  These distributions have PMF
+$$
+   f_p(x) = \binom{n}{x} p^x (1 - p)^{n - x}
+$$
+and we have
+\begin{align*}
+   \lim_{p \downarrow 0} f_p(x) & = \begin{cases} 1, & x = 0 \\ 0, & x > 0
+   \end{cases}
+   \\
+   \lim_{p \uparrow 1} f_p(x) & = \begin{cases} 0, & x < n \\ 1, & x = n
+   \end{cases}
+\end{align*}
+so the completion contains the original exponential family we were given
+plus two new distributions, the degenerate distribution concentrated at zero
+and the degenerate distribution concentrated at $n$.  And these new
+distributions are what are usually thought of as the binomial distributions
+for $p = 0$ and $p = 1$ (when $p = 0$ no successes are possible so $x = 0$
+almost surely; when $p = 1$ no failures are possible so $x = n$ almost surely).
+
+\section{General Exponential Families}
+
+\REVISED
+
+If \eqref{eq:logl-expfam} is the log likelihood of an exponential family,
+the the PMDF of that family must be the exponential of the log likelihood.
+In order that we do not get extra terms that do not appear in the log
+likelihood and in order to get the right support of the family, we take
+the measure with respect to which we calculate densities to be a measure
+in the family, say the measure corresponding to canonical parameter vector
+$\psi$.  Then the PMDF are
+\begin{equation} \label{eq:pmdf-expfam}
+   f_\theta(\omega) = e^{\inner{Y(\omega), \theta - \psi} - c(\theta) + c(\psi)}
+\end{equation}
+where $\omega$ is the complete data (remember that $Y$ is a statistic, but
+not necessarily the complete data) \citep[Equation~(4)]{geyer-gdor}.
+
+The following is Theorem~{6} in \citet{geyer-gdor}.
+It is a simplification of Theorem~{2.6} in \citet{geyer-thesis}.
+\begin{theorem} \label{th:completion-fundamental}
+For a full exponential family having log likelihood \eqref{eq:logl-expfam},
+densities \eqref{eq:pmdf-expfam} canonical statistic vector $Y$,
+observed value of the canonical statistic $y$,
+and full canonical parameter space $\Theta$, suppose $\delta$ is a direction of
+recession,
+\begin{equation} \label{eq:complete-fundamental-hyperplane}
+   H_\delta = \set{ z \in \real^J : \inner{z - y, \delta} = 0 },
+\end{equation}
+and $\Pr_\theta(Y \in H_\delta) > 0$ for some distribution in the family,
+and hence for all, then for all $\theta \in \Theta$
+\begin{equation} \label{eq:complete-fundamental-limit}
+   \lim_{\theta + s \delta} f_{\theta + s \delta}(\omega)
+   =
+   \begin{cases}
+   0, & \inner{Y(\omega) - y, \delta} < 0
+   \\
+   f_\theta(\omega) / \Pr_\theta(Y \in H_\delta), & \inner{Y(\omega) - y, \delta} = 0
+   \\
+   \infty, & \inner{Y(\omega) - y, \delta} > 0
+   \end{cases}
+\end{equation}
+If $\delta$ is not a direction of constancy, then the function
+$s \mapsto \Pr_{\theta + s \delta}(Y \in H_\delta)$ is continuous and
+strictly increasing, and $\Pr_{\theta + s \delta}(Y \in H_\delta) \to 1$
+as $s \to \infty$.
+\end{theorem}
+We note three things about the limit in \eqref{eq:complete-fundamental-limit}.
+\begin{itemize}
+\item It is a probability distribution because the set where it is infinite
+    has measure zero under the dominating measure $\Pr_\psi$
+\item It is a conditional distribution of the original family,
+    the conditional distribution of $Y$ given the event $Y \in H_\delta$
+    for the parameter vector $\theta$.
+\item It is a limit distribution of the original family,
+    the limit of the distributions for parameter vectors $\theta + s \delta$
+    as $s \to \infty$.  By Scheff\'{e}'s lemma, convergence of PMDF implies
+    convergence in total variation of the corresponding probability measures.
+\end{itemize}
+And we note one thing about the set of all limits
+in \eqref{eq:complete-fundamental-limit}.
+\begin{itemize}
+\item They form an exponential family of distributions.  The log likelihood is
+$$
+   \inner{y, \theta} - c(\theta) - \Pr\nolimits_\theta(Y \in H_\delta)
+$$
+and this is clearly an exponential family with
+\begin{itemize}
+\item canonical statistic vector $y$,
+\item canonical parameter vector $\theta$, and
+\item cumulant function given by
+$$
+   c_\delta(\theta) = c(\theta) + \Pr\nolimits_\theta(Y \in H_\delta)
+$$
+\end{itemize}
+\end{itemize}
+
+So the limits in Theorem~\ref{th:completion-fundamental}
+

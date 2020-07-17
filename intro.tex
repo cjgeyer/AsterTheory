@@ -2414,11 +2414,11 @@ of the canonical statistic because differentiating the log likelihood
 $$
    l''(\theta) = - c''(\theta) = - \var_\theta(Y).
 $$
-Then clearly, $\delta$ is a direction of recession if and only if
+Then clearly, $\delta$ is a direction of constancy if and only if
 $$
-   \var_\theta(\inner{Y, \delta}) = \delta^T I(\theta) \delta
+   \var_\theta(\inner{Y, \delta}) = \delta^T I(\theta) \delta.
 $$
-is equal to zero.  And by the spectral theorem
+And by the spectral theorem
 \citet[Section~79]{halmos-vector-spaces} this holds if and only if
 $I(\theta) \delta = 0$, in words, if and only if $\delta$ is a null
 eigenvector of the Fisher information matrix.
@@ -3387,36 +3387,36 @@ From this, for $i$ and $j$ in the same dependence group $G$
    + \cov_\varphi\{E_\varphi(Y_i \mid Y_{q(G)}), E_\varphi(Y_j \mid Y_{q(G)})\}
    \\
    & =
-   E_\varphi\{ Y_{q(G)} \sigma_{i j} \}
+   E_\varphi\{ Y_{q(G)} \gamma_{i j} \}
    + \cov_\varphi\{ Y_{q(G)} \xi_i, Y_{q(G)} \xi_j\}
    \\
    & =
-   \mu_{q(G)} \sigma_{i j} + \var_\varphi(Y_{q(G}) \xi_i \xi_j
+   \mu_{q(G)} \gamma_{i j} + \var_\varphi(Y_{q(G}) \xi_i \xi_j
 \end{split}
 \end{equation}
 where $\mu$ and $\xi$ are the unconditional and conditional mean value
 parameter vectors, respectively, corresponding to $\varphi$ and we introduce
 the notation
 $$
-   \sigma_{i j}
+   \gamma_{i j}
    =
    \frac{\partial^2 c_G(\theta_G)}{\partial \theta_i \partial \theta_j}
 $$
 which can also be written
 \begin{equation} \label{eq:sigma}
-   \sigma_{i j}
+   \gamma_{i j}
    =
    \cov_\varphi(Y_i, Y_j \mid Y_{q(G)} = 1)
 \end{equation}
 provided the conditioning event does not have probability zero (so the
 latter equation makes no sense) but we always have
 $$
-   \cov_\varphi(Y_i, Y_j \mid Y_{q(G)} ) = Y_{q(G)} \sigma_{i j}
+   \cov_\varphi(Y_i, Y_j \mid Y_{q(G)} ) = Y_{q(G)} \gamma_{i j}
 $$
 by the predecessor-is-sample-size property
 (this was used in deriving \eqref{eq:variance-unconditional-same-g}).
 
-For future use we also define $\sigma_{i j} = 0$ when $i$ and $j$ are
+For future use we also define $\gamma_{i j} = 0$ when $i$ and $j$ are
 not in the same dependence group.  This makes sense because if $i \in G$
 and $j \in H$ and $G \neq H$
 $$
@@ -3515,19 +3515,19 @@ $$
    - \sum_{G \in \mathcal{G}} y_{q(G)}
    \frac{\partial^2 c_G(\theta_G)}{\partial \theta_i \partial \theta_j}
    =
-   - \sum_{G \in \mathcal{G}} y_{q(G)} \sigma_{i j}
+   - \sum_{G \in \mathcal{G}} y_{q(G)} \gamma_{i j}
 $$
 Since this is random, observed and expected Fisher information are not
-the same.  Also noting that $\sigma_{i j} = 0$ unless $i, j \in G$ we have
+the same.  Also noting that $\gamma_{i j} = 0$ unless $i, j \in G$ we have
 the following.
 \begin{itemize}
 \item The observed Fisher information matrix for $\theta$ is block diagonal
     with nonzero blocks corresponding to the dependence groups.  The $i, j$
-    component is $y_{q(G)} \sigma_{i j}$ for $G$ such that $i, j \in G$ and
+    component is $y_{q(G)} \gamma_{i j}$ for $G$ such that $i, j \in G$ and
     zero otherwise.
 \item The expected Fisher information matrix for $\theta$ is similarly
     block diagonal.  The $i, j$
-    component is $\mu_{q(G)} \sigma_{i j}$ for $G$ such that $i, j \in G$ and
+    component is $\mu_{q(G)} \gamma_{i j}$ for $G$ such that $i, j \in G$ and
     zero otherwise.
 \end{itemize}
 
