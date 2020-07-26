@@ -81,7 +81,30 @@ almost surely; when $p = 1$ no failures are possible so $x = n$ almost surely).
 
 \section{General Exponential Families}
 
-\REVISED
+\subsection{Support and Support Function}
+
+Let $C$ denote the \emph{closed convex support} of the exponential family
+under discussion.  This is the smallest closed convex set that contains
+the canonical statistic vector with probability one.  Hence it is a closed
+convex subset of the vector space where the canonical statistic takes values.
+
+The closed convex set always exists because the intersection of closed sets
+is closed and the intersection of convex sets is convex and because
+finite-dimensional are second countable, so the complement of $C$ is the
+union of a countable family of open sets having probability zero under
+all distributions in the family (because all have the same support).
+
+Let $\sigma_C$ denote the \emph{support function} of $C$, defined by
+$$
+   \sigma_C(\delta) = \sup_{y \in C} \inner{y, \delta}
+$$
+\citep[Section~8.E]{rockafellar-wets}.  The term ``support'' here is
+unfortunate in that it is unrelated to the term ``support'' in $C$ being
+a support of the canonical statistic vector of the exponential family.
+But both terms are well established (``closed convex support'' in exponential
+family theory and ``support function'' in convex analysis).
+
+\subsection{Probability Mass-Density Functions}
 
 If \eqref{eq:logl-expfam} is the log likelihood of an exponential family,
 the the PMDF of that family must be the exponential of the log likelihood.
@@ -93,39 +116,60 @@ $\psi$.  Then the PMDF are
 \begin{equation} \label{eq:pmdf-expfam}
    f_\theta(\omega) = e^{\inner{Y(\omega), \theta - \psi} - c(\theta) + c(\psi)}
 \end{equation}
-where $\omega$ is the complete data (remember that $Y$ is a statistic, but
+where $\omega$ is the complete data (remember that $Y$ is a statistic,
 not necessarily the complete data) \citep[Equation~(4)]{geyer-gdor}.
 
-The following is Theorem~{6} in \citet{geyer-gdor}.
-It is a simplification of Theorem~{2.6} in \citet{geyer-thesis}.
+\subsection{Straight Line Limits}
+
 \begin{theorem} \label{th:completion-fundamental}
 For a full exponential family having log likelihood \eqref{eq:logl-expfam},
-densities \eqref{eq:pmdf-expfam} canonical statistic vector $Y$,
-observed value of the canonical statistic $y$,
-and full canonical parameter space $\Theta$, suppose $\delta$ is a direction of
-recession,
+densities \eqref{eq:pmdf-expfam}, canonical statistic vector $Y$,
+full canonical parameter space $\Theta$, and closed convex support $C$,
+suppose $\delta$ is a direction in the vector space where the canonical
+parameter takes values,
 \begin{equation} \label{eq:complete-fundamental-hyperplane}
-   H_\delta = \set{ z \in \real^J : \inner{z - y, \delta} = 0 },
+   H_\delta = \set{ y \in \real^J : \inner{y, \delta} = \sigma_C(\delta) },
 \end{equation}
-and $\Pr_\theta(Y \in H_\delta) > 0$ for some distribution in the family,
-and hence for all, then for all $\theta \in \Theta$
+then for all $\theta \in \Theta$
 \begin{equation} \label{eq:complete-fundamental-limit}
    \lim_{\theta + s \delta} f_{\theta + s \delta}(\omega)
    =
    \begin{cases}
-   0, & \inner{Y(\omega) - y, \delta} < 0
+   0, & \inner{Y(\omega), \delta} < \sigma_C(\delta)
    \\
-   f_\theta(\omega) / \Pr_\theta(Y \in H_\delta), & \inner{Y(\omega) - y, \delta} = 0
+   f_\theta(\omega) / \Pr_\theta(Y \in H_\delta),
+   & \inner{Y(\omega), \delta} = \sigma_C(\delta)
    \\
-   \infty, & \inner{Y(\omega) - y, \delta} > 0
+   \infty, & \inner{Y(\omega), \delta} > \sigma_C(\delta)
    \end{cases}
 \end{equation}
-If $\delta$ is not a direction of constancy, then the function
-$s \mapsto \Pr_{\theta + s \delta}(Y \in H_\delta)$ is continuous and
-strictly increasing, and $\Pr_{\theta + s \delta}(Y \in H_\delta) \to 1$
+where the middle term is defined to be $\infty$ in case of divide by zero.
+If $\delta$ is not a direction of constancy
+and $\Pr_\theta(Y \in H_\delta) > 0$, then the function
+$s \mapsto \Pr_{\theta + s \delta}(Y \in H_\delta)$ is continuous,
+strictly increasing, converges to one
 as $s \to \infty$.
 \end{theorem}
-We note three things about the limit in \eqref{eq:complete-fundamental-limit}.
+In the two cases ruled out by the precondition of the last sentence
+the function $s \mapsto \Pr_{\theta + s \delta}(Y \in H_\delta)$ is
+a constant function.  If $\delta$ is a direction of constancy,
+then $\Pr_\theta(Y \in H_\delta) = 1$ for all $\theta$.
+If $\Pr_\theta(Y \in H_\delta) = 0$ for some $\theta$,
+then $\Pr_\theta(Y \in H_\delta) = 0$ for all $\theta$.
+\begin{proof}
+This is a complication of Theorem~{6} in \citet{geyer-gdor}
+that is essentially Theorem~{2.3} in \citet{geyer-thesis}.
+However the proof of that Theorem~{2.3} contains some errors,
+so a corrected proof is given in the appendix of \citet{geyer-gdor}.
+Then the case $\Pr_\theta(Y \in H_\delta) > 0$ is Theorem~{2.6}
+in \citet{geyer-thesis},
+and the case $\Pr_\theta(Y \in H_\delta) = 0$ follows from Theorem~{2.2}
+in \citet{geyer-thesis}.
+The last sentence of the theorem statement is in Theorem~{6}
+in \citet{geyer-gdor}.
+\end{proof}
+In case $\Pr_\theta(Y \in H_\delta) > 0$,
+we note three things about the limit in \eqref{eq:complete-fundamental-limit}.
 \begin{itemize}
 \item It is a probability distribution because the set where it is infinite
     has measure zero under the dominating measure $\Pr_\psi$
@@ -137,8 +181,22 @@ We note three things about the limit in \eqref{eq:complete-fundamental-limit}.
     as $s \to \infty$.  By Scheff\'{e}'s lemma, convergence of PMDF implies
     convergence in total variation of the corresponding probability measures.
 \end{itemize}
-And we note one thing about the set of all limits
-in \eqref{eq:complete-fundamental-limit}.
+Note that the distribution under discussion is both a limit distribution
+and a conditional distribution.  Thinking of it as just one or the other
+is missing something.  It is both.
+
+In case $\Pr_\theta(Y \in H_\delta) = 0$,
+we note one thing about the limit in \eqref{eq:complete-fundamental-limit}.
+\begin{itemize}
+\item It is the zero measure because it is zero on the support of
+the dominating measure $\Pr_\psi$.
+\end{itemize}
+
+\subsection{The Limiting Conditional Model}
+
+We note one thing about the set of all limits
+in \eqref{eq:complete-fundamental-limit}
+in the case when $\Pr_\theta(Y \in H_\delta) > 0$.
 \begin{itemize}
 \item They form an exponential family of distributions.  The log likelihood is
 $$
@@ -149,11 +207,64 @@ and this is clearly an exponential family with
 \item canonical statistic vector $y$,
 \item canonical parameter vector $\theta$, and
 \item cumulant function given by
-$$
+\begin{equation} \label{eq:cumfun-lcm}
    c_\delta(\theta) = c(\theta) + \Pr\nolimits_\theta(Y \in H_\delta)
-$$
+\end{equation}
 \end{itemize}
 \end{itemize}
+\citet{geyer-gdor} calls this family the \emph{limiting conditional model}
+(LCM).  Of course, there are many LCM, one in each direction, but as we
+shall presently see, there is only one LCM of interest in any particular
+data analysis.
 
-So the limits in Theorem~\ref{th:completion-fundamental}
+\subsection{Aggregate Exponential Family}
+
+Denote the LCM in the direction $\delta$ by $\mathcal{P}_\delta$.
+When $\Pr_\theta(Y \in H_\delta) = 0$ we say $\mathcal{P}_\delta$ is empty
+(there are no limit probability distributions, and we do not want to include
+the zero measure in our completion, at least not yet).
+
+Then
+$$
+   \mathcal{P} = \bigcup_{\delta \in \real^J} \mathcal{P}_\delta
+$$
+is a union of exponential families that contains all straight-line limits.
+
+Under certain regularity conditions used by \citet{barndorff-nielsen},
+\citet{brown}, and \citet{geyer-gdor} this union is the completion.
+We do not get anything more by taking further limits in $\mathcal{P}$.
+
+But in general \citet[Chapters~2 and~4]{geyer-thesis} we may need to take
+further limits to arrive at the completion.
+
+Anyway, one can see why \citet{brown} gave this idea the name aggregate
+exponential family.  It is a union (or aggregate) of exponential families.
+
+\subsection{Support and Directions of Recession and Constancy}
+
+\begin{theorem}
+A vector $\delta$ is a direction of recession of the log likelihood of
+a full exponential family
+with closed convex support $C$ and observed value of the canonical statistic
+vector $y$ if and only if $\inner{y, \delta} \ge \sigma_C(\delta)$.
+If $y \in C$ (which happens with probability one), then a vector $\delta$
+is a direction of constancy of the family if and only if
+$\delta$ and $- \delta$ are both directions of recession.
+\end{theorem}
+The condition $y \in C$ is measure-theoretic nonsense.
+We have to say $y \in C$ to be measure-theoretically correct, but
+if your data fail to satisfy $y \in C$, then something is wrong with your data.
+\begin{proof}
+The first sentence is Corollary~{2.4.1} in \citet{geyer-thesis}.
+For the rest, $\delta$ is a direction of constancy if and only if
+$\inner{Y, \delta} = a$ almost surely for some constant $a$.
+And under the assumption $y \in C$, this implies $\inner{y, \delta} = a$
+too, so $\inner{Y - y, \delta} = 0 = \inner{Y - y, - \delta}$ almost surely
+and both $\delta$ and $- \delta$ are directions of recession.
+Conversely, both $\delta$ and $-\delta$ being directions of recession implies
+too, so $\inner{Y - y, \delta} \le 0$ almost surely and
+$\inner{Y - y, - \delta} \le 0$ almost surely, which imply
+$\inner{Y - y, \delta} = 0$ almost surely so $\inner{Y, \delta} = a$ almost
+surely, and $\delta$ is a direction of constancy.
+\end{proof}
 
