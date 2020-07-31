@@ -145,14 +145,15 @@ not without ugly and cumbersome extra decoration of the notation.
 (It is hard to explain how elegant this notation is with simple examples,
 but a perusal of Appendices~\ref{app:markov} and~\ref{app:regular}
 will show this notation is
-extremely powerful, and that appendix would be much longer and more confusing
+extremely powerful, and those appendices would be much longer and more confusing
 if we had to use conventional notation with indices going from 1 to $k$.)
 
 Our notation does have the drawback that we have only the convention
 that lower case letters denote elements of sets and upper case letters
-denote sets, which is why $y_j$ is clearly a component of a vector or subvector
+denote sets to indicate that $y_j$ is a component of a vector or subvector
 (the value of a function at the index $j$) and $y_A$ is a subvector
-(so is still a function, not the value of a function).
+(the restriction of a function to the set $A$, so still a function,
+not the value of a function).
 We also consider any subscript notation that clearly denotes a set
 as indicating a subvector, for example, $y_{\{1, 3, 5\}}$ or $y_{\{j\}}$ or
 $y_{\set{ j \in J : j \prec i }}$.
@@ -200,6 +201,10 @@ the joint distribution of $y$ factorizes as
 \begin{equation} \label{eq:factorize}
    \pr(y) = \prod_{G \in \mathcal{G}} \pr(y_G \mid y_{q(G)})
 \end{equation}
+We emphasize that $q : \mathcal{G} \to N$ maps elements of $\mathcal{G}$,
+which are sets of indices, to elements of $N$, which are single indices,
+so each $y_G$ in \eqref{eq:factorize} is a subvector of $y$,
+and each $y_{q(G)}$ in \eqref{eq:factorize} is a component of $y$.
 
 In this factorization, each component $y_j$ of the response vector $y$
 appears exactly once ``in front of the bar'' in a conditional on
@@ -311,7 +316,7 @@ $j \myline k$ (or if one prefers $y_j \myline y_k$)
 for every $G \in \mathcal{G}$ and every $j, k \in G$ such that $j \neq k$.
 
 As we have just seen, the function $q$ determines the graph
-(the function $q$ knows its domain $\mathcal{G}$).
+(the function $q$ knows its domain $\mathcal{G}$ and codomain $N$).
 Conversely, the graph determines the function $q$.
 \begin{itemize}
 \item The set $J = \bigcup \mathcal{G}$ is the set of nodes of the graph
@@ -322,7 +327,8 @@ Conversely, the graph determines the function $q$.
     (The graph of lines is the graph obtained by keeping all the nodes
     and lines but removing all the arrows).
     \index{aster graph!of lines}
-    This includes any singleton sets of $J$ that have no incoming lines.
+    If a node $j \in J$ has no incoming lines, then the singleton set $\{j\}$
+    is an element of $\mathcal{G}$.
 \item The graph of $q$ is determined by the arrows: $(G, q(G))$ is an
     argument-value pair whenever there is an arrow $j \longrightarrow k$
     with $j = q(G)$ and $k \in G$.
@@ -553,9 +559,10 @@ But $p$ and $\mathcal{G}$ together determine $q$.
 \section{The Transitive Closure of the Predecessor Relation}
 \label{sec:closure}
 
-The \emph{predecessor relation} on $N$ is the function $p$ thought
+The \emph{predecessor relation} on $N$ is the index-to-index predecessor
+function $p$ thought
 of as a relation, that is, thinking set-theoretically
-\citep[Section~7]{halmos-set-theory} as the set
+\citep[Section~7]{halmos-set-theory}, as the set
 $$
    \set{ (j, p(j)) : j \in J }
 $$
@@ -1661,7 +1668,7 @@ aster models may have some rationale supporting them.
 This is a brief overview of the theory
 of exponential families of distributions,
 just enough to allow us to finish the basic theory of aster models.
-We will do some more exponential family later as the need arises.
+We will do some more exponential family theory later as the need arises.
 
 \subsection{Definition}
 \label{sec:define-expfam}
@@ -2008,8 +2015,8 @@ Observe that derivatives of $K_\theta$ evaluated at zero are derivatives
 of $c$ evaluated at $\theta$.  Hence the cumulant function is so called
 \index{exponential family!cumulant function}
 because its derivatives evaluated at $\theta$ give cumulants.
-(Of course, this is only valid when $\theta$ is in the full canonical
-parameter space \eqref{eq:full-expfam}).
+(Of course, this is only valid when $\theta$ is in the interior of the
+full canonical parameter space \eqref{eq:full-expfam}).
 
 This also shows that cumulant functions are infinitely differentiable
 at every point in the interior of the full canonical
@@ -2140,7 +2147,7 @@ function $c_G$, hence the cumulant function in each term is $y_{q(G)}$
 times the cumulant function for sample size one).
 
 As was mentioned in Section~\ref{sec:miss} above, probability theory
-just does the Right Thing in case $y_{q(G} = 0$.
+just does the Right Thing in case $y_{q(G)} = 0$.
 By the predecessor-is-sample-size property, this implies $y_G = 0$ too,
 so the whole contribution to the log likelihood of the term for dependence
 $G$ is zero (when, as we are discussing here, the predecessor is zero).
@@ -2393,7 +2400,7 @@ if they are to use the same parameterization as the original model.
 \end{itemize}
 
 Conditions (e) and (f) connect this concept with multivariate degeneracy.
-The vector $\delta$ is a direction of constancy if an only if the random
+The vector $\delta$ is a direction of constancy if and only if the random
 variable $\inner{Y, \delta}$ is almost surely constant, which is the
 same thing as saying the canonical statistic vector $Y$ is concentrated
 on a hyperplane.  So the canonical parameterization of a full exponential
@@ -2628,7 +2635,8 @@ aster model, and
 \end{equation}
 where $c_G$ is the cumulant function of dependence group $G$.
 
-The inverse mappings to these mappings do not have closed form expression
+The inverse mappings to these mappings do not, in general,
+have closed form expression
 but are described in Section~\ref{sec:calculating-inverse-transformation}
 above.  Define $\tilde{l}$ by
 \begin{equation} \label{eq:logl-aster-expected}
@@ -2729,7 +2737,7 @@ $\xi$ that corresponds to $\theta$.
 \label{sec:dealing}
 
 We are used to the computer dealing with non-identifiability, also called
-collinearity automatically.  R function \code{lm} and \code{glm} in core R
+collinearity, automatically.  R function \code{lm} and \code{glm} in core R
 \citep{r-core}, which fit linear and generalized linear models automatically
 handle it by dropping regressor vectors (columns of the model matrix) until
 identifiability is obtained.  They signal this by reporting \code{NA} for
@@ -3162,7 +3170,7 @@ $\tilde{l}$ given by \eqref{eq:logl-expfam-expected}.
 Both of these functions are always concave and strictly concave if and
 only if the canonical parameterization is identifiable.
 
-A point is a global maximizer of $l$ or $\tilde{l}$ if an only if the first
+A point is a global maximizer of $l$ or $\tilde{l}$ if and only if the first
 derivative is equal to zero.  Hence $\theta$ is an MLE
 if and only if it satisfies the \emph{observed equals expected property}
 \begin{equation} \label{eq:observed-equals-expected-expfam}
@@ -3216,7 +3224,7 @@ of constancy).  Consequently, if $\delta$ is a nonzero
 direction of recession that is not a direction of constancy, then
 \eqref{eq:observed-equals-expected-expfam} has no solutions and maximum
 likelihood estimates for $\theta$ do not exist.
-It turns out this is the only way the MLE for an exponential family
+It turns out this is the only way the MLE for a regular full exponential family
 can fail to exist.
 
 \citet[Theorem~3]{geyer-gdor} gives many equivalent
@@ -3462,7 +3470,7 @@ by Theorem~\ref{th:factorize},
 \end{split}
 \end{equation}
 where the second equality is the Markov property (Theorem~\ref{th:markov}
-in Appendix~\ref{app:markov}); $Y_i$ and $Y_j$ are conditionally independent
+in Appendix~\ref{app:markov}): $Y_i$ and $Y_j$ are conditionally independent
 given $Y_{q(G)}$.
 
 Because covariances are symmetric in their arguments, we do not need to

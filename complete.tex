@@ -88,11 +88,15 @@ under discussion.  This is the smallest closed convex set that contains
 the canonical statistic vector with probability one.  Hence it is a closed
 convex subset of the vector space where the canonical statistic takes values.
 
-The closed convex set always exists because the intersection of closed sets
+The closed convex support always exists because the intersection of closed sets
 is closed and the intersection of convex sets is convex and because
-finite-dimensional are second countable, so the complement of $C$ is the
-union of a countable family of open sets having probability zero under
-all distributions in the family (because all have the same support).
+finite-dimensional vector spaces are second countable.  Define $C$ to be
+the intersection of all closed convex sets that contain the canonical
+statistic vector $Y$ with probability one under some distribution in the
+family, and hence for all distributions in the family (because all have
+the same support).  Then event $Y \notin C$ is the
+union of a countable family of open sets having probability zero,
+hence $Y \in C$ almost surely.
 
 Let $\sigma_C$ denote the \emph{support function} of $C$, defined by
 $$
@@ -199,23 +203,72 @@ in \eqref{eq:complete-fundamental-limit}
 in the case when $\Pr_\theta(Y \in H_\delta) > 0$.
 \begin{itemize}
 \item They form an exponential family of distributions.  The log likelihood is
-$$
-   \inner{y, \theta} - c(\theta) - \Pr\nolimits_\theta(Y \in H_\delta)
-$$
+\begin{equation} \label{eq:logl-expfam-lcm}
+   l_\delta(\theta) =
+   \inner{y, \theta} - c(\theta) - \log \Pr\nolimits_\theta(Y \in H_\delta)
+\end{equation}
 and this is clearly an exponential family with
 \begin{itemize}
 \item canonical statistic vector $y$,
 \item canonical parameter vector $\theta$, and
 \item cumulant function given by
 \begin{equation} \label{eq:cumfun-lcm}
-   c_\delta(\theta) = c(\theta) + \Pr\nolimits_\theta(Y \in H_\delta)
+   c_\delta(\theta) = c(\theta) + \log \Pr\nolimits_\theta(Y \in H_\delta)
 \end{equation}
 \end{itemize}
 \end{itemize}
 \citet{geyer-gdor} calls this family the \emph{limiting conditional model}
 (LCM).  Of course, there are many LCM, one in each direction, but as we
-shall presently see, there is only one LCM of interest in any particular
-data analysis.
+shall presently see, there is usually only one LCM of interest
+in any particular data analysis.
+
+\begin{theorem} \label{th:cumfun-lcm}
+Equation \eqref{eq:cumfun-lcm} gives the correct limit of the cumulant function
+to make \eqref{eq:logl-expfam-lcm} equal to the limit of \eqref{eq:logl-expfam}
+when limits are taken as in Theorem~\ref{th:completion-fundamental}
+in the case $\inner{y, \theta} = \sigma_K(\delta)$.
+\end{theorem}
+\begin{proof}
+In symbols, the assertion of the theorem is
+$$
+   \lim_{s \to \infty} l(\theta + s \delta)
+   =
+   l_\delta(\theta)
+$$
+And
+\begin{align*}
+   \lim_{s \to \infty} l(\theta + s \delta)
+   & =
+   \lim_{s \to \infty}
+   \bigl[ \inner{y, \theta + s \delta} - c(\theta + s \delta) \bigr]
+   \\
+   & =
+   \inner{y, \theta} + \lim_{s \to \infty}
+   \bigl[ s \inner{y, \delta} - c(\theta + s \delta) \bigr]
+   \\
+   & =
+   \inner{y, \theta} + \lim_{s \to \infty}
+   \bigl[ s \sigma_K(\delta) - c(\theta + s \delta) \bigr]
+   \\
+   & =
+   \inner{y, \theta} - c(\theta) - \log \Pr\nolimits_\theta(Y \in H_\delta)
+   \\
+   & =
+   \inner{y, \theta} - c_\delta(\theta)
+\end{align*}
+where the fourth equality is Theorem~{2.2} in \citet{geyer-thesis}.
+\end{proof}
+
+We know, of course, that cumulant functions can be redefined by adding an
+arbitrary constant (the $c(\psi)$ in \eqref{eq:cumfun-expfam}).
+As mentioned in Section~\ref{sec:define-expfam} above, we could even redefine
+the cumulant function by adding an arbitrary affine function if we were to
+accept a different choice of canonical statistic.  But things would get
+very confusing if we made different arbitrary choices for the original
+exponential family and its limiting conditional models.  Hence, however
+the cumulant function of the original exponential family was chosen, we
+will always use \eqref{eq:cumfun-lcm} to define cumulant functions
+for limiting conditional models.
 
 \subsection{Aggregate Exponential Family}
 
@@ -242,29 +295,62 @@ exponential family.  It is a union (or aggregate) of exponential families.
 
 \subsection{Support and Directions of Recession and Constancy}
 
-\begin{theorem}
+\begin{theorem} \label{th:recession-constancy}
 A vector $\delta$ is a direction of recession of the log likelihood of
 a full exponential family
 with closed convex support $C$ and observed value of the canonical statistic
 vector $y$ if and only if $\inner{y, \delta} \ge \sigma_C(\delta)$.
-If $y \in C$ (which happens with probability one), then a vector $\delta$
-is a direction of constancy of the family if and only if
-$\delta$ and $- \delta$ are both directions of recession.
+If $\delta$ and $- \delta$ are both directions of recession, then $\delta$
+is a direction of constancy.
+Conversely, if $\delta$ is a direction of constancy and $y \in C$,
+then $\delta$ and $- \delta$ are both directions of recession.
 \end{theorem}
 The condition $y \in C$ is measure-theoretic nonsense.
 We have to say $y \in C$ to be measure-theoretically correct, but
 if your data fail to satisfy $y \in C$, then something is wrong with your data.
 \begin{proof}
 The first sentence is Corollary~{2.4.1} in \citet{geyer-thesis}.
-For the rest, $\delta$ is a direction of constancy if and only if
-$\inner{Y, \delta} = a$ almost surely for some constant $a$.
-And under the assumption $y \in C$, this implies $\inner{y, \delta} = a$
-too, so $\inner{Y - y, \delta} = 0 = \inner{Y - y, - \delta}$ almost surely
-and both $\delta$ and $- \delta$ are directions of recession.
-Conversely, both $\delta$ and $-\delta$ being directions of recession implies
-too, so $\inner{Y - y, \delta} \le 0$ almost surely and
-$\inner{Y - y, - \delta} \le 0$ almost surely, which imply
-$\inner{Y - y, \delta} = 0$ almost surely so $\inner{Y, \delta} = a$ almost
-surely, and $\delta$ is a direction of constancy.
+If $\delta$ and $- \delta$ are both directions of recession then
+$$
+   \inner{y, \delta} \ge \sigma_K(\delta) = \sup_{x \in K} \inner{x, \delta}
+$$
+and
+\begin{align*}
+   - \inner{y, \delta}
+   & =
+   \inner{y, - \delta}
+   \\
+   & \ge
+   \sigma_K(- \delta)
+   \\
+   & =
+   \sup_{x \in K} \inner{x, - \delta}
+   \\
+   & =
+   - \inf_{x \in K} \inner{x, \delta}
+\end{align*}
+or
+$$
+   \inner{y, \delta} \le \inf_{x \in K} \inner{x, \delta}
+$$
+so
+\begin{equation} \label{eq:recession-constancy-inequalities}
+   \inner{y, \delta} \le \inf_{x \in K} \inner{x, \delta}
+   \le
+   \sup_{x \in K} \inner{x, \delta} \le \inner{y, \delta} 
+\end{equation}
+hence
+\begin{equation} \label{eq:recession-constancy}
+   \inner{x, \delta} = \inner{y, \delta}, \qquad x \in K
+\end{equation}
+hence $\inner{Y, \delta} = \inner{y, \delta}$ almost surely,
+and $\delta$ is a direction of constancy.
+
+Conversely, if $\delta$ is a direction of constancy, then $\inner{Y, \delta}$
+is constant almost surely.  And if $y \in C$, that constant must
+be $\inner{y, \delta}$.  Hence \eqref{eq:recession-constancy} holds.
+Hence \eqref{eq:recession-constancy-inequalities} holds.
+And we have already seen that \eqref{eq:recession-constancy-inequalities}
+is equivalent to both $\delta$ and $- \delta$ being directions of recession.
 \end{proof}
 
