@@ -226,7 +226,7 @@ in any particular data analysis.
 Equation \eqref{eq:cumfun-lcm} gives the correct limit of the cumulant function
 to make \eqref{eq:logl-expfam-lcm} equal to the limit of \eqref{eq:logl-expfam}
 when limits are taken as in Theorem~\ref{th:completion-fundamental}
-in the case $\inner{y, \theta} = \sigma_K(\delta)$.
+in the case $\inner{y, \theta} = \sigma_C(\delta)$.
 \end{theorem}
 \begin{proof}
 In symbols, the assertion of the theorem is
@@ -248,7 +248,7 @@ And
    \\
    & =
    \inner{y, \theta} + \lim_{s \to \infty}
-   \bigl[ s \sigma_K(\delta) - c(\theta + s \delta) \bigr]
+   \bigl[ s \sigma_C(\delta) - c(\theta + s \delta) \bigr]
    \\
    & =
    \inner{y, \theta} - c(\theta) - \log \Pr\nolimits_\theta(Y \in H_\delta)
@@ -312,7 +312,7 @@ if your data fail to satisfy $y \in C$, then something is wrong with your data.
 The first sentence is Corollary~{2.4.1} in \citet{geyer-thesis}.
 If $\delta$ and $- \delta$ are both directions of recession then
 $$
-   \inner{y, \delta} \ge \sigma_K(\delta) = \sup_{x \in K} \inner{x, \delta}
+   \inner{y, \delta} \ge \sigma_C(\delta) = \sup_{x \in K} \inner{x, \delta}
 $$
 and
 \begin{align*}
@@ -321,7 +321,7 @@ and
    \inner{y, - \delta}
    \\
    & \ge
-   \sigma_K(- \delta)
+   \sigma_C(- \delta)
    \\
    & =
    \sup_{x \in K} \inner{x, - \delta}

@@ -73,6 +73,10 @@ The \emph{cumulant function} is
    & =
    n \log\left(1 + e^\theta\right)
 \end{align*}
+Note that, as required for any sum of IID random variables, the cumulant
+function for sample size $n$ is $n$ times the cumulant function for
+sample size one (Section~\ref{sec:iid} above).
+
 We check that this has the correct derivatives
 $$
    c'(\theta) = \frac{n e^\theta}{1 + e^\theta} = n p
@@ -107,17 +111,21 @@ Thus there are two limiting conditional models, one of which contains only
 the distribution concentrated at zero and one of which contains only
 the distribution concentrated at $n$.
 
-It is important that we use \eqref{eq:cumfun-lcm} to determine the cumulant
-function for the LCM.  It is true (Section~\ref{sec:define-expfam} above)
-that a cumulant function plus an affine function is another cumulant function.
-But it could be very confusing if we do not use the formula derived from
-taking limits in the original model.
+In one-dimensional space there are only two directions.  Every positive
+vector points in the same direction and gives the same LCM.  Every negative
+vector points in the same direction and gives the same LCM.  (And, of course,
+the zero vector points in no direction and gives the original model back
+as the LCM corresponding to it.)
+
+As discussed in Theorem~\ref{th:cumfun-lcm} above and its following comments,
+it is important that we use \eqref{eq:cumfun-lcm} to determine the cumulant
+function for the LCM.
 
 So
 \begin{align*}
    c_{- 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = 0)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = 0)
    \\
    & =
    n \log\left(1 + e^\theta\right)
@@ -136,7 +144,7 @@ and
 \begin{align*}
    c_{+ 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = n)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = n)
    \\
    & =
    n \log\left(1 + e^\theta\right)
@@ -152,7 +160,8 @@ and
    n \theta
 \end{align*}
 
-The sum of $m$ independent and identically distributed
+\emph{Addition rule:}
+the sum of $m$ independent and identically distributed
 binomial random variables with sample size $n$ and usual parameter $p$
 has the binomial distribution with sample size $m n$ and usual parameter $p$.
 
@@ -173,7 +182,7 @@ the \emph{probability mass function}
    f(y) = \frac{\xi^y}{y !} e^{- \xi}, \qquad y = 0, 1, 2, \ldots,
 \end{equation}
 where $\xi$ is the \emph{usual parameter}, which turns out to be the
-mean and variance of the distribution.
+mean and variance of the distribution, hence also the mean-value parameter.
 
 This is a \emph{discrete} random variable.
 
@@ -182,12 +191,12 @@ that they are almost one rationale.  First, the Poisson distribution is
 an approximation to the $\text{binomial}(n, p)$ distribution when $n$
 is very large and $p$ is very small and the mean $n p$ is moderate sized.
 An example is a lottery.  Every week millions, sometimes hundreds of millions
-of tickets are sold; that's $n$, the probability of any one ticket winning
-is very small, for example, for the Powerball lottery, the probability is
-one over 292,201,338 (as we write this, the rules change from time to time);
-that's $p$; so $n p$ is moderate sized.  In weeks where the jackpot is small
+of tickets are sold (that's $n$), the probability of any one ticket winning
+is very small --- for example, for the Powerball lottery, the probability is
+one over 292,201,338 (as we write this, the rules change from time to time) ---
+(that's $p$), and $n p$ is moderate sized.  In weeks where the jackpot is small
 and few tickets are sold, there are still tens of millions of tickets sold,
-so $n p$ is less than one but not really small.  In weeks where the jackpot
+so $n p$ is less than one but not very small.  In weeks where the jackpot
 is large, there may be many hundreds of millions
 of tickets sold, so $n p$ is greater
 than one and multiple winners are expected (they split the jackpot among them).
@@ -324,7 +333,7 @@ function for the LCM.  So
 \begin{align*}
    c_{- 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = 0)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = 0)
    \\
    & =
    e^\theta 
@@ -353,7 +362,7 @@ family.  One log likelihood for the Poisson family is
 $$
    l(\theta) = y \theta - e^\theta
 $$
-but if we make the substition $\theta = \psi + \log(r)$ we get
+but if we make the substitution $\theta = \psi + \log(r)$ we get
 $$
    l(\psi) = y \psi + y \log(r) - e^{\psi + \log(r)}
 $$
@@ -363,7 +372,8 @@ $$
    l(\psi) = y \psi - e^{\psi + \log(r)}
 $$
 and we see this has exponential family form with canonical statistic $y$,
-canonical parameter $\psi$ anc cumulant function $c(\psi) = e^{\psi + \log(r)}$.
+canonical parameter $\psi$,
+and cumulant function $c(\psi) = e^{\psi + \log(r)}$.
 
 This is just a special case of the fact,
 noted without proof in Section~\ref{sec:define-expfam},
@@ -413,52 +423,73 @@ the PDF of the zero-truncated Poisson distribution is
 \end{equation}
 
 Since this is not a ``brand name distribution'' the mean and variance
-cannot just be looked up.  The \emph{mean} is
-\begin{equation} \label{eq:mean-of-zero-truncated-in-terms-of-untruncated}
-\begin{split}
-   E(y)
+cannot just be looked up.  In aid of this calculation we prove a rather
+trivial general theorem.
+\begin{theorem} \label{th:truncated-mean-variance}
+Suppose $X$ is a nonnegative-integer-valued random variable,
+and $Y$ is the corresponding zero-truncated random variable.  Then
+$$
+   E(Y^k) = E(X^k) / \Pr(X > 0)
+$$
+for any positive integer $k$.
+\end{theorem}
+\begin{proof}
+For this proof let $f$ denote the PMF of $X$ and $g$ the PMF of $Y$, so
+the relationship between the two is given
+by \eqref{eq:zero-truncated-poisson-pmf-in-terms-of-poisson}
+even though we are no longer assuming $X$ is Poisson.  Then
+\begin{align*}
+   E(Y^k)
    & =
-   \sum_{y = 1}^\infty y g(y)
+   \sum_{y = 1}^\infty y^k g(y)
    \\
    & =
-   \frac{1}{1 - f(0)} \sum_{y = 1}^\infty y f(y)
+   \frac{1}{1 - f(0)} \sum_{x = 1}^\infty x^k f(x)
    \\
    & =
-   \frac{1}{1 - f(0)} \sum_{y = 0}^\infty y f(y)
+   \frac{1}{1 - f(0)} \sum_{x = 0}^\infty x^k f(x)
    \\
    & =
-   \frac{m}{1 - f(0)}
-\end{split}
+   \frac{E(X)}{1 - f(0)}
+   \\
+   & =
+   \frac{E(X)}{\Pr(X > 0)}
+\end{align*}
+where the third equality is the fact that the $x = 0$ term in the sum
+is equal to zero.
+\end{proof}
+Together with
+\begin{align*}
+   \var(Y) & = E(Y^2) - E(Y)^2
+   \\
+   E(Y^2) & = \var(Y) + E(Y)^2
+\end{align*}
+which are well known from elementary probability theory, we can use the
+theorem to calculate the mean and variance of zero-truncated random variables.
+
+For the Poisson distribution, we have $E(X) = \var(X) = m$
+so $E(X^2) = m + m^2$, so
+\begin{equation} \label{eq:mean-of-zero-truncated-Poisson}
+   E(Y)
+   =
+   \frac{E(X)}{\Pr(X > 0)}
+   =
+   \frac{m}{1 - e^{- m}}
 \end{equation}
 and
-\begin{equation}
-\label{eq:second-ordinary-moment-of-zero-truncated-in-terms-of-untruncated}
+\begin{equation} \label{eq:variance-of-zero-truncated-Poisson}
 \begin{split}
-   E(y^2)
+   \var(Y)
    & =
-   \sum_{y = 1}^\infty y^2 g(y)
+   E(Y^2) - E(Y)^2
    \\
    & =
-   \frac{1}{1 - f(0)} \sum_{y = 1}^\infty y^2 f(y)
+   \frac{E(X^2)}{\Pr(X > 0)} - \left(\frac{E(X)}{\Pr(X > 0)}\right)^2
    \\
    & =
-   \frac{1}{1 - f(0)} \sum_{y = 0}^\infty y^2 f(y)
-   \\
-   & =
-   \frac{m + m^2}{1 - f(0)}
+   \frac{m + m^2}{1 - e^{- m}} - \left( \frac{m}{1 - e^{- m}} \right)^2
 \end{split}
 \end{equation}
-because the infinite sum in the next-to-last line is $E(y^2)$ when $y$
-is Poisson, and $E(y^2) = \var(y) + E(y)^2$ for any random variable.
-Hence the \emph{variance} is
-\begin{align*}
-   \var(y)
-   & =
-   E(y^2) - E(y)^2
-   \\
-   & =
-   \frac{m + m^2}{1 - f(0)} - \left( \frac{m}{1 - f(0)} \right)^2
-\end{align*}
 % Mathematica
 % dist = PoissonDistribution[m]
 % f[y_] = PDF[dist, y]
@@ -581,7 +612,7 @@ and \eqref{eq:first-convenient-variance-formula} shows the variance converges
 to zero as $m \to 0$ and $\xi \to 1$.
 As $\theta \to \infty$ and $m \to \infty$ the mean value parameter $\xi$
 is approximately equal to $m$ because $f(0) = e^{- m}$ is approximately zero.
-Then $\xi e^{- m}$ is small compared to $\xi \approx m$, and
+Then $\xi e^{- m}$ is small compared to one, and
 and \eqref{eq:second-convenient-variance-formula} shows the variance is
 also approximately equal to $\xi \approx m$.
 
@@ -614,7 +645,7 @@ function for the LCM.  So
 \begin{align*}
    c_{- 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = 1)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = 1)
    \\
    & =
    m + \log(1 - e^{- m})
@@ -648,12 +679,12 @@ The univariate normal distribution has \emph{probability density function}
 \end{equation}
 \end{sloppypar}
 
-This is a \emph{continuous} random variable.
-(Except when incorporated into an aster model, it is a mixture of discrete
+This is a \emph{continuous} random variable;
+except when incorporated into an aster model, it is a mixture of discrete
 and continuous.  For a normal-location arrow, when the predecessor is zero
 the conditional distribution of the successor is the degenerate random variable
 concentrated at zero, which is discrete, and when the predecessor is greater
-than zero, the conditional distribution of the successor is continuous.)
+than zero, the conditional distribution of the successor is continuous.
 
 The \emph{rationale} is the celebrated central limit theorem,
 or more precisely, theorems, because there are many variants.
@@ -995,7 +1026,7 @@ function for the LCM.  So
 \begin{align*}
    c_{- 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = 0)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = 0)
    \\
    & =
    - \alpha \log(1 - e^\theta)
@@ -1014,7 +1045,7 @@ constants in cumulant functions.
 \subsection{Negative Binomial as Mixture of Poisson}
 \label{sec:mixture}
 
-As stated above, one rationale for the negative binomial distribution
+As stated above, one rationale for the negative binomial distribution is
 that it is a mixture of Poisson distributions.  Let the conditional
 distribution of $Y$ given $\mu$ be Poisson with mean $\mu$,
 and let the marginal distribution of $\mu$ be $\text{Gamma}(\alpha, \lambda)$.
@@ -1154,42 +1185,39 @@ the PDF of the zero-truncated negative binomial distribution is
 \end{sloppypar}
 
 Since this is not a ``brand name distribution'' the mean and variance
-cannot just be looked up.  The \emph{mean} is again given by
-\eqref{eq:mean-of-zero-truncated-in-terms-of-untruncated} except
-that now $m$ is the mean of the untruncated negative binomial distribution,
-that is,
-$$
-   E(y) = \frac{\alpha (1 - p)}{p (1 - p^\alpha)}
-$$
-and we still have
-\eqref{eq:second-ordinary-moment-of-zero-truncated-in-terms-of-untruncated}
-except that $m + m^2$ in the last line, which is variance plus mean squared
-of the untruncated Poisson distribution needs to be replaced by
-variance plus mean squared of the untruncated negative binomial distribution,
-which is
-$$
-   \frac{\alpha (1 - p)}{p^2} - \left( \frac{\alpha (1 - p)}{p} \right)^2
-   =
-   \frac{\alpha (1 - p) [1 - \alpha (1 - p)]}{p^2}
-$$
+cannot just be looked up.
+We still use Theorem~\ref{th:truncated-mean-variance}
+and the comment following it to calculate the mean and the variance but now
+\begin{align*}
+   E(X) & = \frac{\alpha (1 - p)}{p}
+   \\
+   \var(X) & = \frac{\alpha (1 - p)}{p^2}
+   \\
+   E(X^2) & =
+   \frac{\alpha (1 - p)}{p^2} + \left( \frac{\alpha (1 - p)}{p} \right)^2
+   \\
+   \Pr(X > 0) & = 1 - p^\alpha
+\end{align*}
 so
 $$
-   E(y^2)
-   =
-   \frac{1}{1 - p^\alpha}
-   \left[ \frac{\alpha (1 - p)}{p^2} + \left( \frac{\alpha (1 - p)}{p}
-   \right)^2 \right]
+   E(Y) = \frac{\alpha (1 - p)}{p (1 - p^\alpha)}
 $$
-Hence the \emph{variance} is
-$$
-   \var(y)
-   =
+and
+\begin{align*}
+   \var(Y)
+   & = 
+   E(Y^2) - E(Y)^2
+   \\
+   & = 
+   \frac{E(X^2)}{\Pr(X > 0)} - \left(\frac{E(X)}{\Pr(X > 0)}\right)^2
+   \\
+   & =
    \frac{1}{1 - p^\alpha}
    \left[ \frac{\alpha (1 - p)}{p^2} + \left( \frac{\alpha (1 - p)}{p}
    \right)^2 \right]
    -
    \left( \frac{\alpha (1 - p)}{p (1 - p^\alpha)} \right)^2
-$$
+\end{align*}
 % Mathematica
 % dist = NegativeBinomialDistribution[alpha,p]
 % f[y_] = PDF[dist, y]
@@ -1202,10 +1230,6 @@ $$
 % voo - (1 / (1 - p^alpha) (alpha (1 - p) / p^2 + (alpha (1 - p) / p)^2) -
 %     (alpha (1 - p) / (p (1 - p^alpha)))^2)
 % Simplify[%]
-%
-% Oops!
-% mooUntrunc = Sum[ y f[y], {y, 0, Infinity} ]
-% vooUntrunc = Sum[ (y - mooUntrunc)^2 f[y], {y, 0, Infinity} ]
 
 With the assumptions of Section~\ref{sec:negative-binomial} above
 ($\alpha$ known and $p$ unknown) this is an exponential family.
@@ -1314,6 +1338,16 @@ at the log likelihood.
 % Simplify[%]
 % FullSimplify[%]
 % PowerExpand[%]
+%
+% check
+%
+% dist = NegativeBinomialDistribution[alpha, 1 - E^theta]
+% f[y_] = PDF[dist, y]
+% g[y_] = f[y] / (1 - f[0])
+% m[t_] = Sum[ Exp[y t] g[y], {y, 1, Infinity} ]
+% k[t_] = PowerExpand[Log[m[t]]]
+%
+% c[theta_] = Log[- 1 + (1 - E^theta)^(- alpha) ]
 
 Let's check that this cumulant function gives the correct mean and variance.
 \begin{align*}
@@ -1436,15 +1470,13 @@ boundary consists of the single point $1$.
 Thus there is one limiting conditional model, which contains only
 the distribution concentrated at one.
 
-\REVISED
-
 Also as discussed at the end of the those sections,
 it is important that we use \eqref{eq:cumfun-lcm} to determine the cumulant
 function for the LCM.  So
 \begin{align*}
    c_{- 1}(\theta)
    & =
-   c(\theta) + \Pr\nolimits_\theta(Y = 1)
+   c(\theta) + \log \Pr\nolimits_\theta(Y = 1)
    \\
    & =
    \log\left((1 - e^\theta)^{- \alpha} - 1\right)
@@ -1457,95 +1489,82 @@ function for the LCM.  So
    \log\left(\frac{\alpha p^\alpha (1 - p)}{1 - p^\alpha}\right)
    \\
    & =
-   \log\left(\frac{p^\alpha}{1 - p^\alpha}\right)
+   \log\left(\frac{1 - p^\alpha}{p^\alpha}\right)
    +
    \log\left(\frac{\alpha p^\alpha (1 - p)}{1 - p^\alpha}\right)
+   \\
+   & =
+   \log(\alpha) + \log(1 - p)
+   \\
+   & =
+   \log(\alpha) + \theta
 \end{align*}
-So the cumulant function of the family concentrated at zero is the zero
-function, as we also found in Sections~\ref{sec:binomial} and~\ref{sec:poisson}
-above.  But as mentioned at the end of Section~\ref{sec:zero-truncated-poisson}
-above, this agreement just happened because of arbitrary choices of arbitrary
-constants in cumulant functions.
+% Mathematica
+% dist = NegativeBinomialDistribution[alpha,p]
+% f[y_] = PDF[dist, y]
+% g[y_] = f[y] / (1 - f[0])
+% Sum[ g[y], {y, 1, Infinity} ]
+%
+% c[theta_] = Log[(1 - Exp[theta])^(- alpha) - 1]
+% cm1[theta_] = c[theta] + Log[g[1]]
+% p = 1 - E^theta
+%
+% $Assumptions = alpha > 0 && theta < 0
+% cm1[theta]
+% PowerExpand[%]
+% FullSimplify[%]
+%
+% Limit[theta + s - c[theta + s], s -> -Infinity]
 
-\REVISED
+Thus we see that unlike in Sections~\ref{sec:binomial}
+and~\ref{sec:zero-truncated-poisson}, the cumulant function for
+the family concentrated at one is not the identity function but
+rather the identity function plus a constant function.
 
-Taking the limit in
-\eqref{eq:zero-truncated-negative-binomial-pmf}
-as $\theta \to - \infty$ and $p \to 1$ we see that
-\begin{align*}
-   \lim_{p \uparrow 1} g(y)
-   & =
-   \lim_{p \uparrow 1}
-   \frac{\Gamma(\alpha + y) p^\alpha (1-p)^y}
-   {\Gamma(\alpha) \, y! \, (1 - p^\alpha)}
-   \\
-   & =
-   \frac{\Gamma(\alpha + y)}{\Gamma(\alpha) \, y!}
-   \lim_{p \uparrow 1}
-   \frac{p^\alpha (1-p)^y}{1 - p^\alpha}
-   \\
-   & =
-   \frac{\Gamma(\alpha + y)}{\Gamma(\alpha) \, y!}
-   \left[ \lim_{p \uparrow 1} p^\alpha \right]
-   \left[ \lim_{p \uparrow 1} \frac{(1-p)^y}{1 - p^\alpha} \right]
-   \\
-   & =
-   \frac{\Gamma(\alpha + y)}{\Gamma(\alpha) \, y!}
-   \lim_{p \uparrow 1}
-   \frac{(1-p)^y}{1 - p^\alpha}
-   \\
-   & =
-   \frac{\Gamma(\alpha + y)}{\Gamma(\alpha) \, y!}
-   \lim_{p \uparrow 1}
-   \frac{- y (1-p)^{y - 1}}{- \alpha p^{\alpha - 1}}
-\end{align*}
-where the third equality is the limit of a product is the product of the limits
-(if the limits exist, which further calculations show), the fourth equality
-is $p^\alpha \to 1$ as $p \to 1$, and the fifth equality is L'Hospital's rule.
-Now we have two cases
-$$
-   \lim_{p \uparrow 1} g(1)
-   =
-   \alpha \lim_{p \uparrow 1}
-   \frac{- 1}{- \alpha p^{\alpha - 1}}
-   =
-   1
-$$
-and for $y > 1$
-$$
-   \lim_{p \uparrow 1} g(y)
-   =
-   \frac{\Gamma(\alpha + y)}{\Gamma(\alpha) \, y!}
-   \lim_{p \uparrow 1}
-   \frac{- y (1-p)^{y - 1}}{- \alpha p^{\alpha - 1}}
-   =
-   0
-$$
-so as $\theta \to - \infty$ and $m \to 0$ and $\xi \to 1$
-the zero-truncated negative binomial distribution converges to
-the degenerate distribution concentrated at one.
-This LCM is discussed in Section~\ref{app:sec:degenerate} above.
-There are no other limit degenerate distributions.
+\section{Multivariate Bernoulli}
+\label{sec:multivariate-bernoulli}
+
+A random vector is \emph{multivariate Bernoulli} if it always has exactly
+one component equal to one and the rest of its components are equal to zero.
+
+This is the \emph{rationale} for the distribution.
+In categorical data analysis, where we have IID individuals that can take
+values in a finite number of categories, the result for each individual
+can be coded as multivariate Bernoulli.  The category corresponding to the
+component of the random vector that is equal to one says which category
+the individual is in.
+
+This is a \emph{discrete} random vector.
+
+This is a special case of the multinomial distribution, which we do next.
+
+This family is implemented in R package \code{aster2}.
+When incorporated in an aster model, this family is a \emph{dependence group}.
+Because it is
+multivariate, it cannot be implemented in R package \code{aster},
+which allows only univariate families.  Although R package \code{aster2}
+calls this family ``multinomial'' created by the family function
+\code{fam.multinomial}, it is not the general multinomial described in
+the following section, but the multivariate Bernoulli described in this
+section, which is the $n = 1$ special case of the general multinomial.
 
 \section{Multinomial}
 \label{app:sec:multinomial}
 
-Every family preceding this one is one-dimensional and is implemented
-or could be implemented in R package \code{aster}.
 This family is multi-dimensional and hence cannot be implemented in R package
 \code{aster}.
-It is implemented in R package \code{aster2}.
-When incorporated in an aster model, this family is a \emph{dependence group}.
 
 When IID individuals (a simple random sample) are classified into mutually
-exclusive and exhaustive categories (every individual fall in exactly one
+exclusive and exhaustive categories (every individual falls in exactly one
 category), the vector of category counts has
 the \emph{multinomial distribution}.
 This is one \emph{rationale} for this distribution.
 
 The other \emph{rationale} is that when the sample size (predecessor)
 is equal to one, this family serves as a $k$-way switch if there are $k$
-categories.
+categories
+(and this $n = 1$ special case is the multivariate Bernoulli family
+described in the preceding section).
 %%%%%%%%%% NEED BACKWARD REFERENCE to k-way switch %%%%%%%%%%
 
 This is the distribution of a random vector, not a random variable.
@@ -1554,6 +1573,10 @@ The Bernoulli and binomial distributions are related to the multinomial
 distribution, but the multinomial distribution with two categories is
 still a two-dimensional random vector, so it is not Bernoulli or binomial,
 which are one-dimensional distributions (of random variables).
+If $Y$ is a Bernoulli random variable, then
+$(Y, 1 - Y)$ is a multivariate Bernoulli random vector.
+If $Y$ is a binomial random variable with sample size $n$, then
+$(Y, n - Y)$ is a multinomial random vector with sample size $n$.
 
 This is a \emph{discrete} random vector.
 
@@ -1565,7 +1588,7 @@ The \emph{probability mass function} is
 where $p$ is the \emph{usual parameter vector}, which is a probability
 vector satisfying
 \begin{gather*}
-   p_i \ge 0
+   p_i > 0
    \\
    \sum_{i \in I} p_i = 1
 \end{gather*}
@@ -1581,46 +1604,36 @@ where $y$ is the the vector of counts (nonnegative integers) satisfying
 \end{subequations}
 where $n$ is the sample size (the number of IID individuals classified),
 where $S$ is the sample space for $y$, the set
-$$
+\begin{equation} \label{eq:multinomial-canonical-sample-space}
    S = \bigset{ y \in \nats^I : \sum_{i \in I} y_i = n},
-$$
+\end{equation}
 where $\nats$ denotes the \emph{natural numbers} $\{0, 1, 2, 3, \ldots\}$,
 and where we have chosen the index set of $y$ and $\theta$ to be an
 arbitrary finite set $I$ rather than $\{1, \ldots, k\}$ for some $k$
 to fit in with the conventions of aster models (in an aster model $I$
 would be a subset of nodes of the aster graph comprising a multinomial
-dependence group).
-%%%%%%%%%% NEED BACKWARD REFERENCE to subvectors %%%%%%%%%%
+dependence group, see Section~\ref{sec:subvector} for vectors and subvectors).
 
 The \emph{mean vector} and \emph{variance matrix} have components
 \begin{subequations}
 \begin{alignat}{2}
-   E(y_i) & = n p_i
+   E(Y_i) & = n p_i
    \label{eq:mean-vector-components}
    \\
-   \var(y_i) & = n p_i (1 - p_i)
+   \var(Y_i) & = n p_i (1 - p_i)
    \label{eq:variance-matrix-components-diagonal}
    \\
-   \cov(y_i, y_j) & = - n p_i p_j, & \qquad & i \neq j
+   \cov(Y_i, Y_j) & = - n p_i p_j, & \qquad & i \neq j
    \label{eq:variance-matrix-components-off-diagonal}
 \end{alignat}
 \end{subequations}
-The mean of a random vector $y$ is the vector whose components are the
-means of the components of $y$.  Here $E(y) = \xi$ and $\xi_i = n p_i$.
-The variance of a random vector $y$ is the matrix whose components are the
-covariances of the components of $y$.  Here $\var(y) = M$ has components
+The mean of a random vector $Y$ is the vector whose components are the
+means of the components of $Y$.  Here $E(Y) = \xi$ and $\xi_i = n p_i$.
+The variance of a random vector $Y$ is the matrix whose components are the
+covariances of the components of $Y$.  Here $\var(Y) = M$ has components
 $m_{i j}$ which are given by \eqref{eq:variance-matrix-components-diagonal}
 when $i = j$ and by \eqref{eq:variance-matrix-components-off-diagonal} when
 $i \neq j$.
-
-Other names for \emph{variance matrix} are \emph{covariance matrix} (because
-the elements are actually covariances, including the diagonal elements because
-$\cov(y_i, y_i) = \var(y_i)$, \emph{variance-covariance} matrix (because
-the diagonal elements are variances and the off-diagonal elements are
-covariances), and \emph{dispersion matrix}.  We think ``covariance matrix''
-is a particularly bad name because if the term is used up in this context,
-then what does one call the covariance matrix of two random vectors, which
-is an important concept in multivariate statistics?
 
 This is an \emph{exponential family}.  From \eqref{eq:multinomial-pmf}
 the log likelihood is
@@ -1677,19 +1690,23 @@ and $p$ is the usual parameter vector corresponding to it so $p_i = e^{\psi_i}$
 and $p_i e^{\theta_i - \psi_i} = e^{\theta_i}$.  So dropping $c(\psi)$,
 which is an arbitrary constant, we obtain
 \begin{equation} \label{eq:multinomial-cumfun}
-   c(\theta) = n \log \left( \sum_{i \in I} e^{\theta_i} \right)
+   c(\theta) = n \log \left( \sum_{i \in I} e^{\theta_i} \right).
 \end{equation}
-and this gives a log likelihood valid on the whole vector space where
+Since this is finite for all vectors $\theta$, the full canonical parameter
+space is the whole vector space $\real^I$ where $\theta$ lives.
+
+This gives a log likelihood valid on the whole vector space where
 $\theta$ lives
 \begin{equation} \label{eq:multinomial-logl}
 \begin{split}
    l(\theta) & = \inner{y, \theta} - c(\theta)
    \\
    & = \left( \sum_{i \in I} y_i \theta_i \right)
-   - \log \left( \sum_{i \in I} e^{\theta_i} \right)^n
+   - n \log \left( \sum_{i \in I} e^{\theta_i} \right)
 \end{split}
 \end{equation}
-We check that this has the correct derivatives
+
+We check that \eqref{eq:multinomial-cumfun} has the correct derivatives
 \begin{subequations}
 \begin{align}
    \frac{\partial c(\theta)}{\partial \theta_i}
@@ -1721,16 +1738,23 @@ So we do not have a notion of what the map $\theta \to p$ should be
 for values of $\theta$ that do not satisfy the
 constraint \eqref{eq:multinomial-canonical-constraint-try-one}.
 
-We solve the problem by taking \eqref{eq:multinomial-cumfun-first-derivatives}
-to give the correct mean values
+We solve this problem by using the fundamental relationship between
+cumulant functions and means and variances
+(Section~\ref{sec:mean-variance-cumulant} above), which says the
+derivatives above have to give means and covariances.
+Thus \eqref{eq:multinomial-cumfun-first-derivatives} must
+give the correct mean values
 $$
    \frac{n e^{\theta_i}}{\sum_{j \in I} e^{\theta_j}} = n p_i
 $$
 so
 \begin{equation} \label{eq:multinomial-canonical-to-usual}
-   p_i = \frac{e^{\theta_i}}{\sum_{j \in I} e^{\theta_j}}, \qquad i \in I.
+   p_i = \frac{e^{\theta_i}}{\sum_{j \in I} e^{\theta_j}}, \qquad i \in I,
 \end{equation}
-Note that this function is not invertible.  If one adds the same constant
+gives the correct mapping between our new canonical parameters (now
+$\theta$ can be any vector in $\real^I$) and the usual parameters.
+
+This function is not invertible.  If one adds the same constant
 to all of the $\theta_i$, then the value of $p_i$ does not change
 $$
    \frac{e^{\theta_i + c}}{\sum_{j \in I} e^{\theta_j + c}}
@@ -1771,17 +1795,17 @@ The mean value parameter vector, as stated above, is the vector $\xi$ having
 components $\xi_i = n p_i$.  In case $n = 1$, the mean value parameter vector
 is the usual parameter vector.  Otherwise, not.
 
-The mean value parameter space is the relative interior of $n$ times the
+The mean value parameter space is the relative interior of the
 convex hull of $S$
-$$
+\begin{equation} \label{eq:multinomial-mean-value-parameter-space}
    \Xi
    =
-   \bigset{ \xi \in \real^n : \xi_i > 0, i \in I \opand
+   \bigset{ \xi \in \real^I : \xi_i > 0, i \in I \opand
    \sum_{j \in I} \xi_j = n }
-$$
+\end{equation}
 To see this we note that $\theta_i = \log(\xi_i)$ always defines a point
 in the canonical sample space so long as the $\xi_i$ are strictly positive.
-and that point maps via \eqref{eq:multinomial-canonical-to-usual} to
+And that point maps via \eqref{eq:multinomial-canonical-to-usual} to
 $$
    p_i = \frac{e^{\theta_i}}{\sum_{j \in I} e^{\theta_j}}
    =
@@ -1792,148 +1816,127 @@ So every point in $\Xi$ is a mean value parameter vector value,
 and, conversely, every point $\theta \in \real^I$ maps to a value $\xi$
 that satisfies $\xi_i > 0$ for all $i$ and $\sum_{i \in I} \xi_i = n$.
 
-Taking limits in \eqref{eq:multinomial-pmf} as $p_i \to 0$ for
-$i \in A$ where $A \subsetneq I$
+\begin{theorem} \label{th:multinomial-lcm}
+The closed convex support of the multinomial family is
 $$
-   f_A(y) = \begin{cases} 1, & y_i = 0, i \in A \\ 0, & \text{otherwise}
-   \end{cases}
+   C = \bigset{ \xi \in \real^I : \xi_i \ge 0, i \in I \opand
+   \sum_{j \in I} \xi_j = n }
 $$
-which is the PMF of the distribution which is partially or wholly degenerate
-(next section).  The distribution of the random vector $y_A$
-%%%%%%%%%% NEED BACKWARD REFERENCE to subvectors %%%%%%%%%%
-is wholly degenerate concentrated at the point 0 (the vector having all
-components zero),
-and the distribution of the random vector $y_{A^c}$ has the multinomial
-distribution with canonical parameter vector $\theta_{A^c}$ and mean
-value parameter $\xi_{A^c}$,
-and the random vectors $y_A$ and $y_{A^c}$ are stochastically independent
-because a constant random vector is stochastically independent of any
-random vector (even itself).  Thus the preceding sentence completely describes
-the distribution of the random vector $y$.
-
-\emph{Addition rule:} the sum of independent multinomial random vectors
-having the same index set $i$ and the same usual parameter vector $p$ and
-sample sizes $n_1$, $\ldots,$ $n_k$ has the multinomial
-distribution with sample size $n_1 + \cdots + n_k$ and
-usual parameter vector $p$.
-
-\section{Multivariate Degenerate} \label{app:sec:multivariate-degenerate}
-
-This section is just like Section~\ref{app:sec:degenerate} above
-\emph{mutatis mutandis}.
-
-A random vector is \emph{degenerate} if it is concentrated in a hyperplane
-of the vector space where it lives.  If it is concentrated at one point
-we say it is \emph{wholly degenerate}, otherwise \emph{partially degenerate}.
-
-One \emph{rationale} for such random variables is that they arise as limits
-(as we saw at the end of the preceding section).
-
-Another \emph{rationale} for such random variables is that they are allowed
-in probability theory.  The official definition of ``random vector'' in
-probability theory is: a random vector is a vector-valued function
-on the sample space.  Hence any vector-valued function of a random vector
-is another random vector.  (This is just like any scalar-valued function
-of a random variable is another random variable.)
-But this gives us degenerate random vectors.
-For example the function $x \mapsto (x, x)$ takes a non-degenerate random
-variable $X$ to the degenerate random vector $(X, X)$ which is concentrated
-on the hyperplane
-$$
-   \set{ (x, y) \in \real^2 : x = y }
-$$
-This may not seem to be a very interesting example, but it is not far removed
-from interesting examples.  In probability theory we say that any linear
-function of a multivariate normal random vector is another multivariate
-normal random vector.  But this is only true if degenerate multivariate
-normal random vectors are allowed \citep[Slides~118 ff.]{geyer-5101-deck5}.
-
-A random vector is degenerate in the sense defined here if and only if
-it is concentrated on a hyperplane in the vector space where it lives
-\citep[Slide~119 ff.]{geyer-5101-deck5}.  For an exponential family
-the canonical parameterization is not identifiable if and only if the
-distribution of the canonical statistic is degenerate
-\citep[Theorem~1]{geyer-gdor}.  Every multinomial distribution is degenerate
-because of the constraint
-\eqref{eq:multinomial-canonical-statistic-constraint-sum-to-n}.
-This is why the canonical parameterization is not identifiable.
-
-But a limiting conditional model of a multinomial distribution is even
-more degenerate than the original (non-limit) multinomial model.
-It satisfies additional constraints $y_i = 0$, $i \in A$ for some proper
-subset of the index set $I$.
-
-Aster models do not implement any degenerate families except multinomial,
-so we restrict our discussion to that case.  We assert that the
-cumulant function for the multinomial LCM just described is
-\begin{equation} \label{eq:multinomial-cumfun-degenerate}
-   c_A(\theta) = n \log \left( \sum_{i \in A^c} e^{\theta_i} \right)
+the closure \eqref{eq:multinomial-mean-value-parameter-space}.
+The support function is given by
+\begin{equation} \label{eq:multinomial-support-function}
+   \sigma_C(\delta) = n \max(\delta),
 \end{equation}
-We prove that this is correct by evaluating limit formula in Theorem~6
-of \citet{geyer-gdor}
+where
+$$
+   \max(\delta) = \max_{i \in I} \delta_i.
+$$
+Define the hyperplane
+$$
+   H_\delta = \set{ y \in \real^I : \inner{y, \delta} = \sigma_C(\delta) },
+$$
+which is \eqref{eq:complete-fundamental-hyperplane} with the index set $I$
+instead of $J$.
+Then the cumulant function for the LCM conditioned on $H_\delta$ is
+\begin{equation} \label{eq:multinomial-cumfun-lcm}
+   c_\delta(\theta)
+   =
+   n \log \left(
+   \sum_{\substack{i \in I \\ \delta_i = \max(\delta)}} e^{\theta_i} \right).
+\end{equation}
+If we define
+$$
+   G = \set{ i \in I : \delta_i = \max(\delta) },
+$$
+then under the LCM conditioned on $H_\delta$, the family of distributions
+for $y_G$ is multinomial with sample size $n$
+and $y_{I \setminus G} = 0$ almost surely.
+\end{theorem}
+\begin{proof}
+For any $i \in I$ define the vector $v^{(i)}$ (we use the temporary notation
+of superscript in parenthesis to denote a sequence of vectors)
+having $v^{(i)}_i = n$ and $v^{(i)}_j = 0$ for $j \in I \setminus \{ i \}$.
+Clearly, each such $v^{(i)}$ is in
+the sample space \eqref{eq:multinomial-canonical-sample-space} and
+has probability $p_i^n > 0$.  Thus it must be in any support.
+Now the formula
+$$
+   C = \bigset{ \sum_{i \in I} p_i v^{(i)} : p_i \ge 0, i \in I \opand
+   \sum_{j \in I} p_j = 1 }
+$$
+shows that $C$ is the convex hull of the vectors $v^{(i)}$.  Thus $C$ must
+be contained in the closed convex support.  On the other hand, $C$ contains
+$S$, so $C$ is the smallest closed convex set containing $S$.  Hence
+$C$ is the closed convex support.
+
+We now claim that any vector $v$ having $v_j = 0$ when
+$\delta_j < \max(\delta)$ maximizes $\inner{\fatdot, \delta}$ over $C$.
+We have
+$$
+   \inner{v, \delta}
+   =
+   \sum_{\substack{i \in I \\ \delta_i = \max(\delta)}} v_i \delta_i
+   =
+   \max(\delta)
+   \sum_{\substack{i \in I \\ \delta_i = \max(\delta)}} v_i
+   =
+   \max(\delta)
+   \sum_{i \in I} v_i
+   =
+   n \max(\delta)
+$$
+and for any $x \in C$ we have
+$$
+   \inner{v, \delta}
+   =
+   \sum_{i \in I} v_i \delta_i
+   \le
+   \max(\delta)
+   \sum_{i \in I} v_i
+   =
+   n \max(\delta)
+$$
+Thus \eqref{eq:multinomial-support-function} is correct.
+
+Now if $y \in C$ such that
+\begin{equation} \label{eq:multinomial-lcm-foo}
+   \inner{y, \delta} = \sigma_C(\delta) = n \max(\delta)
+\end{equation}
+we must have, as we have already seen, $y_j = 0$ if $\delta_j < \max(\delta)$.
+Conversely, if $y \in C$ and $y_j = 0$ if $\delta_j < \max(\delta)$,
+then \eqref{eq:multinomial-lcm-foo} holds.
+Hence conditioning the original model on $Y \in H_\delta$ is the same as
+conditioning on $Y_{I \setminus G} = 0$.  Then the usual formulas
+for conditionals for multinomials show that $Y_G$ is multinomial
+with sample size $n$, as asserted.
+
+It only remains to calculate the cumulant function for the LCM using
+\eqref{eq:cumfun-lcm}.
 \begin{align*}
-   c_A(\theta)
+   c_\delta(\theta)
    & =
-   c(\theta) + \log \Pr( \set{y : y_i = 0, i \in A} )
+   c(\theta) + \log \Pr\nolimits_\theta(Y \in H_\delta)
    \\
    & =
    n \log \left( \sum_{i \in I} e^{\theta_i} \right)
    +
-   n \log \left( \sum_{i \in A^c} p_i \right)
+   \log \left( \sum_{i \in G} p_i \right)^n
    \\
    & =
    n \log \left( \sum_{i \in I} e^{\theta_i} \right)
    +
-   n \log \left( \sum_{i \in A^c} \frac{e^{\theta_i}}
-   {\sum_{j \in I} e^{\theta_j}} \right)
+   n \log \left( \sum_{i \in G} p_i \right)
+   \\
+   & =
+   n \log \left( \sum_{i \in I} e^{\theta_i} \right)
+   +
+   n \log \left(
+   \frac{\sum_{i \in G} e^{\theta_i}}{\sum_{i \in I} e^{\theta_i}} \right)
+   \\
+   & =
+   n \log \left( \sum_{i \in G} e^{\theta_i} \right)
 \end{align*}
-and after some cancellation, we see this equals
-\eqref{eq:multinomial-cumfun-degenerate}.
-
-We check that this gives the correct means
-\begin{alignat*}{2}
-   \frac{\partial c_A(\theta)}{\partial \theta_i} & = 0, & \qquad & i \in A
-   \\
-   \frac{\partial c_A(\theta)}{\partial \theta_i}
-   & = \frac{n e^{\theta_i}}{\sum_{j \in I} e^{\theta_j}}, & \qquad & i \notin A
-\end{alignat*}
-and for once we will not bother with the details in checking the variances.
-
-If $A$ is the complement of a singleton, that is, $A = \{i\}^c$, then
-the LCM multinomial distribution described in this section is wholly degenerate
-because then we know that $y_j = 0$ with probability one for $j \neq i$,
-and we also know from
-\eqref{eq:multinomial-canonical-statistic-constraint-sum-to-n}
-that we must have $y_i = n$ with probability one.
-
-This is why we required $A$ to be a proper subset of $I$.
-If we had $y_i = 0$ for all $i$, then we could not satisfy
-\eqref{eq:multinomial-canonical-statistic-constraint-sum-to-n}.
-
-\section{Multivariate Bernoulli}
-
-The multinomial distribution for sample size one is sometimes called
-\emph{multivariate Bernoulli}.  This is the family that is actually
-implemented in R package \code{aster2} (there is no sample size
-hyperparameter).
-
-If there were a need for multinomial families with sample size greater than
-one, a sample size hyperparameter could be added to R function
-\code{fam.multinomial} in that package with default one, that is,
-the signature would be
-\begin{verbatim}
-fam.multinomial(dimension, sample.size = 1)
-\end{verbatim}
-But, as with the digits model discribed in Section~\ref{app:sec:degenerate}
-we do not know of any need for such models in life history analysis.
-
-Not even the authors know why this appendix was written the way it is,
-with the long section titled ``Bernoulli'' describing the family
-actually implemented and the short section ``Binomial'' describing the
-family possibly but not actually implemented but, in contrast,
-the long section titled ``Multinomial''
-describing the family possibly but not actually implemented and
-this short section describing the family actually implemented.
+\end{proof}
 
 \section{Normal Location-Scale}
 
@@ -1947,7 +1950,7 @@ Let's see how that happens.  We already have the probability density
 function \eqref{eq:normal-pdf} of the normal distribution.
 Now if we write down the log likelihood not dropping any terms that contain
 either parameter we get
-$$
+\begin{equation} \label{eq:logl-normal-location-scale}
    l(\theta)
    =
    - \log(\sigma) - \frac{(x - \nu)^2}{2 \sigma^2}
@@ -1955,7 +1958,7 @@ $$
    - \log(\sigma) - \frac{x^2}{2 \sigma^2}
    + \frac{x \nu}{\sigma^2}
    - \frac{\nu^2}{2 \sigma^2}
-$$
+\end{equation}
 where for reasons to be discussed presently we have changed the notation
 for the random variable from $y$ to $x$ and the notation
 for the mean from $\xi$ to $\nu$.
@@ -1999,7 +2002,8 @@ In terms of the canonical parameters, the usual parameters are
 The first canonical parameter is unrestricted $- \infty < \theta_1 < \infty$
 but the second canonical parameter is restricted $- \infty < \theta_2 < 0$.
 Thus our guess at the cumulant function from looking at the log likelihood
-\begin{align*}
+\begin{equation} \label{eq:cumfun-normal-location-scale}
+\begin{split}
    c(\theta)
    & =
    \log(\sigma) + \frac{\nu^2}{2 \sigma^2}
@@ -2011,14 +2015,33 @@ Thus our guess at the cumulant function from looking at the log likelihood
    \cdot (- 2 \theta_2)
    \\
    & =
-   \frac{1}{2} \log\left(\frac{1}{2}\right)
-   -
-   \frac{1}{2} \log(- \theta_2)
+   \frac{1}{2} \log\left(- \frac{1}{2 \theta_2}\right)
    -
    \frac{\theta_1^2}{4 \theta_2} 
-\end{align*}
+\end{split}
+\end{equation}
+(this agrees with the cumulant function for this family
+in R package \code{aster2}).
+
+Notice that in going from the PDF to the log likelihood
+\eqref{eq:logl-normal-location-scale}, on a factor of $1 / \sqrt{2 \pi}$
+was dropped, so the PDF of the family (with respect to Lebesgue measure)
+can now be written
+$$
+   f_\theta(x)
+   =
+   \frac{1}{\sqrt{2 \pi}} e^{x \theta_1 + x^2 \theta_2 - c(\theta)}
+$$
+and the fact that PDF integrate to one gives
+$$
+   \int e^{x \theta_1 + x^2 \theta_2} \, d x
+   =
+   \sqrt{2 \pi} e^{c(\theta)}
+$$
+
 Because our guess at the cumulant function is not defined on a whole vector
-space we use equation (5) in \citet{geyer-gdor}, which is \eqref{eq:cumfun-expfam}
+space we use equation (5) in \citet{geyer-gdor},
+which is \eqref{eq:cumfun-expfam}
 in this book, as we have done several times before in this appendix
 \begin{align*}
    c(\theta)
@@ -2028,18 +2051,52 @@ in this book, as we have done several times before in this appendix
    \\
    & =
    c(\psi) + \log E_\psi
-   \bigl( e^{x (\theta_1 - \psi_1) + x^2 (\theta_2 - \psi_2)} \bigr)
+   \bigl( e^{y_1 (\theta_1 - \psi_1) + y_2 (\theta_2 - \psi_2)} \bigr)
    \\
    & =
-   c(\psi) + \frac{2 \nu_\psi (\theta_1 - \psi_1 + \nu_\psi (\theta_2 - \psi_2))
-   + (\theta_1 - \psi_1)^2 \sigma^2_\psi}
-   {2 - 4 (\theta_2 - \psi_2) \sigma^2_\psi}
+   c(\psi)
+   +
+   \log \left( \frac{1}{\sqrt{2 \pi}} \int
+   e^{x (\theta_1 - \psi_1) + x^2 (\theta_2 - \psi_2)}
+   e^{x \psi_1 + x^2 \psi_2) - c(\psi)} \, d x \right)
    \\
-   & \qquad
-   - \frac{1}{2} \log\left( - 2 (\theta_2 - \psi_2) + \frac{1}{\sigma^2_\psi}
-   \right)
-   - \frac{1}{2} \log\left( \sigma^2_\psi \right)
+   & =
+   \log \left( \frac{1}{\sqrt{2 \pi}} \int
+   e^{x \theta_1 + x^2 \theta_2} \, d x \right)
 \end{align*}
+and, as we have already seen, the last expression is equal to $c(\theta)$ for
+$\theta$ such that $\theta_2 < 0$.
+In case $\theta_2 \ge 0$ the integrand is either constant or goes to infinity
+as $x \to \infty$ or $x \to - \infty$ or both.  In any case the integral
+does not exist.  Thus the canonical parameter space is indeed
+\begin{equation} \label{eq:canonical-parameter-space-normal-location-scale}
+   \Theta = \set{ \theta \in \real^2 : \theta_2 < 0 }.
+\end{equation}
+
+The canonical sample space for sample size one is
+$$
+   S = \set{ y \in \real^2 : y_1^2 = y_2 }
+$$
+which is a curve.  Thus any intersection with a tangent line consists of
+a single point.  And, because this is a continuous distribution, single points
+have probability zero.  Thus in the limiting conditional model theorem
+(Theorem~\ref{th:completion-fundamental} above) we are in the case where
+the probability of $Y \in H_\delta$ is equal to zero
+(regardless of what $\delta$ is).  So there are no LCM for this family.
+
+For sample size one, the data are on the curve $S$ with probability one.
+So the MLE does not exist with probability one.  This is no surprise.
+One cannot estimate two parameters from one variable $x$.
+
+For sample size greater than one, the data are in the interior of the convex
+hull of the curve $S$ with probability one.
+So the MLE exists with probability one.  This is no surprise either.
+One can estimate the two parameters of the normal distribution from
+data $x_1$, $x_2$, $\ldots$, $x_n$ for $n \ge 2$.
+
+So we don't need the theory of limiting conditional models for this family.
+That theory is only needed for discrete families.
+
 % Mathematica
 %
 % dist = NormalDistribution[moo, Sqrt[voo]]
@@ -2051,7 +2108,363 @@ in this book, as we have done several times before in this appendix
 % cumfun[theta1_, theta2_] = Integrate[Exp[x theta1 + x^2 theta2] f[x],
 %     {x, -Infinity, Infinity}, Assumptions -> voo > 0]
 
-\section{Other Families Not Yet Implemented}
+We forgot to check that \eqref{eq:cumfun-normal-location-scale} has
+the correct derivatives.  Let's do that now.
+\begin{align*}
+   \frac{\partial c(\theta)}{\partial \theta_1}
+   & =
+   -
+   \frac{\theta_1}{2 \theta_2}
+   \\
+   \frac{\partial c(\theta)}{\partial \theta_2}
+   & =
+   -
+   \frac{1}{2 \theta_2}
+   +
+   \frac{\theta_1^2}{4 \theta_2^2}
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_1^2}
+   & =
+   - \frac{1}{2 \theta_2}
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_1 \partial \theta_2}
+   & =
+   \frac{\theta_1}{2 \theta_2^2}
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_2^2}
+   & =
+   \frac{1}{2 \theta_2^2}
+   -
+   \frac{\theta_1^2}{2 \theta_2^3}
+\end{align*}
+Translating these back to functions of $x$ and the original parameters,
+they say
+\begin{align*}
+   E(X) & = \nu
+   \\
+   E(X^2) & = \sigma^2 + \nu^2
+   \\
+   \var(X) & = \sigma^2
+   \\
+   \cov(X, X^2) & = 2 \nu \sigma^2
+   \\
+   \var(X^2) & = 4 \nu^2 \sigma^2 + 2 \sigma^4
+\end{align*}
+The first three of these are well known.  The other two do check
+(in Mathematica).
+% Mathematica
+% c[theta1_, theta2_] = (1/2) Log[- 1 / (2 theta2)] - theta1^2 / (4 theta2) 
+% c1[theta1_, theta2_] = D[c[theta1, theta2], theta1]
+% c2[theta1_, theta2_] = D[c[theta1, theta2], theta2]
+% c11[theta1_, theta2_] = D[c1[theta1, theta2], theta1]
+% c12[theta1_, theta2_] = D[c1[theta1, theta2], theta2]
+% c22[theta1_, theta2_] = D[c2[theta1, theta2], theta2]
+% c1[nu / sigma^2, - 1 / (2 sigma^2)]
+% c2[nu / sigma^2, - 1 / (2 sigma^2)]
+% c11[nu / sigma^2, - 1 / (2 sigma^2)]
+% c12[nu / sigma^2, - 1 / (2 sigma^2)]
+% c22[nu / sigma^2, - 1 / (2 sigma^2)]
+%
+% dist = NormalDistribution[nu, sigma]
+% f[x_] = PDF[dist, x]
+% $Assumptions = sigma > 0 && Element[nu, Reals]
+% Integrate[f[x], {x, -Infinity, Infinity}]
+% Integrate[(x - nu)(x^2 - nu^2 - sigma^2)f[x], {x, -Infinity, Infinity}]
+% Integrate[(x^2 - nu^2 - sigma^2)^2 f[x], {x, -Infinity, Infinity}]
+
+\section{Gamma Rate}
+
+The gamma distribution has PDF
+\begin{equation} \label{eq:gamma-pdf}
+   f(y) = \frac{\lambda^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} e^{- \lambda y},
+   \qquad 0 < y < \infty,
+\end{equation}
+where $\alpha > 0$ and $\lambda > 0$ are parameters.
+
+This is a \emph{continuous} random variable;
+except when incorporated into an aster model, it is a mixture of discrete
+and continuous.  For a gamma-rate arrow, when the predecessor is zero
+the conditional distribution of the successor is the degenerate random variable
+concentrated at zero, which is discrete, and when the predecessor is greater
+than zero, the conditional distribution of the successor is continuous.
+
+This is the most well known continuous distribution after
+the normal distribution, and it has many rationales, but these rationales
+do not seem to justify its inclusion in aster models, which is why
+R packages \code{aster} and \code{aster2} do not include it.
+This family includes the exponential distribution (case $\alpha = 1$)
+and the chi-square distributions (case $\alpha = n / 2$ and $\lambda = 1 / 2$)
+as special cases.
+
+The main rationale is vague.  This is the most well-known distribution
+with support $(0, \infty)$.  So it is a TTT (thing to do) when one wants such.
+
+The \emph{mean} and \emph{variance} are
+\begin{subequations}
+\begin{align}
+   E(y) & = \frac{\alpha}{\lambda}
+   \label{eq:gamma-mean}
+   \\
+   \var(y) & = \frac{\alpha}{\lambda^2}
+   \label{eq:gamma-var}
+\end{align}
+\end{subequations}
+
+In this section, we treat this as a one-parameter family
+with $\alpha$ known and $\lambda$ unknown.
+
+With this understanding, the log likelihood is
+$$
+   l(\theta)
+   = 
+   \alpha \log(\lambda) - \lambda y
+$$
+(we have dropped terms that do not contain $\lambda$).
+From this we see that we have an \emph{exponential family} with
+\emph{canonical statistic} $y$,
+\emph{canonical parameter} $\theta = - \lambda$, and
+\emph{cumulant function}
+\begin{equation} \label{eq:cumfun-gamma-rate}
+   c(\theta) = - \alpha \log(\lambda) = - \alpha \log(- \theta).
+\end{equation}
+
+We check that this has the correct derivatives
+$$
+   c'(\theta) = \frac{\alpha}{- \theta} = \frac{\alpha}{\lambda}
+$$
+and
+$$
+   c''(\theta) = \frac{\alpha}{\theta^2} = \frac{\alpha}{\lambda^2}.
+$$
+
+Because our guess at the cumulant function is not defined on a whole vector
+space we use equation (5) in \citet{geyer-gdor},
+which is \eqref{eq:cumfun-expfam}
+in this book, as we have done several times before in this appendix
+\begin{align*}
+   c(\theta)
+   & =
+   c(\psi) + \log E_\psi \bigl( e^{y (\theta - \psi)} \bigr)
+   \\
+   & =
+   c(\psi) + \log \int e^{y (\theta - \psi)} f_\psi(y) \, d y
+   \\
+   & =
+   c(\psi) + \log \int e^{y (\theta - \psi)}
+   \frac{\lambda_\psi^\alpha}{\Gamma(\alpha)} y^{\alpha - 1}
+   e^{- \lambda_\psi y} \, d y
+\end{align*}
+where $\lambda_\psi = - \psi$ so
+\begin{align*}
+   c(\theta)
+   & =
+   \log \int
+   \frac{1}{\Gamma(\alpha)} y^{\alpha - 1} e^{y \theta} \, d y
+\end{align*}
+and this integral clearly exists if and only if $\theta < 0$ in which
+case, by \eqref{eq:gamma-pdf} integrating to one,
+we get \eqref{eq:cumfun-gamma-rate}, as we must.
+
+Hence the full canonical parameter space of this family is
+$$
+   \Theta = \set{ \theta \in \real : \theta < 0 }.
+$$
+
+The \emph{mean value parameter} is
+$$
+   \xi = \frac{\alpha}{- \theta}
+$$
+
+\emph{Addition rule:} the sum of $n$ independent and identically distributed
+gamma random variables with shape parameter $\alpha$ and rate parameter
+$\lambda$ has the gamma distribution
+with shape parameter $n \alpha$ and rate parameter $\lambda$.
+
+\emph{General addition rule:} the sum of $n$ independent
+gamma random variables with shape parameters $\alpha_1$, $\ldots,$ $\alpha_n$
+and rate parameter $\lambda$ (same for all) has the gamma distribution
+with shape parameter $\alpha_1 + \cdots + \alpha_n$
+and rate parameter $\lambda$.
+
+There are no limit degenerate distributions.
+This is because the boundary of the closed convex support,
+which is the interval $[0, \infty)$ is the point zero.
+We can never observe data on the boundary, because continuous
+distributions put probability zero at any point.
+
+\section{Gamma Shape-Rate}
+
+If we take the gamma distribution with PDF \eqref{eq:gamma-pdf}
+to have both parameters unknown, then the log likelihood is
+$$
+   l(\theta)
+   =
+   \alpha \log(\lambda) - \log \Gamma(\alpha) + \alpha \log(x) - \lambda x
+$$
+(we have dropped terms that do not contain $\alpha$ or $\lambda$ and have
+changed the data variable from $y$ to $x$).  This has the form of
+a two-dimensional exponential family with \emph{canonical statistics}
+$y_1 = x$ and $y_2 = \log x$, \emph{canonical parameters}
+$\theta_1 = - \lambda$ and $\theta_2 = \alpha$, and
+\emph{cumulant function}
+\begin{equation} \label{eq:cumfun-gamma-shape-rate}
+   c(\theta) = \log \Gamma(\alpha) - \alpha \log(\lambda)
+   = \log \Gamma(\theta_2) - \theta_2 \log(- \theta_1)
+\end{equation}
+With this definition of canonical parameters and statistics, we can rewrite
+the PDF as
+\begin{equation} \label{eq:gamma-pdf-too}
+\begin{split}
+   f_\theta(y)
+   & =
+   \frac{\lambda^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} e^{- \lambda x}
+   \\
+   & =
+   x^{- 1} e^{\inner{y, \theta} - c(\theta)}
+   \\
+   & =
+   y_1^{- 1} e^{\inner{y, \theta} - c(\theta)}
+\end{split}
+\end{equation}
+Because our guess at the cumulant function is not defined on a whole vector
+space we use equation (5) in \citet{geyer-gdor},
+which is \eqref{eq:cumfun-expfam}
+in this book, as we have done several times before in this appendix
+\begin{align*}
+   c(\theta)
+   & =
+   c(\psi) + \log E_\psi \bigl( e^{\inner{y, \theta - \psi}} \bigr)
+   \\
+   & =
+   c(\psi) + \log \int e^{\inner{y, \theta - \psi}} f_\psi(y) \, d y
+   \\
+   & =
+   c(\psi) + \log \int e^{\inner{y, \theta - \psi}}
+   y_1^{- 1} e^{\inner{y, \psi} - c(\psi)} \, d x
+   \\
+   & =
+   \log \int y_1^{- 1} e^{\inner{y, \theta}} \, d x
+\end{align*}
+We know that \eqref{eq:gamma-pdf-too} integrates if and only if
+$\alpha > 0$ and $\lambda > 0$ \citep[Slides~27--30]{slides-5101-deck-6}.
+It follows that the full canonical parameter space is
+$$
+   \Theta = \set{ \theta \in \real^2 : \theta_1 < 0 \opand \theta_2 > 0 }
+$$
+and in order that \eqref{eq:gamma-pdf-too} integrate to one when the integral
+exists, the last integral above must be $c(\theta)$.
+
+Let us check that \eqref{eq:cumfun-gamma-shape-rate} has the correct
+derivatives
+\begin{align*}
+   \frac{\partial c(\theta)}{\partial \theta_1}
+   & =
+   - \frac{\theta_2}{\theta_1}
+   \\
+   \frac{\partial c(\theta)}{\partial \theta_2}
+   & =
+   \mydigamma(\theta_2) - \log(- \theta_1)
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_1^2}
+   & =
+   \frac{\theta_2}{\theta_1^2}
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_1 \partial \theta_2}
+   & =
+   - \frac{1}{\theta_1}
+   \\
+   \frac{\partial^2 c(\theta)}{\partial \theta_2^2}
+   & =
+   \trigamma(\theta_2)
+\end{align*}
+Translating these back to functions of $x$ and the original parameters,
+they say
+\begin{align*}
+   E(X) & = \frac{\alpha}{\lambda}
+   \\
+   E\{\log(X)\} & = \mydigamma(\alpha) - \log(\lambda)
+   \\
+   \var(X) & = \frac{\alpha}{\lambda^2}
+   \\
+   \cov\{X, \log(X)\} & = \frac{1}{\lambda}
+   \\
+   \var\{\log(X)\} & = \trigamma(\alpha)
+\end{align*}
+where the digamma function is the first derivative of $\log \Gamma(\fatdot)$,
+and the trigamma function is the second derivative of this function.
+
+Two of these agree with the known formulas for the mean and variance
+of a gamma random variable \eqref{eq:gamma-mean} and \eqref{eq:gamma-var}.
+The others involve integrals we don't know how to do other than by
+the method of cumulant functions (what we just did).
+(But Mathematica knows how to do these integrals.)
+% Mathematica
+% dist = GammaDistribution[alpha, 1 / lambda]
+% f[x_] = PDF[dist, x]
+% Integrate[ f[x], {x, 0, Infinity}, Assumptions -> alpha > 0 && lambda > 0 ]
+% moo = Integrate[ x f[x], {x, 0, Infinity},
+%     Assumptions -> alpha > 0 && lambda > 0 ]
+% voo = Integrate[ (x - moo)^2 f[x], {x, 0, Infinity},
+%     Assumptions -> alpha > 0 && lambda > 0 ]
+% loo = Integrate[ Log[x] f[x], {x, 0, Infinity},
+%     Assumptions -> alpha > 0 && lambda > 0 ]
+% uoo = Integrate[ (Log[x] - loo)^2 f[x], {x, 0, Infinity},
+%     Assumptions -> alpha > 0 && lambda > 0 ]
+% woo = Integrate[ (Log[x] - loo) (x - moo) f[x], {x, 0, Infinity},
+%     Assumptions -> alpha > 0 && lambda > 0 ]
+
+The mean value parameter is the two-dimensional vector $\xi$ having components
+\begin{align*}
+   \xi_1
+   & =
+   - \frac{\theta_2}{\theta_1}
+   \\
+   \xi_2
+   & =
+   \mydigamma(\theta_2) - \log(- \theta_1)
+\end{align*}
+
+The addition rules for the gamma distribution were given in the preceding
+section (they do not depend on which parameters are considered known or
+unknown).
+
+The canonical sample space for sample size one is
+$$
+   S = \set{ y \in \real^2 : y_1 = e^{y_2} }
+$$
+which is a curve.  Thus any intersection with a tangent line consists of
+a single point.  And, because this is a continuous distribution, single points
+have probability zero.  Thus in the limiting conditional model theorem
+(Theorem~\ref{th:completion-fundamental} above) we are in the case where
+the probability of $Y \in H_\delta$ is equal to zero
+(regardless of what $\delta$ is).  So there are no LCM for this family.
+
+For sample size one, the data are on the curve $S$ with probability one.
+So the MLE does not exist with probability one.  This is no surprise.
+One cannot estimate two parameters from one variable $x$.
+
+For sample size greater than one, the data are in the interior of the convex
+hull of the curve $S$ with probability one.
+So the MLE exists with probability one.  This is no surprise either.
+One can estimate the two parameters of the normal distribution from
+data $x_1$, $x_2$, $\ldots$, $x_n$ for $n \ge 2$.
+
+So we don't need the theory of limiting conditional models for this family.
+That theory is only needed for discrete families.
+
+The last three paragraphs almost exactly repeat what was said about
+the normal-location-scale family.  The reasoning applies to any continuous
+distribution.  The details distinguishing one of these families from the
+other do not matter in this argument.
 
 \section{K-Truncated Families}
+
+R package \code{aster} implements $k$-truncated Poisson and $k$-truncated
+negative binomial for any nonnegative integer $k$.  Example~{3} in
+\citet{aster2} used two-truncated negative binomial.  We no longer think
+%%%%%%%%%% NEED BACKWARD REFERENCE to subsampling %%%%%%%%%%
+using this family is the best way to do this example.  Moreover we know
+of no other examples in life history analysis that need these families
+(except for the zero-truncated ones already discussed).  Therefore
+we omit further discussion of them.
 
