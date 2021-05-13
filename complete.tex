@@ -285,10 +285,12 @@ is a union of exponential families that contains all straight-line limits.
 
 Under certain regularity conditions used by \citet{barndorff-nielsen},
 \citet{brown}, and \citet{geyer-gdor} this union is the completion.
-We do not get anything more by taking further limits in $\mathcal{P}$.
+We do not get anything more by taking further straight-line limits
+in $\mathcal{P}$.
 
-But in general \citet[Chapters~2 and~4]{geyer-thesis} we may need to take
-further limits to arrive at the completion.
+But in general \citep[Chapters~2 and~4]{geyer-thesis} we may need to take
+further straight-line limits or general (not straight line) limits
+to arrive at the completion.
 
 Anyway, one can see why \citet{brown} gave this idea the name aggregate
 exponential family.  It is a union (or aggregate) of exponential families.
@@ -312,7 +314,7 @@ if your data fail to satisfy $y \in C$, then something is wrong with your data.
 The first sentence is Corollary~{2.4.1} in \citet{geyer-thesis}.
 If $\delta$ and $- \delta$ are both directions of recession then
 $$
-   \inner{y, \delta} \ge \sigma_C(\delta) = \sup_{x \in K} \inner{x, \delta}
+   \inner{y, \delta} \ge \sigma_C(\delta) = \sup_{x \in C} \inner{x, \delta}
 $$
 and
 \begin{align*}
@@ -324,24 +326,24 @@ and
    \sigma_C(- \delta)
    \\
    & =
-   \sup_{x \in K} \inner{x, - \delta}
+   \sup_{x \in C} \inner{x, - \delta}
    \\
    & =
-   - \inf_{x \in K} \inner{x, \delta}
+   - \inf_{x \in C} \inner{x, \delta}
 \end{align*}
 or
 $$
-   \inner{y, \delta} \le \inf_{x \in K} \inner{x, \delta}
+   \inner{y, \delta} \le \inf_{x \in C} \inner{x, \delta}
 $$
 so
 \begin{equation} \label{eq:recession-constancy-inequalities}
-   \inner{y, \delta} \le \inf_{x \in K} \inner{x, \delta}
+   \inner{y, \delta} \le \inf_{x \in C} \inner{x, \delta}
    \le
-   \sup_{x \in K} \inner{x, \delta} \le \inner{y, \delta} 
+   \sup_{x \in C} \inner{x, \delta} \le \inner{y, \delta} 
 \end{equation}
 hence
 \begin{equation} \label{eq:recession-constancy}
-   \inner{x, \delta} = \inner{y, \delta}, \qquad x \in K
+   \inner{x, \delta} = \inner{y, \delta}, \qquad x \in C
 \end{equation}
 hence $\inner{Y, \delta} = \inner{y, \delta}$ almost surely,
 and $\delta$ is a direction of constancy.
@@ -352,5 +354,264 @@ be $\inner{y, \delta}$.  Hence \eqref{eq:recession-constancy} holds.
 Hence \eqref{eq:recession-constancy-inequalities} holds.
 And we have already seen that \eqref{eq:recession-constancy-inequalities}
 is equivalent to both $\delta$ and $- \delta$ being directions of recession.
+\end{proof}
+
+\subsection{Curved Line Limits}
+
+Chapter~4 of \citet{geyer-thesis} covers completely general
+limits of sequences of distributions in an exponential family of distributions,
+these limits being in the sense of convergence of probability mass-density
+functions.  Although the section title says ``curved line limits,'' these
+limits are just limits of sequences.  We only get a line by connecting
+the dots, and that line does not have to be a smooth curve.
+
+Theorems~4.1 through~{4.5} in \citet{geyer-thesis} show that taking general
+limits gives no more limits that correspond to probability distributions
+than taking iterated straight line limits.  General limits can produce
+limits that are subprobability distributions
+\citep[Examples~4.2 through~4.4]{geyer-thesis}, but these can never be
+maximum likelihood estimates for a full family, because iterated straight
+line limits produce the corresponding probability distribution, which must
+have higher likelihood.
+This shows that we do not need to consider curved line limits, so long
+as we limit our attention to full families.
+%%%%% Need to worry about subsampling, which are curved exponential family
+%%%%% Do not need to worry about conditional aster models, which are also
+%%%%%     curved exponential family, because of associated independence
+%%%%%     models, which are full exponential family
+
+\section{Unconditional Aster Models}
+
+Unconditional aster models are regular full exponential families.
+Thus the theory of the preceding section applies to them.
+
+The following theorem encapsuates the calculations of Slide~35~ff.\ of the
+slides for the aster special topics course \citep{geyer-8931-aster}.
+\begin{theorem} \label{th:dor-arrow}
+Suppose $\{j\}$ is a dependence group by itself in an aster graph, and
+the one-parameter exponential family of distributions for $y_j$ given
+$y_{p(j)} = 1$ has closed convex support that is an interval with
+endpoints $a_j$ and $b_j$ (either of which may be infinite).  Let $J$
+be the set of non-initial nodes of the aster graph.
+
+If $y_j = a_j y_{p(j)}$, then the vector $\eta$ having index set $J$
+and coordinates
+\begin{equation} \label{eq:dor-lower-bound}
+   \eta_i = \begin{cases} -1, & i = j \\ a_j & i = p(j) \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of recession of the saturated aster model.
+If $y_j = b_j y_{p(j)}$, then the vector $\eta$ having index set $J$
+and coordinates
+\begin{equation} \label{eq:dor-upper-bound}
+   \eta_i = \begin{cases} 1, & i = j \\ - b_j & i = p(j) \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of recession of the saturated aster model.
+\end{theorem}
+\begin{proof}
+We need to show that $\inner{Y - y, \eta} \le 0$ almost surely,
+where $Y$ is a random realization of the response vector and $y$
+is the observed value of the response vector.  From the definition
+of $a_j$ and $b_j$ we know $a_j Y_{p(j)} \le Y_j \le b_j Y_{p(j)}$
+almost surely.
+
+In case $y_j = a_j y_{p(j)}$ and $\eta$ is
+given by \eqref{eq:dor-lower-bound} we have two cases.
+If $p(j)$ is noninitial, then
+$$
+   \inner{Y - y, \eta} = - (Y_j - y_j) + a_j (Y_{p(j)} - y_{p(j)})
+   =
+   - Y_j + a_j Y_{p(j)}
+$$
+and this is indeed less than or equal to zero almost surely by definition
+of $a_j$.
+If $p(j)$ is initial, then
+$$
+   \inner{Y - y, \eta} = - (Y_j - y_j)
+   =
+   - Y_j + a_j y_{p(j)}
+$$
+and this is indeed less than or equal to zero almost surely by definition
+of $a_j$.
+
+In case $y_j = b_j y_{p(j)}$ and $\eta$ is
+given by \eqref{eq:dor-upper-bound} we have two cases.
+If $p(j)$ is noninitial, then
+$$
+   \inner{Y - y, \eta} = (Y_j - y_j) - b_j (Y_{p(j)} - y_{p(j)})
+   =
+   Y_j - b_j Y_{p(j)}
+$$
+and this is indeed less than or equal to zero almost surely by definition
+of $b_j$.
+If $p(j)$ is initial, then
+$$
+   \inner{Y - y, \eta} = Y_j - y_j
+   =
+   Y_j - b_j y_{p(j)}
+$$
+and this is indeed less than or equal to zero almost surely by definition
+of $b_j$.
+\end{proof}
+As we see in the proof, there are two cases.  When $p(j)$ is noninitial
+the arrow $y_{p(j)} \longrightarrow j$ represents a conditional
+distribution and $\eta$ has two nonzero components.
+When $p(j)$ is initial the arrow $y_{p(j)} \longrightarrow j$ represents,
+in effect, a marginal distribution and $\eta$ has one nonzero component.
+But the formulas \eqref{eq:dor-lower-bound} and \eqref{eq:dor-upper-bound}
+work in either case because the middle case does not occur when
+$p(j) \notin J$.
+
+\begin{theorem} \label{th:dor-multinomial}
+Suppose $G$ is a multinomial dependence group in an aster graph.
+Let $J$ be the set of non-initial nodes of the aster graph.
+
+If $j \in G$ and $y_j = 0$, then the vector $\eta$ having index set $J$
+and coordinates
+\begin{equation} \label{eq:dor-multinomial}
+   \eta_i = \begin{cases} -1, & i = j \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of recession of the saturated aster model.
+
+And the vector $\eta$ having index set $J$ and coordinates
+\begin{equation} \label{eq:doc-multinomial}
+   \eta_i = \begin{cases} -1, & i \in G \\
+   +1, & i = q(G) \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of constancy of the saturated aster model.
+\end{theorem}
+\begin{proof}
+For \eqref{eq:dor-multinomial} we need to show
+that $\inner{Y - y, \eta} \le 0$ almost surely,
+where $Y$ is a random realization of the response vector and $y$
+is the observed value of the response vector.
+
+This is obvious.
+$$
+   \inner{Y - y, \eta} = - (Y_j - y_j)
+   =
+   - Y_j
+$$
+and this is indeed less than or equal to zero almost surely
+by definition of the multinomial distribution.
+
+For \eqref{eq:doc-multinomial} we need to show
+that $\inner{Y - y, \eta} = 0$ almost surely,
+where $Y$ and $y$ are as above.
+
+This too is obvious.
+$$
+   \inner{Y - y, \eta} = (Y_{q(G)} - y_{q(G)}) - \sum_{j \in G} (Y_j - y_j)
+$$
+and this is indeed equal to zero almost surely,
+by definition of the multinomial distribution.
+\end{proof}
+
+\begin{theorem} \label{th:dor-normal}
+Suppose $G = \{j, k\}$ is a normal-location-scale dependence group
+in an aster graph.
+Let $J$ be the set of non-initial nodes of the aster graph.
+
+If $y_{q(G)} = 1$, then the vector $\eta$ having index set $J$
+and coordinates
+\begin{equation} \label{eq:dor-normal}
+   \eta_i = \begin{cases} 2 y_j, & i = j \\
+   -1, & i = k \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of recession of the saturated aster model.
+
+But this direction of recession does not produce a limiting conditional model
+because it corresponds to the case $\Pr_\theta(Y \in H_\delta) = 0$ in
+in Theorem~\ref{th:completion-fundamental}.
+\end{theorem}
+\begin{proof}
+The closed curve consisting of points $y_G$ such that $y_k = y_j^2$
+supports the conditional distribution of $y_G$ given $y_{q(G)} = 1$.
+The function $f : y_j \mapsto y_j^2$ is a convex function.
+By the gradient inequality \citep[Theorem~2.13 (b)]{rockafellar-wets}
+$$
+   f(Y_j) - f(y_j) \ge f'(y_j) (Y_j - y_j)
+$$
+where $Y$ is a random realization of the canonical statistic vector and
+$y$ is its observed value.  But this can also be written
+$$
+   Y_k - y_k \ge 2 y_j (Y_j - y_j)
+$$
+because $f(y_j) = y_k$ and $f(Y_j) = Y_k$ and $f'(y_j) = 2 y_j$.
+And it can also be written
+$$
+   - \eta_k (Y_k - y_k) \ge \eta_j (Y_j - y_j)
+$$
+because of the definition of $\eta$ in the theorem statement.
+And this says $\inner{Y - y, \eta} \le 0$ so $\eta$ is a direction of
+recession.
+
+Since $f$ is strictly convex
+\citep[Theorem~2.13 ($\text{a}'$)]{rockafellar-wets},
+we have strict inequality in the gradient inequality
+\citep[Theorem~2.13 ($\text{b}'$)]{rockafellar-wets} when $Y_j \neq y_j$.
+Hence we have \hbox{$\inner{Y - y, \eta} < 0$} almost surely.
+But the latter is equivalent to $\Pr_\theta(Y \in H_\delta) = 0$ in
+in Theorem~\ref{th:completion-fundamental}.
+\end{proof}
+
+\REVISED
+
+\begin{theorem} \label{th:dor-aster}
+The set of all directions of recession is a closed convex cone.
+The set of all directions of constancy is a vector subspace.
+Every direction of constancy is also a direction of recession.
+A vector $\delta$ is a direction of constancy if and only if
+both $\delta$ and $- \delta$ are directions of recession.
+
+The set of all directions of recession of a currently implemented
+unconditional aster model
+is the smallest closed convex cone containing all of the directions
+of recession described by Theorems~\ref{th:dor-arrow}
+and~\ref{th:dor-multinomial}.
+The set of all directions of constancy of an unconditional aster model
+is the smallest vector subspace containing all of the directions
+of constancy described by Theorem~\ref{th:dor-multinomial}.
+\end{theorem}
+The ``currently implemented'' aster models are those implemented
+in R package \code{aster} that have only univariate dependence groups
+(each noninitial node of the aster graph is a dependence group all by
+itself, hence directions of recession are characterized
+by Theorem~\ref{th:dor-arrow} above) and those implemented
+in R package \code{aster2} that have not only univariate dependence groups
+but also multinomial and normal-location-scale dependence groups.
+Another feature of currently implemented aster models (both \code{aster}
+and \code{aster2}) is that they do not allow zero values to be specified
+for initial nodes.
+% Immediately preceding sentence is TRUE for R package aster2 and FALSE
+% for R package aster, as of version 1.0.3.  Probabily should add checks
+% to R package aster to make this TRUE for it too.
+\begin{proof}
+The set of all directions of recession is a closed convex cone
+by Section~3.2 and Theorem~3 of \citet{geyer-gdor} and Proposition~6.5
+and Theorem~{6.9} in \citet{rockafellar-wets}.
+That the set of all directions of constancy is a vector subspace
+was shown in Section~\ref{sec:direction-of-constancy} above.
+That every direction of constancy is a direction of recession is
+immediate from the definitions.
+If $\inner{Y - y, \delta} = 0$ almost surely (one characterization
+of direction of constancy), then $\inner{Y - y, \delta} \le 0$ almost surely
+and $\inner{Y - y, - \delta} \le 0$ almost surely (one characterization
+of $\delta$ and $- \delta$ being directions of recession).
+Conversely, $\inner{Y - y, \delta} \le 0$ almost surely
+and $\inner{Y - y, - \delta} \le 0$ almost surely
+imply $\inner{Y - y, \delta} = 0$ almost surely.
+
+Sections~4.1 and~{4.2} in \citet{geyer-thesis} characterize all possible
+limit distributions in an exponential family of distributions.
+Theorem~{2.7} in \citet{geyer-thesis} says that all limit distributions
+can be obtained by taking iterated straight line limits.
+The limit of a product being the product of the limits, when we take a
+limit we get a limit in each term of the fundamental factorization of
+aster models \eqref{eq:factorize}.
 \end{proof}
 

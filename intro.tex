@@ -15,7 +15,7 @@ Poisson regression with log link) in two ways
 \begin{itemize}
 \item in GLM components of the response vector are
     necessarily conditionally independent given covariate data
-    but in aster models they need not be, and
+    but in aster models they need not, and
 \item in GLM the conditional distributions of components of the
     response vector given covariate data all come from the same family
     but in aster models they need not.
@@ -139,7 +139,7 @@ we say $y_A$ is a \emph{subvector} of $y$.
 \index{subvector}
 
 If we were to insist that all vectors, including subvectors, have
-index sets $\{1, \ldots, k\}$ for some natural number $k$.  Then we could
+index sets $\{1, \ldots, k\}$ for some natural number $k$, then we could
 not distinguish different subvectors of the same length, or at least could
 not without ugly and cumbersome extra decoration of the notation.
 (It is hard to explain how elegant this notation is with simple examples,
@@ -192,9 +192,12 @@ probabilities and expectations.
 \section{Factorization}
 \label{sec:factorization}
 
-If $J$ is the index set of the response vector $y$ of an aster model,
-then there is a partition $\mathcal{G}$ of $J$
-and a function $q : \mathcal{G} \to N$, where $N \supset J$, such that
+Let $J$ be the index set of the response vector $y$ of an aster model.
+We also need more variables that are not in the response vector.
+As we shall see they are treated as constants.
+Let $N$ be the index set of all the variables, so $J \subset N$.
+Then there is a partition $\mathcal{G}$ of $J$
+and a function $q : \mathcal{G} \to N$, such that
 \index{aster model!property!factorization}
 \index{factorization|seeunder{aster model}}
 the joint distribution of $y$ factorizes as
@@ -204,7 +207,8 @@ the joint distribution of $y$ factorizes as
 We emphasize that $q : \mathcal{G} \to N$ maps elements of $\mathcal{G}$,
 which are sets of indices, to elements of $N$, which are single indices,
 so each $y_G$ in \eqref{eq:factorize} is a subvector of $y$,
-and each $y_{q(G)}$ in \eqref{eq:factorize} is a component of $y$.
+and each $y_{q(G)}$ in \eqref{eq:factorize} is a component of the vector
+of all the variables.
 
 In this factorization, each component $y_j$ of the response vector $y$
 appears exactly once ``in front of the bar'' in a conditional on
@@ -295,7 +299,7 @@ and his equation (3.23) can be further factorized, his equation (3.24).
 But in aster model theory, we shall never be interested in such further
 factorizations (even in cases where they are possible) and never use any
 notation that allows for them.  So we will never have an analog of equation
-(3.24) in \citet{lauritzen}.  For us, factorization is \eqref{eq:factorize}.
+(3.24) in \citet{lauritzen}.  For us, factorization is our \eqref{eq:factorize}.
 
 \section{Graphs}
 
@@ -1149,7 +1153,7 @@ life history stages like an insect's larva, pupa, and adult.  We present this
 graph for hypothetical data even though a similar model has been fit to real
 data by \citet{aster-hornworm}.  Those data are for the tobacco hornworm
 \emph{Manducca sexta}, which is an insect (a moth) that does have these life
-history stages.  These data were not collected with the intention of using
+history stages.  Those data were not collected with the intention of using
 an aster model (which were very new when the experiment was done) and so were
 not ideal for aster analysis.  Although an aster analysis was done by
 \citet{aster-hornworm}, it does not serve as quite as clean an example as
@@ -1206,7 +1210,7 @@ and 0-Poi = zero-truncated Poisson, which we have already met,
 we now also have $\mathcal{M}$ = multinomial.
 Lines without arrowheads are ``lines'' connecting nodes in the
 same dependence group.  Hence the dependence groups containing more than
-one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11, 12\}$.
+one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11\}$.
 Other nodes are dependence groups all by themselves; $\{j\}$ is a dependence
 group for $j \ge 13$.
 
@@ -1486,9 +1490,9 @@ and the predecessor-is-sample size property (Section~\ref{sec:piss} above)
 \begin{split}
    y_{10} & = 1 - y_1
    \\
-   y_{11} & = y_1 (1 - y_2)
+   y_{11} & = y_1 - y_2
    \\
-   y_{12} & = y_2 (1 - y_3)
+   y_{12} & = y_2 - y_3
 \end{split}
 \end{equation}
 The aster models with graphs \eqref{gr:aster1} and \eqref{gr:aster1-too}
@@ -1766,8 +1770,8 @@ it can be extended to this whole vector space by
    c(\theta) = c(\psi) + \log\left\{
    E_\psi\bigl( e^{\inner{Y, \theta - \psi}} \bigr) \right\}
 \end{equation}
-\index{exponential family!cumulant function}
 where $\theta$ varies while $\psi$ is fixed at
+\index{exponential family!cumulant function}
 a possible value of the canonical parameter vector, and
 the expectation and hence $c(\theta)$ are assigned
 the value $\infty$ for $\theta$ such that the expectation does not exist.
@@ -1776,9 +1780,9 @@ The family is \emph{full} if its canonical parameter space is
 \begin{equation} \label{eq:full-expfam}
    \Theta = \{\, \theta : c(\theta) < \infty \,\}
 \end{equation}
+and a full family is \emph{regular} if its canonical parameter space is an open
 \index{exponential family!full}
 \index{exponential family!canonical parameter!space}
-and a full family is \emph{regular} if its canonical parameter space is an open
 \index{exponential family!regular}
 subset of the vector space where $\theta$ takes values.
 
@@ -1832,6 +1836,8 @@ from this family with log likelihood
    \left\langle \sum_{i = 1}^n z_i, \theta \right\rangle - n c(\theta)
 \end{split}
 \end{equation}
+where subscripts indicate a sequence of vectors rather than components
+of one vector: $z_1$, $z_2$, $\ldots$ are IID random vectors.
 This tells us that IID sampling from an exponential family gives another
 exponential family with
 \begin{itemize}
@@ -1951,7 +1957,7 @@ $$
 provided that the function $M$ so defined is finite on a neighborhood of
 zero; otherwise we say the random vector $Y$ does not have an MGF.
 Clearly, the MGF only depends on the distribution of $Y$,
-so we also this is the MGF of this distribution.
+so we also say this is the MGF of this distribution.
 
 The MGF of the distribution of the canonical statistic of an exponential
 \index{exponential family!moment generating function}
@@ -2021,7 +2027,8 @@ full canonical parameter space \eqref{eq:full-expfam}).
 This also shows that cumulant functions are infinitely differentiable
 at every point in the interior of the full canonical
 parameter space \eqref{eq:full-expfam}), and
-cumulant functions of a regular full exponential are infinitely differentiable
+cumulant functions of a regular full exponential family
+are infinitely differentiable
 at every point of the full canonical
 parameter space \eqref{eq:full-expfam}).
 
@@ -2041,7 +2048,7 @@ First and second order cumulants are mean and variance
 \citep[Theorem~8.1]{barndorff-nielsen}.
 \index{exponential family!canonical statistic!mean vector}
 \index{exponential family!canonical statistic!variance matrix}
-Of course, the formulas are valid only where $c$ is differentiable,
+Of course, these formulas are valid only where $c$ is differentiable,
 which is when $\theta$ is in the interior of the full canonical
 parameter space \eqref{eq:full-expfam}.
 On the boundary of the full canonical parameter space, the derivatives
@@ -2085,7 +2092,7 @@ object, then the same formulas work for univariate and multivariate $Y$.
 \index{cumulant function|seeunder{aster model}}
 We finally get to the final axiom of aster models.
 Each conditional distribution in the factorization \eqref{eq:factorize}
-is actually stands for parametric family of distributions,
+actually stands for parametric family of distributions,
 and each of these is an exponential family of distributions.
 As explained in Section~\ref{sec:piss} above,
 the distribution for these conditional families is determined
@@ -2140,9 +2147,9 @@ that is,
    \sum_{G \in \mathcal{G}}
    \left[ \inner{y_G, \theta_G} - y_{q(G)} c_G(\theta_G) \right]
 \end{equation}
+(by the predecessor-is-sample-size property, the conditional distribution
 \index{aster model!log likelihood}
 \index{log likelihood|seeunder{aster model}}
-(by the predecessor-is-sample-size property, the conditional distribution
 of $y_G$ given $y_{q(G)}$ is the sum of IID random vectors having cumulant
 function $c_G$, hence the cumulant function in each term is $y_{q(G)}$
 times the cumulant function for sample size one).
@@ -2151,7 +2158,7 @@ As was mentioned in Section~\ref{sec:miss} above, probability theory
 just does the Right Thing in case $y_{q(G)} = 0$.
 By the predecessor-is-sample-size property, this implies $y_G = 0$ too,
 so the whole contribution to the log likelihood of the term for dependence
-$G$ is zero (when, as we are discussing here, the predecessor is zero).
+group $G$ is zero (when, as we are discussing here, the predecessor is zero).
 And zero is the correct contribution because the conditional distribution
 of $y_G$ given $y_{q(G)} = 0$ is concentrated at zero,
 that is, it is zero with probability one, so the contribution to the
@@ -2202,7 +2209,7 @@ observation.
 
 The aster log likelihood \eqref{eq:logl-aster-theta} does not have
 exponential family form \eqref{eq:logl-expfam}.
-But since \eqref{eq:logl-aster-theta} is linear in $y$, it must be an
+But since \eqref{eq:logl-aster-theta} is affine in $y$, it must be an
 exponential family having canonical statistic vector $y$.  In order
 to figure out the canonical parameter and cumulant function for this family
 we rewrite \eqref{eq:logl-aster-theta} as follows
@@ -2376,6 +2383,11 @@ estimates because (a) would imply the log likelihood is higher somewhere
 between these points.  Thus the MLE for a full
 exponential family is unique (if it exists) if and only if there are
 no nonzero directions of constancy.
+
+It is clear from condition (e) or (f) that the set of
+all directions of constancy of an exponential family
+(with a particular canonical parameterization) is a vector subspace,
+which is called the \emph{constancy space} of the family.
 
 Conditions (c) and (d) connect this concept with identifiability.
 If there exist two distinct canonical parameter vectors $\theta$ and $\theta^*$
@@ -2631,13 +2643,13 @@ where $c$ is the cumulant function of the (unconditional, joint) aster
 model \eqref{eq:aster-cumfun}, and $Y$ is the response vector of the
 aster model, and
 \begin{equation} \label{eq:aster-theta-to-xi}
-   \xi_G = c_G'(\theta) = E_\theta(Y_G),
+   \xi_G = c_G'(\theta) = E_\theta(Y_G \mid Y_{q(G)} = 1),
    \qquad G \in \mathcal{G},
 \end{equation}
 where $c_G$ is the cumulant function of dependence group $G$.
 
 The inverse mappings to these mappings do not, in general,
-have closed form expression
+have closed form expressions
 but are described in Section~\ref{sec:calculating-inverse-transformation}
 above.  Define $\tilde{l}$ by
 \begin{equation} \label{eq:logl-aster-expected}
@@ -2679,7 +2691,7 @@ of the inverse is the inverse of the derivative (this is not always
 stated in the theorem statement, but does appear in the proof).
 In our case, the derivative of the forward mapping $\varphi \to \mu$
 is $c''(\varphi) = I(\varphi)$.  We know this matrix is invertible
-if and only if the $\varphi$ is identifiable.  And when it is invertible
+if and only if $\varphi$ is identifiable.  And when it is invertible
 (when there are no nonzero directions of constancy, when $Y$ is not
 concentrated on a hyperplane) the derivative of the inverse mapping
 $\mu \to \varphi$ is $c''(\varphi)^{- 1}$.
@@ -2698,7 +2710,8 @@ $$
 
 \subsection{Conditional}
 
-Now we go over all of this section again for conditional mean values and
+Now we go over all of the preceding section again
+for conditional mean values and
 dependence groups.  We fuss less about the details because they are the
 same \emph{mutatis mutandis}.
 For dependence group $G$, define $\tilde{l}_G$ by
@@ -2738,7 +2751,7 @@ $\xi$ that corresponds to $\theta$.
 \label{sec:dealing}
 
 We are used to the computer dealing with non-identifiability, also called
-collinearity, automatically.  R function \code{lm} and \code{glm} in core R
+collinearity, automatically.  R functions \code{lm} and \code{glm} in core R
 \citep{r-core}, which fit linear and generalized linear models automatically
 handle it by dropping regressor vectors (columns of the model matrix) until
 identifiability is obtained.  They signal this by reporting \code{NA} for
@@ -2801,11 +2814,10 @@ are necessary for this to work).
 
 This procedure can always be implemented by the computer provided it has
 a way of determining directions of constancy.
-It is clear from the definition in Section~\ref{sec:direction-of-constancy}
-above that the set of all directions of constancy is a subset of the
-vector space where the canonical parameter takes values.
-Since that vector space is finite-dimensional, so is the subspace.
-The set of all directions of constancy is called the \emph{constancy space}.
+As stated in Section~\ref{sec:direction-of-constancy}
+above, the set of all directions of constancy is a vector subspace of the
+vector space where the canonical parameter takes values,
+which is called the \emph{constancy space}.
 Hence the set of all directions of constancy can be characterized by
 providing a basis for the constancy space.
 
@@ -2890,7 +2902,7 @@ the other parameter transformations.
     but since the aster transform is nonlinear this does not
     correspond to setting any components of $\varphi$ to be equal to zero.
 \item When some components of the response vector that are predecessors
-    are equal to zero almost surely $\xi$ is not identifiable:
+    are equal to zero almost surely, $\xi$ is not identifiable:
     if $\mu_{q(G)} = 0$, then $\xi_G$ can be chosen arbitrarily,
     but then $\theta_G$ will be determined by this arbitrary choice,
     and then $\varphi$ will be determined by $\theta$.
@@ -3025,7 +3037,7 @@ as with the other $\tilde{l}$ functions, $\tilde{l}_\text{sub}$ is concave
 and strictly concave when the canonical parameter $\beta$ of the unconditional
 canonical affine submodel is identifiable, which is when there does not
 exist a nonzero direction of constancy, a nonzero vector $\eta$ such that
-$\inner{M^T Y, \eta}$ is almost surely constant.
+$\inner{M^T Y, \eta} = \inner{Y, M \eta}$ is almost surely constant.
 Whenever $\tau$ is a possible value of the mean value parameter vector,
 that is, $\tau = E_\beta(M^T Y)$ for some $\beta$, then that $\beta$
 is a global maximizer of \eqref{eq:logl-aster-expected-submodel}.
