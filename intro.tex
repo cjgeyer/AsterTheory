@@ -14,7 +14,7 @@ exponential family models (for example, logistic regression and
 Poisson regression with log link) in two ways
 \begin{itemize}
 \item in GLM components of the response vector are
-    necessarily conditionally independent given covariate data
+    conditionally independent given covariate data
     but in aster models they need not, and
 \item in GLM the conditional distributions of components of the
     response vector given covariate data all come from the same family
@@ -33,7 +33,8 @@ what happens conditional on survival).
 Aster models unify many disparate kinds of life history analysis that have
 appeared in the biological literature: comparison of Darwinian fitness between
 various groups \citep{aster1,aster2}, estimation of fitness landscapes
-(\citealp{lande-arnold}; \citealp{aster2,aster3}, \citealp*{aster-hornworm}),
+(\citealp{lande-arnold}; \citealp{mitchell-olds-shaw}; \citealp{aster2,aster3},
+\citealp*{aster-hornworm}),
 Leslie matrix analysis
 \citep{caswell}, life table analysis in demography \citep{goodman},
 and estimation of population growth rates
@@ -48,6 +49,7 @@ of the response vector factorizes completely as a product of marginal and
 conditional distributions (equation~\eqref{eq:factorize} below).
 This makes aster models a special case of chain graph models
 \citep[Sections~2.1.1 and~3.2.3]{lauritzen}.
+
 Aster models also have the predecessor-is-sample-size property
 (Section~\ref{sec:piss} below)
 that makes the joint distribution of the response vector an exponential
@@ -77,6 +79,8 @@ and limiting conditional models.
 R package \code{aster2} is the very incomplete.
 It does do dependence groups and limiting conditional models, but everything
 else is either missing or much harder to use than in R package \code{aster}.
+The only analyses known to us using R package \code{aster2} are
+\citet{aster-hornworm} and \citet*{aster-microbial-symbionts}.
 
 So any aster model that can be done with R package \code{aster} should
 be done with that package.
@@ -103,7 +107,10 @@ categorical data analysis, even though they are far more more complicated.
 \label{sec:subvector}
 
 We adopt a notation from \citet{lauritzen} for subvectors, but fuss about it
-more.
+more.  The idea that vectors can have arbitrary index sets, rather than
+indices that are consecutive numbers starting at one, appears earlier in
+\citet{rockafellar-monotropic}.  The idea that vectors are functions
+occurs everywhere in functional analysis \citep[Appendix~B]{rudin}.
 
 As in set theory \citep[Section~8]{halmos-set-theory}, if $A$ and $B$
 are sets, then $A^B$ denotes the set of all functions $B \to A$.
@@ -157,6 +164,43 @@ not the value of a function).
 We also consider any subscript notation that clearly denotes a set
 as indicating a subvector, for example, $y_{\{1, 3, 5\}}$ or $y_{\{j\}}$ or
 $y_{\set{ j \in J : j \prec i }}$.
+
+It will not be important in what follows, but a special subvector
+$y_\emptyset$ has the empty index set.
+It is a function $\emptyset \to \real$.
+One might wonder what that is, but mathematicians define such.
+For any set $A$ there is exactly one function $\emptyset \to A$,
+which is called the empty function.  It has an empty graph
+(no argument-value pairs) because there are no possible argument values.
+That is, if $f : \emptyset \to A$ is an empty function, then it is
+valid to write $f(x)$ for all $x$ in the domain of $f$, which is the
+empty set, so there are no such $x$.  But there is the function.
+And there is exactly one such function (for each set $A$) because there
+is only one empty set and only one subset of
+$\emptyset \times A = \emptyset$ that is the graph of $f$.
+We also want to consider the vector space $\real^\emptyset$.
+Since this has only one element, the empty function $\emptyset \to \real$,
+this must be a vector space having only one element.  Every vector space
+has a zero vector.  So this single element must be the zero vector of the
+vector space $\real^\emptyset$.
+So the empty function $f : \emptyset \to \real$ must be the zero vector
+of this vector space.  And this makes a crazy kind of mathematical sense:
+we do have $f(x) = 0$ for all $x$ in the domain of $f$, just like for
+any other zero vector.  The only tricky part is that there are no such $x$.
+But that is OK to mathematicians.  Quantifiers can range over any set,
+including the empty set, so the statement $f(x) = 0$ for all $x \in \emptyset$
+is a true mathematical statement.  We say $f(x) = 0$ holds \emph{vacuously},
+meaning there are no $x$ that need to be considered.
+Whether one finds this paragraph interesting or just crazy, it is an
+inevitable part of the vectors-are-really-functions point of view.
+It is always there in the background, whether or not we pay any attention
+to it.
+
+When we consider random vectors $Y$, then $Y_A$ is also a random vector
+for any $A$ that is a subset of the index set (domain) of $Y$.
+This includes $Y_\emptyset$.  But since this random vector has only one
+possible value, the empty function $y_\emptyset$, this must be a constant
+random vector (one that takes the same value with probability one).
 
 \section{Regression Notation}
 
@@ -263,10 +307,10 @@ We can find such a total order using the algorithm called topological sort
 \index{topological sort}
 \citep[Section~6.6]{aho-et-al}.
 
-Using R function \code{tsort} in R package \code{pooh}
-\citep{pooh-package}
+R function \code{tsort} in R package \code{pooh}
+\citep{pooh-package} implements this algorithm.
 \index{R package!pooh@\code{pooh}}
-for each $G \in \mathcal{G}$ such that there exists
+For each $G \in \mathcal{G}$ such that there exists
 a (necessarily unique) $H \in \mathcal{G}$ such that $q(G) \in H$
 let $G$ be a component of the vector \code{from} that is an argument to
 \code{tsort} and
@@ -333,9 +377,15 @@ Conversely, the graph determines the function $q$.
     \index{aster graph!of lines}
     If a node $j \in J$ has no incoming lines, then the singleton set $\{j\}$
     is an element of $\mathcal{G}$.
+    R function \code{weak} in R package \code{pooh} \citep{pooh-package}
+    can be used to find the dependence groups implied by a graph of lines.
 \item The graph of $q$ is determined by the arrows: $(G, q(G))$ is an
     argument-value pair whenever there is an arrow $j \longrightarrow k$
     with $j = q(G)$ and $k \in G$.
+    (If there is an arrow $j \longrightarrow k$ for any $k \in G$,
+    then there must also be an arrow $j \longrightarrow k$
+    for every $k \in G$.)
+
 \end{itemize}
 
 Thus we can reason with with graphs or with $q$ functions (which we will
@@ -348,7 +398,8 @@ Graphs can be helpful, but we do not have to use them.
 In theory, as stated above, there is a line between every pair of distinct
 elements of every dependence group and no other lines.
 
-In practice, this leads to annoying and unnecessary clutter.
+In practice, this leads to annoying and unnecessary clutter
+when we display graphs as figures.
 Because we never further factorize dependence groups
 (Section~\ref{sec:further-factorize} above), we can find the dependence
 groups from the graph if we only include enough lines so that each
@@ -917,7 +968,8 @@ to estimate $\xi$ as defined in this section.
 
 R package \texttt{aster2} and recent papers and technical reports use
 the definition presented here (the conditional mean value parameter vector
-is $\xi$ if they mention conditional mean value parameters at all).
+is defined as we do here if they mention conditional mean value parameters
+at all).
 
 \section{Some Aster Graphs}
 \label{sec:graphs}
@@ -1210,7 +1262,7 @@ and 0-Poi = zero-truncated Poisson, which we have already met,
 we now also have $\mathcal{M}$ = multinomial.
 Lines without arrowheads are ``lines'' connecting nodes in the
 same dependence group.  Hence the dependence groups containing more than
-one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11\}$.
+one node are $\{1, 2, 3\}$, $\{4, 5, 6\}$, $\{7, 8, 9\}$, and $\{10, 11, 12\}$.
 Other nodes are dependence groups all by themselves; $\{j\}$ is a dependence
 group for $j \ge 13$.
 
@@ -1235,15 +1287,16 @@ equal to one, then exactly one of its three successor nodes ($y_4$, $y_5$,
 and $y_6$) is equal to one, and, if this predecessor
 is equal to zero, then all of its three successor nodes are also equal to zero.
 In effect, exactly one of the ``exterior nodes'' of this group of switches
-($y_1$, $y_4$, $y_7$, $y_{10}$, $y_{11}$, $y_{12}$, $y_9$, $y_6$, and $y_3$)
+($y_1$, $y_3$, $y_4$, $y_6$, $y_7$, $y_9$, $y_{10}$, $y_{11}$, and $y_{12}$)
 is equal to one.  There is one path taken by any particular individual,
 from the initial node (marked 1) through these four multinomial dependence
 groups.
 
-The intended application for this graph \citep{aster-hornworm} is life history
+The intended application for this graph \citep[as in][]{aster-hornworm}
+is life history
 data for an insect.  As in our graphs without dependence groups,
 ``columns'' of the graph are for different
-times (here days, there years).
+times (days, perhaps).
 Nodes in the top ``row'' of this graph ($y_1$, $y_4$, $y_7$, and $y_{10}$)
 indicate death.
 Nodes in the second ``row'' of this graph ($y_2$, $y_5$, $y_8$, and $y_{11}$)
@@ -1252,7 +1305,7 @@ Nodes in the third ``row'' of this graph ($y_3$, $y_4$, $y_9$, and $y_{12}$)
 indicate the individual is an adult (moth, with wings, flying around trying
 to mate).
 Nodes in the fourth ``row'' of this graph ($y_{13}$ through $y_{16}$)
-indicate the mating success.
+indicate mating success.
 Nodes in the bottom ``row'' of this graph ($y_{17}$ through $y_{20}$)
 count number of eggs laid.  So this graph is for female individuals.
 In \citet{aster-hornworm} the same graph with only the multinomial dependence
@@ -1678,7 +1731,8 @@ We will do some more exponential family theory later as the need arises.
 \label{sec:define-expfam}
 
 The usual definition of exponential families of distributions
-(\citealp[Chapter~8]{barndorff-nielsen}; \citealp[Chapter~1]{brown})
+(\citealp[Chapter~8]{barndorff-nielsen}; \citealp[Chapter~1]{brown};
+\citealp[Chapter~1]{geyer-thesis})
 involves probability mass-density functions (or measure-theoretic probability
 density functions with respect to an arbitrary positive measure).
 Here we give a simpler definition from \citet{geyer-gdor}.
@@ -1947,6 +2001,25 @@ This shows the canonical affine submodel is itself an exponential family with
 \end{itemize}
 \index{exponential family!canonical affine submodel|)}
 
+It is helpful to have a term saying what model a canonical affine submodel
+is a submodel of.  In this context, we call that model
+the \emph{saturated model}.
+\index{aster model!saturated}
+It is the special case of \eqref{eq:affine} with $a = 0$ and $M$ the identity
+matrix, so $\theta = \beta$.  The saturated model is the largest possible
+canonical affine submodel (of itself).
+
+A canonical affine submodel is a full exponential family if its parameter
+space is
+$$
+   \set{ \beta \in \real^K : c(a + M \beta) < \infty }
+$$
+where $K$ is the index set of $\beta$ and $c$ is the cumulant function
+of the saturated model.  Because the linear transformations are continuous
+functions and the preimage of an open set through a continuous function is open,
+the full canonical affine submodel is regular if the saturated model is
+a regular full exponential family.
+
 \subsection{Moment and Cumulant Generating Functions}
 
 \index{generating function|seeunder{exponential family}}
@@ -2192,7 +2265,7 @@ function for all real $r \ge 0$.
 R package \code{aster} \citep{aster-package} has several infinitely divisible
 families: Poisson, negative binomial, and normal-location
 (normal with unknown mean and known variance).
-Hence, if the conditional distribution of $y_G$ given $y_{q(G)}$
+Hence, if the conditional distribution of $y_G$ given $y_{q(G)} = 1$
 is infinitely divisible, then
 the distribution of $y_{q(G)}$ can be nonnegative-real-valued.
 
@@ -2335,8 +2408,8 @@ canonical.
 
 A direction $\delta$ in the vector space where the canonical parameter vector
 of an exponential family takes values is called a \emph{direction of constancy}
-if $\inner{Y, \delta}$ is constant almost surely, where $Y$ is the canonical
-statistic vector.
+if the random variable $\inner{Y, \delta}$ is constant almost surely,
+where $Y$ is the canonical statistic vector.
 Because all of the distributions in an exponential family have
 the same support (this follows from the log likelihood being finite for
 all all data values when the canonical parameter value is in the full
@@ -2381,7 +2454,7 @@ If $\delta$ is not a direction of constancy and $s \neq 0$,
 then $\theta$ and $\theta + s \delta$ cannot both be maximum likelihood
 estimates because (a) would imply the log likelihood is higher somewhere
 between these points.  Thus the MLE for a full
-exponential family is unique (if it exists) if and only if there are
+exponential family (if it exists) is unique if and only if there are
 no nonzero directions of constancy.
 
 It is clear from condition (e) or (f) that the set of
@@ -2436,8 +2509,9 @@ $$
 $$
 Then clearly, $\delta$ is a direction of constancy if and only if
 $$
-   \var_\theta(\inner{Y, \delta}) = \delta^T I(\theta) \delta.
+   \var_\theta(\inner{Y, \delta}) = \delta^T I(\theta) \delta
 $$
+is zero.
 And by the spectral theorem
 \citet[Section~79]{halmos-vector-spaces} this holds if and only if
 $I(\theta) \delta = 0$, in words, if and only if $\delta$ is a null
@@ -2594,11 +2668,65 @@ hence by Lemma~\ref{lem:concave-maximizer} this $\theta$ is a global maximizer
 of $\tilde{l}$.  If there are other global maximizers $\theta^*$,
 then they also satisfy $\mu = c'(\theta^*)$.  Hence,
 such $\theta$ and $\theta^*$ correspond to the same $\mu$.
-Hence by Theorem~\ref{th:mean-value} $\theta$ and $\theta^*$ correspond
-to the same distribution.
+Hence $\theta$ and $\theta^*$ correspond to the same distribution
+by Theorem~\ref{th:mean-value}.
 Hence, if the canonical parameterization is identifiable,
 then $\theta = \theta^*$.
 \end{proof}
+
+\begin{theorem} \label{th:om}
+For a regular full exponential family with identifiable canonical
+parameterization,
+any algorithm that always goes uphill if it can on $\tilde{l}$
+defined by \eqref{eq:logl-expfam-expected}
+converges to the unique maximizer of $\tilde{l}$ which is the unique
+canonical parameter vector $\theta$ corresponding to mean value
+parameter vector $\mu$.
+\end{theorem}
+\begin{proof}
+Any cumulant function is lower semicontinuous and convex
+\citep[Theorem~7.1]{barndorff-nielsen}.
+Hence \eqref{eq:logl-expfam-expected}
+defines an upper semicontinuous concave function.
+The rest of the theorem is Corollary~{27.2.2} in \citep{rockafellar}.
+\end{proof}
+\begin{corollary} \label{cor:om-mani-padme-hum}
+For a regular full exponential family with identifiable canonical
+parameterization,
+any algorithm that always goes uphill if it can on the log likelihood
+defined by \eqref{eq:logl-expfam} converges to the unique MLE if the observed
+value of the canonical statistic vector $y$ is a possible value of the
+mean value parameter vector.
+\end{corollary}
+\begin{proof}
+In case $y = \mu$ for some mean value parameter vector $\mu$,
+this is a special case of Theorem~\ref{th:om}.
+\end{proof}
+
+The point of the theorem and its corollary is that maximization
+of upper semicontinuous strictly concave functions is easy.
+Any algorithm, no matter what the starting point,
+and no matter how inefficient,
+can find the unique solution,
+so long as it is not so stupid as to be
+going downhill when it should be going uphill.
+
+Of course we do not have to use inefficient algorithms, we can use
+algorithms as clever as we want, but we must be careful to not be so
+clever that we turn out to be stupid.  No matter what algorithm we
+use it must have the property of always going uphill if it can.
+The algorithms used by R function \code{aster} in R package \code{aster}
+have this property.
+The algorithm used by R function \code{transformUnconditional} in
+R package \code{aster2}
+has this property.
+
+Corollary~\ref{cor:om-mani-padme-hum} hides a big issue.
+There does not have to be a mean value parameter vector $\mu$ such that
+$\mu = y$, and in this case the MLE does not exist: there is no $\theta$
+that maximizes \eqref{eq:logl-expfam} because we can always go uphill
+from any $\theta$.  This is the subject
+of Section~\ref{sec:direction-of-recession} and Chapter~\ref{chap:completion}.
 
 \section{Aster Mean Value Parameters}
 
@@ -2626,7 +2754,7 @@ Theorem~\ref{th:regular} in Appendix~\ref{app:regular} says, if each
 family for a dependence group is a regular full exponential family,
 then the (unconditional, joint) distribution of the aster model is
 a regular full exponential family.  All of the families for dependence
-groups (or arrows for dependence groups that are single nodes) that
+groups (including dependence groups that are singleton sets) that
 have ever been implemented in aster software are regular full exponential
 families.
 %%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
@@ -2651,7 +2779,10 @@ where $c_G$ is the cumulant function of dependence group $G$.
 The inverse mappings to these mappings do not, in general,
 have closed form expressions
 but are described in Section~\ref{sec:calculating-inverse-transformation}
-above.  Define $\tilde{l}$ by
+above.  Apply Theorem~\ref{th:mean-value-inversion} to the regular
+full exponential exponential family that is the saturated aster model
+in its unconditional canonical parameterization.
+Then \eqref{eq:logl-expfam-expected} becomes in this special case
 \begin{equation} \label{eq:logl-aster-expected}
    \tilde{l}(\varphi) = \inner{\mu, \varphi} - c(\varphi)
 \end{equation}
@@ -2752,8 +2883,9 @@ $\xi$ that corresponds to $\theta$.
 
 We are used to the computer dealing with non-identifiability, also called
 collinearity, automatically.  R functions \code{lm} and \code{glm} in core R
-\citep{r-core}, which fit linear and generalized linear models automatically
-handle it by dropping regressor vectors (columns of the model matrix) until
+\citep{r-core}, which fit linear and generalized linear models, handle
+non-identifiability automatically
+by dropping regressor vectors (columns of the model matrix) until
 identifiability is obtained.  They signal this by reporting \code{NA} for
 coefficient estimates corresponding to these dropped regressor vectors.
 
@@ -2786,7 +2918,8 @@ is equivalent to dropping the corresponding regressor.
 From a theoretical point of view there is just one issue: directions of
 constancy (Section~\ref{sec:direction-of-constancy} above).
 Suppose we have an exponential family in which the canonical parameter
-is $\beta$ (this includes canonical affine submodels but also the models
+is $\beta$ (this includes canonical affine submodels but also the
+saturated models
 they are submodels of).  If $\delta$ is a direction of constancy, then
 $\beta$ and $\beta + s \delta$ correspond to the same distribution for
 all $s$.  If $\delta \neq 0$, then we do not have identifiability, and
@@ -2979,7 +3112,7 @@ where $\mu$ is the saturated model mean value parameter.
 
 Theorem~\ref{th:regular-submodel} in Appendix~\ref{app:regular} says
 that every unconditional aster model is a regular full exponential family
-if the saturated model is a regular full exponential.
+if the saturated model is a regular full exponential family.
 Theorem~\ref{th:regular} in Appendix~\ref{app:regular} says the latter
 happens when every family for every dependence group is a regular full
 exponential family, which is the case for all families currently implemented
@@ -3027,9 +3160,12 @@ for the ``right square'' give parameter transformations discussed in the
 preceding section, and the three unlabeled arrows are parameter transformations
 that have no closed-form expression.
 
-The inverse mappings to the the mapping $\beta \mapsto \tau$ is calculated
+The inverse mapping to the the mapping $\beta \mapsto \tau$ is calculated
 just like the other upward arrows in the diagram.
-Define
+Apply Theorem~\ref{th:mean-value-inversion} to the regular
+full exponential exponential family that is
+the unconditional canonical affine submodel.
+Then \eqref{eq:logl-expfam-expected} becomes in this special case
 \begin{equation} \label{eq:logl-aster-expected-submodel}
    \tilde{l}_\text{sub}(\beta) = \inner{\tau, \beta} - c_\text{sub}(\beta)
 \end{equation}
@@ -3048,7 +3184,7 @@ As discussed in Section~\ref{sec:dealing} above, we can always deal with
 non-uniqueness (non-identifiability) by constraining some components of
 $\beta$ to be equal to zero.
 
-The other labeled arrows on the ``right square'' in the diagram are the
+The other unlabeled arrows on the ``right square'' in the diagram are the
 inverses of linear transformations, but these generally do not have solutions.
 
 The mapping $\varphi = a + M \beta$ need be neither one-to-one nor onto.
@@ -3104,7 +3240,7 @@ We almost don't have a competing view.  As far as I know, there are only
 two published examples of conditional aster analyses.  Example~{1} in
 \citet{aster2} was done as a conditional aster analysis but can easily
 be redone as an unconditional aster analysis
-\citep[Slide Deck~4, slides 47ff.]{geyer-8931-aster}.
+\citep[Slide Deck~4, slides 47 ff.]{geyer-8931-aster}.
 The analysis in \citet{aster-aphid} titled
 ``Relating Plant Fitness to Aphid-Load'' was done as a conditional aster
 analysis and had to be so done because time-dependent covariates (in this
@@ -3298,8 +3434,8 @@ implies $\inner{y - Y, M \beta} = 0$ almost surely.
 Moreover, $\beta$ is an MLE if and only if
 \eqref{eq:observed-equals-expected-expfam-submodel} holds.
 
-A lot more can be said and will be said on this subject.
-%%%%%%%%%% NEED FORWARD REFERENCE to chapter on solutions at infinity %%%%%%%%%%
+A lot more can be said and will be said on this subject
+(Chapter~\ref{chap:completion}).
 
 \subsection{Unconditional Aster Models}
 
@@ -3509,7 +3645,7 @@ with the blocks being for ``individuals'' (in scare quotes).
 Now we revert to calculus to find the Fisher information matrix for the
 unconditional submodel canonical parameter $\beta$.
 The map $\beta \mapsto \varphi$ given by \eqref{eq:affine-unconditional}
-has derivative $M$ the model matrix, that is, if $m_{i j}$ are components
+has derivative $M$, the model matrix, that is, if $m_{i j}$ are components
 of $M$, then
 $$
    \frac{\partial{\varphi_i}}{\partial \beta_j} = m_{i j}.
