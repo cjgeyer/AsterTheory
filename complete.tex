@@ -391,10 +391,54 @@ as we limit our attention to full families.
 Unconditional aster models are regular full exponential families.
 Thus the theory of the preceding section applies to them.
 
-The following theorem encapsuates the calculations of Slide~35~ff.\ of the
-slides for the aster special topics course \citep{geyer-8931-aster}.
+\begin{theorem} \label{th:dor-predecessor-zero}
+Suppose $G$ is a dependence group in an aster graph, and $y_{q(G)} = 0$
+where $y$ is the observed value of the response vector,  then the
+vector $\eta$ whose only nonzero component is $\eta_{q(G)} = -1$ is a
+direction of recession of the saturated aster model.
+
+Taking the limit in this direction gives the LCM that is the same as the
+OM except $Y_{q(G)} = 0$ almost surely, and this means the distributions
+of all successors, successors of successors, successors of successors of
+successors, etc.\ are not identifiable in this LCM.
+\end{theorem}
+\begin{proof}
+We know $q(G)$ is not a terminal node.  It is not an initial node either,
+because aster models are required to have nonzero data at initial nodes.
+If $Y$ is the response vector, then we know from
+the predecessor-is-sample-size property that $Y_{q(G)} \ge 0$ is required.
+Since $y_{q(G)}$ is at the lower endpoint of the support of $Y_{q(G)}$,
+the vector described in the theorem statement is a direction of recession.
+
+If we take limits in this direction, we get the OM conditioned on the event
+$Y_{q(G)} = 0$ almost surely, and this implies $Y_j = 0$ almost surely for
+all $j \prec q(G)$, where $\prec$ is the transitive closure of the successor
+relation.  The cumulant function for this LCM does not depend on any
+of the variables $\varphi_j$ for $j \preceq q(G)$.
+This can be seen by applying \eqref{eq:cumfun-expfam} to this model.
+\begin{align*}
+   c(\varphi)
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   e^{\inner{Y, \varphi - \varphi^*}} \right) \right\}
+   \\
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   \prod_{j \in J} e^{Y_j (\varphi_j - \varphi^*_j)}
+   \right) \right\}
+   \\
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   \prod_{\substack{j \in J \\ j \not\preceq q(G)}}
+   e^{Y_j (\varphi_j - \varphi^*_j)}
+   \right) \right\}
+\end{align*}
+where $\varphi$ varies and $\varphi^*$ is fixed.
+And then \eqref{eq:logl-aster-phi} shows that the log likelihood for the
+LCM does not depend on any of these variables either.
+\end{proof}
 \begin{theorem} \label{th:dor-arrow}
-Suppose $\{j\}$ is a dependence group by itself in an aster graph, and
+Suppose $\{j\}$ is a univariate dependence group in an aster graph, and
 the one-parameter exponential family of distributions for the arrow
 $y_{p(j)} \longrightarrow y_j$ has closed convex support that is an
 interval with endpoints $a_j$ and $b_j$ (either of which may be infinite and
@@ -411,9 +455,6 @@ and coordinates
 \end{equation}
 is a direction of recession of the saturated aster model.
 
-The vector \eqref{eq:dor-lower-bound} is a direction of constancy
-if and only if If $a_j = b_j$ or $Y_{p(j)} = 0$, almost surely.
-
 Taking the limit in the direction of recession \eqref{eq:dor-lower-bound}
 gives the LCM that is the same as the OM except the arrow
 $y_{p(j)} \longrightarrow y_j$ has the degenerate family of distributions
@@ -428,14 +469,17 @@ and coordinates
 \end{equation}
 is a direction of recession of the saturated aster model.
 
-The vector \eqref{eq:dor-upper-bound} is a direction of constancy
-if and only if If $a_j = b_j$ or $Y_{p(j)} = 0$, almost surely.
-
 Taking the limit in the direction of recession \eqref{eq:dor-upper-bound}
 gives the LCM that is the same as the OM except the arrow
 $y_{p(j)} \longrightarrow y_j$ has the degenerate family of distributions
 concentrated at $b_j$.
 This LCM is the OM conditioned on the event $Y_j = b_j Y_{p(j)}$.
+
+In case $a_j = b_j$ the vectors \eqref{eq:dor-lower-bound}
+and \eqref{eq:dor-upper-bound} are both directions of recession,
+and are negatives of each other, hence both directions of constancy.
+But in this case we only need one direction of constancy since one
+is a scalar multiple of the other.
 \end{theorem}
 \begin{proof}
 We have a direction of recession if and only if $\inner{Y - y, \eta} \le 0$
@@ -464,16 +508,27 @@ $$
 $$
 the last equality being that $Y_{p(j)}$ is a constant random variable,
 and this is indeed less than or equal to zero almost surely by definition
-of $a_j$.
+of $a_j$.  Thus in either case we have \eqref{eq:dor-lower-bound} is
+a direction of recession and
+\begin{equation} \label{eq:lower-foo}
+   \inner{Y - y, \eta} = - Y_j + a_j Y_{p(j)}
+\end{equation}
+Taking limits in the direction \eqref{eq:dor-lower-bound} arrives at
+the limiting conditional model that conditions
+on \eqref{eq:lower-foo} being equal to zero, that is, on the event
+$Y_j = a_j Y_{p(j)}$.  By the predecessor-is-sample-size principle
+this is the same thing as saying the arrow
+$y_{p(j)} \longrightarrow y_j$ has the degenerate family of distributions
+concentrated at $a_j$.
 
-This $\eta$ is a direction of constancy if and only if
-$\inner{Y - y, \eta} = 0$ almost surely, which we just established is
-equivalent to $Y_j = a_j Y_{p(j)}$ almost surely, and this happens
-if and only if $a_j = b_j$ or $Y_{p(j)} = 0$
-almost surely (which implies $Y_j = 0$ almost surely).
+The proofs of the assertions about \eqref{eq:dor-upper-bound} are similar.
 
-The proofs of the assertions about \eqref{eq:dor-upper-bound} are
-similar.
+That the conditions for \eqref{eq:dor-lower-bound}
+and \eqref{eq:dor-upper-bound} both hold when $a_j = b_j$ and that
+one is then the negative of the other is obvious.
+That $\eta$ and $- \eta$ both being
+directions of recession implies either is a direction of constancy is
+\citet{geyer-gdor} Theorem~3 part (e) and Theorem~1 part (g).
 \end{proof}
 As we see in the proof, there are two cases.  When $p(j)$ is noninitial
 the arrow $y_{p(j)} \longrightarrow y_j$ represents a conditional
@@ -486,8 +541,12 @@ But the formulas \eqref{eq:dor-lower-bound} and \eqref{eq:dor-upper-bound}
 work in either case because the middle case does not occur when
 $p(j) \notin J$.
 
-The cases $a_j = b_j$ or $Y_{p(j)} = 0$ almost surely cannot occur in
-aster models allowed by R package \code{aster}.  But once we start
+When $a_j = 0$ and $y_j = 0$ the vector \eqref{eq:dor-lower-bound} agrees
+with the direction of recession in Theorem~\ref{th:dor-predecessor-zero}
+when $j$ in this theorem is $q(G)$ in that theorem.
+
+The case $a_j = b_j$ cannot occur in aster models allowed
+by R package \code{aster}.  But once we start
 taking limits, then they can.  So they are allowed by R package \code{aster2}.
 
 Degenerate distributions concentrated at $a_j$ or $b_j$ are further
@@ -508,10 +567,7 @@ and coordinates
 \end{equation}
 is a direction of recession of the saturated aster model.
 
-This direction of recession is a direction of constancy if and only if
-$Y_{q(G)} = 0$ almost surely.
-
-And the vector $\eta$ having index set $J$ and coordinates
+The vector $\eta$ having index set $J$ and coordinates
 \begin{equation} \label{eq:doc-multinomial}
    \eta_i = \begin{cases} -1, & i \in G \\
    +1, & i = q(G) \\
@@ -538,10 +594,6 @@ $$
 and this is indeed less than or equal to zero almost surely
 by definition of the multinomial distribution.
 
-Then \eqref{eq:dor-multinomial} is a direction of constancy if and only if
-$\inner{Y - y, \eta} = - Y_j$ is zero almost surely.  But this is false
-unless $Y_{q(G)} = 0$ almost surely.
-
 For \eqref{eq:doc-multinomial} we need to show
 that $\inner{Y - y, \eta} = 0$ almost surely,
 where $Y$ and $y$ are as above.
@@ -559,6 +611,10 @@ the arrow $y_{p(j)} \longrightarrow y_j$ having the degenerate family
 concentrated at zero almost surely.  And this makes the multinomial
 distribution of $Y_G$ given $Y_{q(G)}$ partially degenerate.
 \end{proof}
+
+The vector \eqref{eq:dor-multinomial} agrees
+with the direction of recession in Theorem~\ref{th:dor-predecessor-zero}
+when $j$ in this theorem is $q(G)$ in that theorem.
 
 In case all but one of the components of a multinomial $Y_G$ are zero,
 we can apply the theorem repeatedly to get a completely degenerate
@@ -590,12 +646,8 @@ But this direction of recession does not produce a limiting conditional model
 because it corresponds to the case $\Pr_\theta(Y \in H_\delta) = 0$ in
 in Theorem~\ref{th:completion-fundamental}.
 
-If $y_{q(G)} > 1$, then almost surely there are no directions of recession
+If $y_{q(G)} \ge 2$, then almost surely there are no directions of recession
 for this family.
-
-There are no directions of constancy for this family unless $Y_{q(G)} = 0$
-almst surely, in which case any vector $\eta$ with $\eta_i = 0$, $i \notin G$
-is a direction of constancy.
 \end{theorem}
 \begin{proof}
 The closed curve consisting of points $y_G$ such that $y_k = y_j^2$
@@ -637,16 +689,18 @@ is the $n$-fold Minkowski sum of this set, which is $n C$
 in this family are continuous, the interior of $n C$ actually supports
 the family for $n \ge 2$.  Hence (almost surely) it is not possible
 to observe data on the boundary of the convex support for $n \ge 2$.
-
-The vector $\eta$ is a direction of constancy for this family if and only
-if $\inner{Y, \eta}$ is constant almost surely, which it certainly if if
-$Y_{q(G)} = 0$ almost surely, which implies $Y_G = 0$ almost surely.
-Then any $\eta_G$ is a direction of constancy of the family.
-Conversely, we have seen that if $Y_{q(G)} > 0$ we have no directions of
-constancy.  The only directions of recession occur when $Y_{q(G)} = 1$
-and they cannot be directions of constancy (if they were, they would
-give the limiting conditional model equal to the original model).
 \end{proof}
+
+Since any two-parameter-normal dependence group must be terminal,
+we can ignore all such dependence groups in figuring out GDOR for the
+rest of the nodes of the graph.  Then we can take the limit in the direction
+of the GDOR found and get rid of all variables that are zero almost surely
+in that LCM.  Then we can look for DOR again using this theorem
+with the case $y_q(G) = 0$ now excluded.
+
+What this theorem says is that we had better not have any of the directions
+of recession it describes because otherwise we don't have an LCM and MLE
+do not exist in any sense.
 
 \begin{theorem} \label{th:dor-aster}
 The set of all directions of recession is a closed convex cone.
@@ -656,10 +710,15 @@ A vector $\delta$ is a direction of constancy if and only if
 both $\delta$ and $- \delta$ are directions of recession.
 
 The set of all directions of recession of saturated aster models
-having families described by Theorems~\ref{th:dor-arrow},
-\ref{th:dor-multinomial}, and~\ref{th:dor-normal}
+having families described by Theorems~\ref{th:dor-predecessor-zero},
+\ref{th:dor-arrow}, and~\ref{th:dor-multinomial}
 is the smallest closed convex cone containing all of the directions
 of recession described by those theorems.
+
+The set of all directions of recession for normal-location-scale
+dependence groups $G$ with $y_{q(G)} > 0$
+is the smallest closed convex cone containing all of the directions
+of recession described by Theorem~\ref{th:dor-normal}.
 
 The set of all directions of constancy of such aster models
 is the smallest vector subspace containing all of the directions
@@ -685,57 +744,32 @@ Now we need to figure out how to use these theorems when applied to
 general unconditional aster models (canonical affine submodels of
 the saturated aster model).  The principle is simple.  If $M$ is the
 model matrix of a canonical affine submodel, then $\delta$ is a direction
-of recession (resp\@. constancy) of that submodel if and only
-if $\eta = M \delta$ is a direction of recession (resp\@. constancy)
+of recession (resp.\ constancy) of that submodel if and only
+if $\eta = M \delta$ is a direction of recession (resp.\ constancy)
 of the saturated model.
 
 So we revisit the theorems.
-Let $J_r$ denote the set of noninitial nodes of the aster graph for
-which we have a direction of recession in
-Theorem~\ref{th:dor-arrow}, \ref{th:dor-multinomial}, or~\ref{th:dor-normal}
-(details to follow),
-let $J_c$ denote the subset of $J_r$ for which the direction of recession
-is a direction of constancy,
-let $\eta_j$ denote the direction of recession.
+
+In Theorem~\ref{th:dor-predecessor-zero} we have one direction of recession
+whose only nonzero coordinate is $\eta_j = - 1$ when $j$ is a predecessor
+node such that $y_j = 0$.  Then we may ignore all nodes that are successors,
+successors of successors, etc.\ of such nodes because we may figure out GDOR
+for graphs that do not have these nodes.  So we only include such DOR when
+$y_j = 0$ but $y_{p(j)} > 0$.
 
 In Theorem~\ref{th:dor-arrow} we have either
 \eqref{eq:dor-lower-bound} or \eqref{eq:dor-upper-bound} or both or neither
-is a direction of recession.  If both, then one is the negative of the
-other and both are directions of constancy, and we let $\eta_j$ denote
-either one and have $j \in J_c$.  If one, then the one that is a direction
-of recession is $\eta_j$ and $j \in J_r \setminus J_c$.
-If neither, then there is no $\eta_j$ and $j \notin J_r$.
+is a direction of recession.  If $a_j = b_j$, then we can take either to
+be a direction of constancy and ignore the other.
+If $y_{p(j)} = 0$, then we can ignore the directions of recession as discussed
+above.  Thus we get only one direction of recession or direction of constancy.
 
-In Theorem~\ref{th:dor-multinomial} we have $j \in J_r$ and $\eta_j$
-given by \eqref{eq:dor-multinomial} in case $y_j = 0$.  If $y_{p(j)} = 0$,
-then this direction of recession is also a direction of constancy, so
-we also have $j \in J_c$.  If $y_{p(j)} > 0$, then this direction of
-recession is not a direction of constancy, so $j \notin J_c$.  If
-$y_j > 0$, then there is no $\eta_j$ and $j \notin J_r$.
+In Theorem~\ref{th:dor-multinomial} when $y_{q(G)} > 0$ we have one
+direction of recession for each $j \in G$ such that $y_j = 0$ and
+we also have one direction of constancy for the whole dependence group.
 
-But we may also have directions of constancy
-given by \eqref{eq:doc-multinomial}.
-Let $\mathcal{G}_m$ denote the family of index sets of multinomial dependence 
-groups $G$ such that $y_{q(G)} > 0$.  Then none of the $\eta_j$
-for $j \in J_r \cap G$ is a direction of constancy, but there is a direction
-of constancy \eqref{eq:doc-multinomial}, which we denote $\eta_G$.
-(In case $y_{q(G)} = 0$, we already have directions of constancy $\eta_j$
-for all $j \in G$, so $\eta_G$ would be redundant.)
-
-As in Theorem~\ref{th:dor-normal} let $j$ denote the node of the normal
-dependence group corresponding to the canonical statistic that is the
-sum of normals (rather than the one that is the sum of squares).
-Then if $y_{q(G)} \ge 2$ we have no directions of recession.
-If $y_{q(G)} = 1$ we have one direction of recession $\eta_j$ given
-by \eqref{eq:dor-normal} that is not a direction of constancy.
-If $y_{q(G)} = 0$ we have two directions of constancy, call them $\eta_j$
-and $\eta_k$ where $G = \{ j, k \}$ as in the theorem statement.
-These can be somewhat arbitrarily defined, but we can take them to be
-vectors having only one nonzero component, the $j$-th for $\eta_j$
-and the $k$-th for $\eta_k$, and we make take the nonzero component to
-be equal to one.  (In case $y_{q(G)} \ge 2$ we have $J_r \cap G = \emptyset$.
-In case $y_{q(G)} = 1$ we have $J_r \cap G = \{ j \}$ and $j \notin J_c$.
-In case $y_{q(G)} = 0$ we have $G \subset J_c$.)
+In Theorem~\ref{th:dor-normal} we have one direction of recession for
+each dependence group with $y_{q(G)} = 1$.
 
 So that completes our list of directions of recession and constancy.
 \begin{theorem} \label{th:dor-aster-explicit}
@@ -743,24 +777,19 @@ A vector $\delta$ is a direction of recession
 of an unconditional canonical affine submodel
 if and only if $\eta = M \delta$ has the form
 \begin{equation} \label{eq:dor-aster-explicit}
-   \eta = \sum_{j \in J_r} e_j \eta_j + \sum_{G \in \mathcal{G}_m} e_G \eta_G
+   \eta = \sum_{j \in J_r} e_j \eta_j
 \end{equation}
-where the $e_j$ and $e_G$ are real numbers satisfying $e_j \ge 0$ for
-$j \in J_r \setminus J_c$.
-Such directions of recession are directions of constancy if
-$e_j = 0$ for $j \in J_r \setminus J_c$.
+where $J_r$ is the index set for directions of recession,
+$J_c$ is the index set for directions of constancy, and
+the $e_j$ are real numbers satisfying $e_j \ge 0$
+for $j \in J_r \setminus J_c$.
 \end{theorem}
 \begin{proof}
 This just makes explicit what Theorem~\ref{th:dor-aster} already says.
 \end{proof}
 
-Consider the following linear program having variables $e_\text{foo}$
-for $\text{foo} \in J_r \cup \mathcal{G}_m$ and $\delta_k$ for $k \in K$.
-(We don't have a convention for
-what $\text{foo}$ is, it can be either a node of the aster graph, which
-we usually denote by a lower case letter or a multinomial dependence group,
-which we usually denote by an upper case letter.  $K$ is the index set of
-$\delta$)
+Consider the following linear program having variables $e_j$
+for $j \in J_r \cup J_c$ and $\delta_k$ for $k \in K$.
 \begin{alignat}{2}
   \text{maximize}   & \ \sum_{j \in J_r \setminus J_c} e_j
   \nonumber
@@ -769,7 +798,7 @@ $\delta$)
   \label{prog:foo}
   \\
                     & \ M \delta =
-  \sum_{j \in J_r} e_j \eta_j + \sum_{G \in \mathcal{G}_m} e_G \eta_G
+  \sum_{j \in J_r} e_j \eta_j
   \nonumber
 \end{alignat}
 \begin{theorem} \label{th:lin-prog-one}
@@ -783,10 +812,9 @@ $\delta$ part of the solution is a direction of recession that is not
 a direction of constancy.
 \end{theorem}
 \begin{proof}
-The feasible region is nonempty because it always contains the point with
-$\delta = 0$ and $e_\text{foo} = 0$ for all $\text{foo}$.  Then solutions
-exist because the objective function is obviously bounded on the feasible
-region.
+The feasible region is nonempty because it always contains the zero vector.
+Then solutions exist because the objective function is obviously bounded
+on the feasible region.
 
 The optimal value is zero if and only if at the solution $e_j = 0$ for
 $j \in J_r \setminus J_c$, in which case the $\delta$ part of the solution
@@ -796,7 +824,7 @@ existence of MLE is then Theorem~{4} in \citet{geyer-gdor}.
 
 If there exists any feasible point such that some $e_j$
 for $j \in J_r \setminus J_c$ is nonzero, then we can multiply all components
-of $\delta$ and all $e_\text{foo}$ by a strictly positive constant to make
+of $\delta$ and all $e_j$ by a strictly positive constant to make
 the largest $e_j$ for $j \in J_r \setminus J_c$ equal to one, in which case
 the objective function is greater than or equal to one.
 Optimizing then only increases the objective function.
@@ -825,8 +853,7 @@ and consider the following linear program.
                       j \in (J_r \setminus J_c) \setminus J^{*}
   \nonumber
   \\
-                    & \ M \delta =
-  \sum_{j \in J_r} e_j \eta_j + \sum_{G \in \mathcal{G}_m} e_G \eta_G
+                    & \ M \delta = \sum_{j \in J_r} e_j \eta_j
   \nonumber
 \end{alignat}
 
@@ -866,6 +893,7 @@ Since each $\delta$ found is a direction of recession that is not
 a direction of constancy, so is $\gamma$.
 
 The termination condition of optimal value zero or $J^{{*}{*}} = \emptyset$,
-proves that $\gamma$ involves the most components $\eta_\text{foo}$, hence
+proves that $\gamma$ is such that $\eta = M \gamma$ has the most possible
+nonzero components $\eta_j$ for $j \in J_r \setminus J_c$.  Hence it
 is generic.
 \end{proof}
