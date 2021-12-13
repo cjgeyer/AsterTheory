@@ -391,52 +391,6 @@ as we limit our attention to full families.
 Unconditional aster models are regular full exponential families.
 Thus the theory of the preceding section applies to them.
 
-\begin{theorem} \label{th:dor-predecessor-zero}
-Suppose $G$ is a dependence group in an aster graph, and $y_{q(G)} = 0$
-where $y$ is the observed value of the response vector,  then the
-vector $\eta$ whose only nonzero component is $\eta_{q(G)} = -1$ is a
-direction of recession of the saturated aster model.
-
-Taking the limit in this direction gives the LCM that is the same as the
-OM except $Y_{q(G)} = 0$ almost surely, and this means the distributions
-of all successors, successors of successors, successors of successors of
-successors, etc.\ are not identifiable in this LCM.
-\end{theorem}
-\begin{proof}
-We know $q(G)$ is not a terminal node.  It is not an initial node either,
-because aster models are required to have nonzero data at initial nodes.
-If $Y$ is the response vector, then we know from
-the predecessor-is-sample-size property that $Y_{q(G)} \ge 0$ is required.
-Since $y_{q(G)}$ is at the lower endpoint of the support of $Y_{q(G)}$,
-the vector described in the theorem statement is a direction of recession.
-
-If we take limits in this direction, we get the OM conditioned on the event
-$Y_{q(G)} = 0$ almost surely, and this implies $Y_j = 0$ almost surely for
-all $j \prec q(G)$, where $\prec$ is the transitive closure of the successor
-relation.  The cumulant function for this LCM does not depend on any
-of the variables $\varphi_j$ for $j \preceq q(G)$.
-This can be seen by applying \eqref{eq:cumfun-expfam} to this model.
-\begin{align*}
-   c(\varphi)
-   & =
-   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
-   e^{\inner{Y, \varphi - \varphi^*}} \right) \right\}
-   \\
-   & =
-   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
-   \prod_{j \in J} e^{Y_j (\varphi_j - \varphi^*_j)}
-   \right) \right\}
-   \\
-   & =
-   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
-   \prod_{\substack{j \in J \\ j \not\preceq q(G)}}
-   e^{Y_j (\varphi_j - \varphi^*_j)}
-   \right) \right\}
-\end{align*}
-where $\varphi$ varies and $\varphi^*$ is fixed.
-And then \eqref{eq:logl-aster-phi} shows that the log likelihood for the
-LCM does not depend on any of these variables either.
-\end{proof}
 \begin{theorem} \label{th:dor-arrow}
 Suppose $\{j\}$ is a univariate dependence group in an aster graph, and
 the one-parameter exponential family of distributions for the arrow
@@ -477,9 +431,14 @@ This LCM is the OM conditioned on the event $Y_j = b_j Y_{p(j)}$.
 
 In case $a_j = b_j$ the vectors \eqref{eq:dor-lower-bound}
 and \eqref{eq:dor-upper-bound} are both directions of recession,
-and are negatives of each other, hence both directions of constancy.
+and are negatives of each other, hence are both directions of constancy.
 But in this case we only need one direction of constancy since one
 is a scalar multiple of the other.
+
+In case $y_{p(j)} = 0$  and $-\infty < a_j < b_j < \infty$
+the vectors \eqref{eq:dor-lower-bound}
+and \eqref{eq:dor-upper-bound} are still both directions of recession,
+but are not directions of constancy unless $Y_{p(j)} = 0$ almost surely.
 \end{theorem}
 \begin{proof}
 We have a direction of recession if and only if $\inner{Y - y, \eta} \le 0$
@@ -506,7 +465,8 @@ $$
    =
    - Y_j + a_j Y_{p(j)}
 $$
-the last equality being that $Y_{p(j)}$ is a constant random variable,
+the last equality being that $Y_{p(j)}$ is a constant random variable
+so $Y_{p(j)} = y_{p(j)}$ almost surely,
 and this is indeed less than or equal to zero almost surely by definition
 of $a_j$.  Thus in either case we have \eqref{eq:dor-lower-bound} is
 a direction of recession and
@@ -529,7 +489,16 @@ one is then the negative of the other is obvious.
 That $\eta$ and $- \eta$ both being
 directions of recession implies either is a direction of constancy is
 \citet{geyer-gdor} Theorem~3 part (e) and Theorem~1 part (g).
+
+In case $y_{p(j)} = 0$  and $-\infty < a_j < b_j < \infty$
+we also have $y_j = 0$ so $y_j = a_j y_{p(j)} = b_j y_{p(j)}$ holds trivially.
+Thus we have already proved that both are directions of recession.
+In order for \eqref{eq:dor-lower-bound} to be a direction of constancy
+we need $Y_j = a_j Y_{p(j)}$ to hold almost surely, but this is false
+unless $Y_{p(j)} = 0$ almost surely.
+Similarly for \eqref{eq:dor-upper-bound}.
 \end{proof}
+
 As we see in the proof, there are two cases.  When $p(j)$ is noninitial
 the arrow $y_{p(j)} \longrightarrow y_j$ represents a conditional
 distribution and $\eta$ has two nonzero components unless $a_j = 0$ and
@@ -541,10 +510,6 @@ But the formulas \eqref{eq:dor-lower-bound} and \eqref{eq:dor-upper-bound}
 work in either case because the middle case does not occur when
 $p(j) \notin J$.
 
-When $a_j = 0$ and $y_j = 0$ the vector \eqref{eq:dor-lower-bound} agrees
-with the direction of recession in Theorem~\ref{th:dor-predecessor-zero}
-when $j$ in this theorem is $q(G)$ in that theorem.
-
 The case $a_j = b_j$ cannot occur in aster models allowed
 by R package \code{aster}.  But once we start
 taking limits, then they can.  So they are allowed by R package \code{aster2}.
@@ -553,6 +518,16 @@ Degenerate distributions concentrated at $a_j$ or $b_j$ are further
 discussed in the appropriate section of Appendix~\ref{app:families}
 (the details depend on the family the degenerate distribution is derived
 from).
+
+In the case considered last in the theorem where $y_{p(j)} = 0$ and
+\eqref{eq:dor-lower-bound} and \eqref{eq:dor-upper-bound} are both
+directions of recession and point in different directions, any nonnegative
+combination (linear combination with nonnegative coefficients) of these
+two vectors is another direction of recession (any nonnegative combimation
+of directions of recession is another direction of recession,
+\citealp{geyer-gdor}, Theorem~3).  For example, the vector $\eta$ whose
+only nonzero component is $\eta_{p(j)} = a_j - b_j$ is a direction
+of recession.
 
 \begin{theorem} \label{th:dor-multinomial}
 Suppose $G$ is a multinomial dependence group in an aster graph.
@@ -566,6 +541,9 @@ and coordinates
    0, & \text{otherwise} \end{cases}
 \end{equation}
 is a direction of recession of the saturated aster model.
+
+This vector is not a direction of constancy
+of the saturated aster model unless $Y_{q(G)} = 0$ almost surely.
 
 The vector $\eta$ having index set $J$ and coordinates
 \begin{equation} \label{eq:doc-multinomial}
@@ -586,15 +564,20 @@ $Y_j = 0$ almost surely.
 For \eqref{eq:dor-multinomial} we need to show
 that $\inner{Y - y, \eta} \le 0$ almost surely.
 This is obvious.
-$$
+\begin{equation} \label{eq:dor-multinomial-foo}
    \inner{Y - y, \eta} = - (Y_j - y_j)
    =
    - Y_j
-$$
+\end{equation}
 and this is indeed less than or equal to zero almost surely
 by definition of the multinomial distribution.
 
-For \eqref{eq:doc-multinomial} we need to show
+In order for \eqref{eq:dor-multinomial} to be a direction of constancy
+we need \eqref{eq:dor-multinomial-foo} to be zero almost surely.
+But this is false unless $Y_{q(G)} = 0$ almost surely.
+
+For $\eta$ given by \eqref{eq:doc-multinomial} to be a direction of
+constancy we need to show
 that $\inner{Y - y, \eta} = 0$ almost surely,
 where $Y$ and $y$ are as above.
 This too is obvious.
@@ -604,7 +587,7 @@ $$
 and this is indeed equal to zero almost surely,
 by definition of the multinomial distribution.
 
-By Theorem~\ref{th:completion-fundamental} taking limits in the direction
+By Theorem~\ref{th:completion-fundamental}, taking limits in the direction
 \eqref{eq:dor-multinomial} results in an LCM that conditions the OM on
 the event $Y_j = 0$ almost surely, and this corresponds to
 the arrow $y_{p(j)} \longrightarrow y_j$ having the degenerate family
@@ -612,9 +595,18 @@ concentrated at zero almost surely.  And this makes the multinomial
 distribution of $Y_G$ given $Y_{q(G)}$ partially degenerate.
 \end{proof}
 
-The vector \eqref{eq:dor-multinomial} agrees
-with the direction of recession in Theorem~\ref{th:dor-predecessor-zero}
-when $j$ in this theorem is $q(G)$ in that theorem.
+As mentioned after the preceeding theorem, any nonnegative combination
+of directions of recession is another direction of recession.  This includes
+the direction of constancy (any direction of constancy is a direction
+of recession, and so is the negative of any direction of constancy).
+Hence a vector $\eta$ is a direction of recession described by this theorem
+if and only if
+\begin{gather*}
+    \eta_j < \max_{i \in G} \eta_i \quad \text{implies} \quad y_j = 0
+    \\
+    \text{$q(G)$ noninitial} \quad \text{implies} \quad 
+    \max_{i \in G} \eta_i = - \eta_{q(G)}
+\end{gather*}
 
 In case all but one of the components of a multinomial $Y_G$ are zero,
 we can apply the theorem repeatedly to get a completely degenerate
@@ -626,6 +618,22 @@ distribution.
 
 These partially degenerate multinomial distributions are further
 discussed in Section~\ref{app:sec:multinomial} in the appendix.
+
+In case $y_{q(G)} = 0$ but $Y_{q(G)} = 0$ does not hold almost surely,
+the theorem says that every $\eta$ whose only nonzero component is
+$\eta_j = -1$ is a direction of recession.  Hence any nonnegative
+combination of these is a direction of recession.  Hence considering
+also \eqref{eq:doc-multinomial} gives a vector $\eta$ having nonzero
+components $\eta_G$ in case $q(G)$ is initial and $\eta_{G \cup \{q(G)\}}$
+in case $q(G)$ is noninitial, is a direction of recession if and only if
+$$
+    \text{$q(G)$ noninitial} \quad \text{implies} \quad 
+    \max_{i \in G} \eta_i = - \eta_{q(G)}
+$$
+and this direction of recession is a direction of constancy if and only if
+$$
+    \eta_i = \eta_j, \qquad i, j \in G
+$$
 
 \begin{theorem} \label{th:dor-normal}
 Suppose $G = \{j, k\}$ is a normal-location-scale dependence group
@@ -648,6 +656,11 @@ in Theorem~\ref{th:completion-fundamental}.
 
 If $y_{q(G)} \ge 2$, then almost surely there are no directions of recession
 for this family.
+
+If $y_{q(G)} = 0$, then every vector of the form \eqref{eq:dor-normal}
+is a direction of recession (for all real numbers $y_j$).
+These directions of recession are not directions of constancy unless
+$Y_{q(G)} = 0$ almost surely.
 \end{theorem}
 \begin{proof}
 The closed curve consisting of points $y_G$ such that $y_k = y_j^2$
@@ -689,18 +702,128 @@ is the $n$-fold Minkowski sum of this set, which is $n C$
 in this family are continuous, the interior of $n C$ actually supports
 the family for $n \ge 2$.  Hence (almost surely) it is not possible
 to observe data on the boundary of the convex support for $n \ge 2$.
+
+In case $y_{q(g)} = 0$, the convex support of the conditional distribution
+of $Y_G$ given $Y_{q(G)}$ is $0 \cdot C = \{ 0 \}$.
+Now we have to consider the three-dimensional set of all possible vectors
+$Y_{\{j, k, l\}}$ with $l = q(G)$.  Since limits of sequences of normal vectors
+are again normal vectors
+\citep[Proposition~6.6 and Theorem~6.9]{rockafellar-wets},
+normal vectors at the point $0 = (0, 0, 0)$ are those of the form
+\eqref{eq:dor-normal} and any nonnegative combinations of such.
+
+In order for such a vector $\eta$ to be a direction of constancy,
+we must have $\eta_j Y_j + \eta_k Y_k = 0$ almost surely.
+But this is false unless $Y_{q(G)} = 0$ almost surely.
 \end{proof}
 
-Since any two-parameter-normal dependence group must be terminal,
-we can ignore all such dependence groups in figuring out GDOR for the
-rest of the nodes of the graph.  Then we can take the limit in the direction
-of the GDOR found and get rid of all variables that are zero almost surely
-in that LCM.  Then we can look for DOR again using this theorem
-with the case $y_q(G) = 0$ now excluded.
+If $y_{q(G)} \ge 1$, then the theorem gives at most one direction of recession,
+and it is not a direction of constancy.
+If $y_{q(G)} = 0$, then the theorem gives an infinite number of directions
+of recession pointing in different directions.
+Our intention with these theorems is to use them to discover generic
+directions of recession of (not saturated) unconditional aster models
+using repeated linear programming.  But we cannot put an infinite number
+of vectors into a linear program.
 
-What this theorem says is that we had better not have any of the directions
-of recession it describes because otherwise we don't have an LCM and MLE
-do not exist in any sense.
+Moreover, our use of this theorem has to be fundamentally different from
+our use of Theorems~\ref{th:dor-arrow} and~\ref{th:dor-multinomial}.
+From the latter we discover DOR that lead to LCM in which we find MLE.
+From the former we discover DOR that do not lead to LCM, and the MLE
+does not exist, and we have to rudely inform users that their models
+are no good: you cannot estimate the variance of a normal distribution
+from one observation.
+
+Users can avoid these kind of error messages by assuming homoscedastic
+errors (just like in linear models).  The way this is done in aster models
+is to have the variance node of each normal-location-scale family
+have the same parameter.  And the way to do that is to have \code{+ foo}
+in the formula, where \code{foo} is the indicator vector of the variance
+nodes of all normal-location-scale dependence groups (the $k$ in the theorem)
+and no other appearance of \code{foo} in the formula.
+
+Users can have more complicated formulas in which variance differs among
+normal-location-scale dependence groups, but then it is the job of the
+computer to catch situations in which this leads to directions of recession
+described by the theorem.
+
+Fortunately, we can separate these two kinds of problems
+All normal dependence groups must be terminal (so not really
+``fortunately'' because this follows from the predecessor-is-sample-size
+principle). 
+Thus we can trim all of the normal dependence groups off of the aster graph
+and still have a possible aster model.
+Then we can apply our algorithm (still to be developed in what follows)
+to determine whether a GDOR exists and, if so, what the LCM is
+(for the model with normal dependence groups trimmed off).
+
+Then we can put the normal dependence groups back, and look for more
+directions of recession.  In this, the following theorem helps.
+
+\begin{theorem} \label{th:dor-predecessor-zero}
+Suppose $G$ is a dependence group in an aster graph, and $y_{q(G)} = 0$
+where $Y$ is the response vector and $y$ its observed value, then the
+vector $\eta$ whose only nonzero component is $\eta_{q(G)} = -1$ is a
+direction of recession of the saturated aster model.
+
+Taking the limit in this direction gives the LCM that is the same as the
+OM except $Y_{q(G)} = 0$ almost surely, and this means the distributions
+of all successors, successors of successors, successors of successors of
+successors, etc.\ are not identifiable in this LCM.
+
+This direction of recession is not a direction of constancy
+unless $Y_{q(G)} = 0$ almost surely.
+\end{theorem}
+\begin{proof}
+We know $q(G)$ is not a terminal node.  It is not an initial node either,
+because aster models are required to have nonzero data at initial nodes.
+We know from
+the predecessor-is-sample-size property that $Y_{q(G)} \ge 0$ is required.
+Since $y_{q(G)}$ is at the lower endpoint of the support of $Y_{q(G)}$,
+the vector described in the theorem statement is a direction of recession.
+
+If we take limits in this direction, we get the OM conditioned on the event
+$Y_{q(G)} = 0$ almost surely, and this implies $Y_j = 0$ almost surely for
+all $j \prec q(G)$, where $\prec$ is the transitive closure of the successor
+relation.  The cumulant function for this LCM does not depend on any
+of the variables $\varphi_j$ for $j \preceq q(G)$.
+This can be seen by applying \eqref{eq:cumfun-expfam} to this model.
+\begin{align*}
+   c(\varphi)
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   e^{\inner{Y, \varphi - \varphi^*}} \right) \right\}
+   \\
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   \prod_{j \in J} e^{Y_j (\varphi_j - \varphi^*_j)}
+   \right) \right\}
+   \\
+   & =
+   c(\varphi^*) + \log\left\{ E_{\varphi^*} \left(
+   \prod_{\substack{j \in J \\ j \not\preceq q(G)}}
+   e^{Y_j (\varphi_j - \varphi^*_j)}
+   \right) \right\}
+\end{align*}
+where $\varphi$ varies and $\varphi^*$ is fixed.
+And then \eqref{eq:logl-aster-phi} shows that the log likelihood for the
+LCM does not depend on any of these variables either.
+
+This vector is a direction of constancy if and only if $Y_{q(G)} = 0$ almost
+surely.
+\end{proof}
+
+The vector this theorem finds to be a direction of recession is also found
+by theorems preceeding it, but the point of this theorem is that it
+applies to any aster model whatsoever, even those having families that
+have not been implemented yet.  And the theorem also provides more information
+about LCM.
+
+In particular, it tells us that for LCM we found by applying our
+(yet to be developed) GDOR algorithm to the model with normal dependence
+groups trimmed off, any normal dependence groups having $Y_{q(G)} = 0$
+in the LCM can still be ignored: their parameters will be non-identifiable
+in the LCM.
 
 \begin{theorem} \label{th:dor-aster}
 The set of all directions of recession is a closed convex cone.
@@ -710,15 +833,11 @@ A vector $\delta$ is a direction of constancy if and only if
 both $\delta$ and $- \delta$ are directions of recession.
 
 The set of all directions of recession of saturated aster models
-having families described by Theorems~\ref{th:dor-predecessor-zero},
-\ref{th:dor-arrow}, and~\ref{th:dor-multinomial}
+having families described by Theorems~\ref{th:dor-arrow},
+\ref{th:dor-multinomial}, \ref{th:dor-normal},
+and~\ref{th:dor-predecessor-zero}
 is the smallest closed convex cone containing all of the directions
 of recession described by those theorems.
-
-The set of all directions of recession for normal-location-scale
-dependence groups $G$ with $y_{q(G)} > 0$
-is the smallest closed convex cone containing all of the directions
-of recession described by Theorem~\ref{th:dor-normal}.
 
 The set of all directions of constancy of such aster models
 is the smallest vector subspace containing all of the directions
@@ -738,7 +857,19 @@ aster models \eqref{eq:factorize}.
 Thus when we have all possible limiting conditional models for each of
 the families for each of the dependence groups, we have also gotten
 all of the limits for the whole aster model.
+
+Conversely, since the theorems mentioned describe all possible limits
+of distributions for dependence groups in the families described by
+those theorems, which includes all families currently implemented in
+R packages \code{aster} and \code{aster2}, we have discovered all
+possible limits.  There are no other directions of recession.
 \end{proof}
+
+As the theorem statement only implicitly refers to but the the proof
+explicitly says, the theorem does not apply to aster models having
+multivariate dependence groups whose families have not been invented yet.
+We would need to add theorems about their directions of recession if we
+add them to aster models.
 
 Now we need to figure out how to use these theorems when applied to
 general unconditional aster models (canonical affine submodels of
@@ -750,37 +881,37 @@ of the saturated model.
 
 So we revisit the theorems.
 
-In Theorem~\ref{th:dor-predecessor-zero} we have one direction of recession
-whose only nonzero coordinate is $\eta_j = - 1$ when $j$ is a predecessor
-node such that $y_j = 0$.  Then we may ignore all nodes that are successors,
-successors of successors, etc.\ of such nodes because we may figure out GDOR
-for graphs that do not have these nodes.  So we only include such DOR when
-$y_j = 0$ but $y_{p(j)} > 0$.
-
 In Theorem~\ref{th:dor-arrow} we have either
 \eqref{eq:dor-lower-bound} or \eqref{eq:dor-upper-bound} or both or neither
 is a direction of recession.  If $a_j = b_j$, then we can take either to
 be a direction of constancy and ignore the other.
-If $y_{p(j)} = 0$, then we can ignore the directions of recession as discussed
-above.  Thus we get only one direction of recession or direction of constancy.
+If the predecessor is zero almost surely (this cannot happen unless the
+model we are considering is already an LCM) then any directions of recession
+are directions of constancy, but not otherwise.
 
 In Theorem~\ref{th:dor-multinomial} when $y_{q(G)} > 0$ we have one
 direction of recession for each $j \in G$ such that $y_j = 0$ and
 we also have one direction of constancy for the whole dependence group.
+If the predecessor is zero almost surely (this cannot happen unless the
+model we are considering is already an LCM) then all directions of recession
+are directions of constancy, but not otherwise.
 
-In Theorem~\ref{th:dor-normal} we have one direction of recession for
-each dependence group with $y_{q(G)} = 1$.
+For now we ignore Theorem~\ref{th:dor-normal}.
 
 So that completes our list of directions of recession and constancy.
+
 \begin{theorem} \label{th:dor-aster-explicit}
 A vector $\delta$ is a direction of recession
 of an unconditional canonical affine submodel
+with normal dependence groups trimmed off and
+no arrows having degenerate families
 if and only if $\eta = M \delta$ has the form
 \begin{equation} \label{eq:dor-aster-explicit}
    \eta = \sum_{j \in J_r} e_j \eta_j
 \end{equation}
-where $J_r$ is the index set for directions of recession,
-$J_c$ is the index set for directions of constancy, and
+where $J_r$ is the index set for directions of recession
+of the saturated model discussed above,
+$J_c$ is the subset of $J_r$ indexing directions of constancy, and
 the $e_j$ are real numbers satisfying $e_j \ge 0$
 for $j \in J_r \setminus J_c$.
 \end{theorem}
@@ -789,7 +920,7 @@ This just makes explicit what Theorem~\ref{th:dor-aster} already says.
 \end{proof}
 
 Consider the following linear program having variables $e_j$
-for $j \in J_r \cup J_c$ and $\delta_k$ for $k \in K$.
+for $j \in J_r$ and $\delta_k$ for $k \in K$.
 \begin{alignat}{2}
   \text{maximize}   & \ \sum_{j \in J_r \setminus J_c} e_j
   \nonumber
@@ -895,5 +1026,33 @@ a direction of constancy, so is $\gamma$.
 The termination condition of optimal value zero or $J^{{*}{*}} = \emptyset$,
 proves that $\gamma$ is such that $\eta = M \gamma$ has the most possible
 nonzero components $\eta_j$ for $j \in J_r \setminus J_c$.  Hence it
-is generic.
+is generic unless $\gamma = 0$ and the algorithm proves the MLE exists
+in the OM.
 \end{proof}
+
+From now on we only use the LCM corresponding to the GDOR found.
+This means every $\eta_j$ for $j \in J^{{*}{*}}$ found by the algorithm
+is a direction of constancy of this LCM.  The other DOR remain the same.
+
+Now we add back in all of the normal dependence groups.
+Normal-location arrows are covered by Theorem~\ref{th:dor-arrow}
+with $a_j = - \infty$ and $b_j = + \infty$.  They can never have
+directions of recession.  So that leaves normal-location-scale dependence
+groups.
+
+From Theorem~\ref{th:dor-normal} we know that those with $y_{q(G)} \ge 2$
+have no directions of recession to add to our problem.
+From Theorem~\ref{th:dor-predecessor-zero} we know that
+those with $y_{q(G)} = 0$ have non-identifiable parameters in the LCM.
+If $G = \{ j, k \}$ then we add a vector whose only nonzero component
+is $\eta_j = 1$ to the list of directions of constancy and also a vector
+whose only nonzero component
+is $\eta_k = 1$ to the list of directions of constancy.
+Finally, from Theorem~\ref{th:dor-normal} we know that those
+with $y_{q(G)} = 1$ have exactly one direction of recession that is not
+a direction of constancy given by \eqref{eq:dor-normal}.
+have no directions of recession to add to our problem.
+
+So we throw all of this back into linear program \eqref{prog:foo}.
+It had better have optimal value zero.
+Otherwise users get rude error messages.
