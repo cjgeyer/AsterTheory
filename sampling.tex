@@ -1,0 +1,1395 @@
+
+\chapter{Subsampling} \label{chap:subsampling}
+
+\section{Introduction}
+
+In aster models the ideal is to actually measure
+all components of fitness and make them nodes in the graphical model.
+Sometimes, however, it is just too much work to count all of some component
+of fitness, all seeds produced by a plant, for example.
+
+For a part of an aster graph
+$$
+\begin{CD}
+   \cdots @>>> y_\text{this} @>>> y_\text{that} @>>> \cdots
+\end{CD}
+$$
+suppose that $y_\text{that}$ is typically too large to count (cost effectively).
+The conditional distribution of $y_\text{that}$ given $y_\text{this}$ is
+the sum of $y_\text{this}$
+independent and identically distributed (IID) random variables.
+
+This is the predecessor-is-sample-size property
+(Section~\ref{sec:piss} above).
+In short, $y_\text{that}$ is a random ``sample''
+from some ``population'' and the sample size is $y_\text{this}$, where the scare
+quotes are to indicate that ``sample'' and ``population'' don't refer
+to an actual sample and population but are just a way of discussing
+probability that is common in introductory statistics books, which
+take finite population sampling (actually taking a random sample from
+a known finite population) as an analogy for all applications of probability
+theory; any IID set of random variables is called a ``sample'' from
+a ``population'' whether or not that makes literal sense.
+
+The obvious solution to our problem is to ``subsample'' the ``sample.''
+Take a random sample of the things $y_\text{this}$ counts,
+and for that subsample count how many of whatever component
+of fitness $y_\text{that}$ counts (this proposal will be generalized
+in Section~\ref{sec:generalize} below).  In this case,
+\citet[p.~E43]{aster2} proposed to simply insert an extra arrow in the
+graph to represent the subsampling process.
+Taking a random subsample is a Bernoulli process (flip a ``biased coin''
+to decide for each of the $y_\text{this}$ things whether it goes in the
+subsample).
+So this is a Bernoulli arrow, but we mark it specially as a subsampling arrow
+$$
+\begin{CD}
+   \cdots @>>> y_\text{this} @>\text{samp}>> y_\text{this-sub}
+   @>>> y_\text{that-sub} @>>> \cdots .
+\end{CD}
+$$
+Here $y_\text{this}$ is the same variable it was before (the observed count for
+``this'' fitness component), $y_\text{this-sub}$ is the subsample size
+(the subset of the $y_\text{this}$ things that go in the subsample),
+and $y_\text{that-sub}$ is the observed count for ``that'' fitness component
+for the subsample).  We no longer observe $y_\text{that}$, which
+is what we would have observed if we had not subsampled.  Not having to
+count $y_\text{that}$ was the whole point of the subsampling.
+
+\citet{aster2} further proposed to treat aster models with subsampling
+just like any other aster model.  This suggestion was backed
+up by Section~8 of a supporting technical report \citep{tr661}.
+That technical report, however, notes
+% that because of the way the aster transform, the map from
+%the conditional canonical parameter vector $\theta$ to the unconditional
+%canonical parameter vector $\varphi$ \citep[eq.~(5)]{aster1}, works,
+this suggestion is not quite the right thing.  It says
+\begin{quote}
+The somewhat odd thing about this proposal is that the parameter
+$p$ [the subsampling probability] is \emph{known} and is a \emph{conditional}
+mean value parameter, but we intend to use an \emph{unconditional} aster model
+and treat the [corresponding] unconditional canonical parameter as
+\emph{unknown} [emphasis in the original].
+\end{quote}
+and devotes the rest of its Section~8 to a simulation study that shows
+that, although, not quite the right thing, it does well enough.
+
+\citet*[Appendix~S1]{stanton-geddes-et-al} show how to, in effect, remove
+the effect of subsampling when producing point estimates and confidence
+intervals for expected fitness, completing something left undone by
+\citet{aster2} and the accompanying technical report.
+
+Here we give a new proposal that does the right thing with subsampling
+arrows and hence supersedes all earlier proposals.
+We have to realize that aster models with subsampling are no longer
+regular full exponential families, so they no longer satisfy the original
+rationale for aster models.
+
+With subsampling there are two models we have to consider: the model with
+subsampling, which reflects the experiment actually done, and the same model
+with subsampling removed, which reflects biology of the organisms being
+studied.  We give both of these models the same parameterization (subsampling
+arrows in the aster graph have no (unknown) parameters because the subsampling
+probabilities are known).  Once this fundamental realization is made,
+everything else about aster models with subsampling follows from well
+known likelihood theory.
+
+\section{Subsampling}
+
+\subsection{Graphs With and Without Subsampling}
+\label{sec:with-and-without}
+
+We already have one two-way classification of aster graphs: the full aster
+graph and graphs for ``individuals'' in scare quotes
+(Section~\ref{sec:scare-quotes} above).  Now we introduce a different
+two-way classification: with and without subsampling.  Together these give
+us a four-way classification.
+
+When using aster models with subsampling, we are also interested in the graph
+and the corresponding aster model if subsampling had not been done.
+The graph and model with subsampling represent the experiment actually done.
+The graph and model without subsampling represent the biology.
+We must refer to both in our discussion.  For example, we use the graph
+and model with subsampling to estimate parameters, but we use the graph
+and model without subsampling to predict biological properties of
+organisms from these estimates.
+
+Understanding the correspondence between the two graphs is helped by
+referring to the following picture, which is part of an aster graph
+with subsampling.
+\begin{equation} \label{graph:with}
+\begin{CD}
+   \cdots @>>> y_i @>>> y_j @>\text{samp}>> y_k @>>> y_m @>>> \cdots
+\end{CD}
+\end{equation}
+Only one subsampling arrow is shown (labeled ``samp'').  The other arrows
+are non-subsampling.  Nodes at the head of subsampling arrows (here $y_k$)
+are called \emph{subsampling nodes}.  Thus $y_k$ is the only subsampling node
+among the nodes shown.
+Here $y_j$ is the count of some
+sort of thing (flowers, seeds, etc.)\ of actual individuals in the experiment,
+and $y_k$ is the count of the same thing for a random subsample of those
+individuals who are
+carried forward to later stages of the experiment.
+Thus $y_j$ and $y_k$ are both measurements of
+the \emph{same} component of fitness.
+The relationship between
+$y_j$ and $y_k$ is artificial (done by the experimenters) and has nothing
+to do with biology.
+
+The corresponding graph without subsampling is formed by removing the
+subsampling arrow and subsampling node and pasting together the graph
+so no break is formed
+\begin{equation} \label{graph:without}
+\begin{CD}
+   \cdots @>>> y_i @>>> y_j @>>> y_m @>>> \cdots
+\end{CD}
+\end{equation}
+This graph corresponds to the experiment that would have been done if there
+were no subsampling.
+
+Here is a more complicated example that illustrates that sometimes
+it may be necessary to have subsampling arrows following each other.
+\begin{equation} \label{graph:with-with}
+\begin{tikzcd}[row sep=tiny]
+   \hphantom{y_0} & \hphantom{y_1} & \hphantom{y_2} & y_3 \arrow{r} & y_5
+   \\
+   y_0 \arrow{r} & y_1 \arrow{r}{\text{samp}}
+   & y_2 \arrow{ru}{\text{samp}} \arrow{rd}
+   \\
+   \hphantom{y_0} & \hphantom{y_1} & \hphantom{y_2} & y_4 \arrow{r} & y_6
+\end{tikzcd}
+\end{equation}
+This is the graph for one ``individual'' assuming all ``individuals'' have
+isomorphic subgraphs.
+Here is the corresponding subgraph when we remove the subsampling arrows.
+\begin{equation} \label{graph:with-with-stripped}
+\begin{tikzcd}[row sep=tiny]
+   \hphantom{y_0} & \hphantom{y_1} & y_5
+   \\
+   y_0 \arrow{r} & y_1 \arrow{ru} \arrow{rd}
+   \\
+   \hphantom{y_0} & \hphantom{y_1} & y_4 \arrow{r} & y_6
+\end{tikzcd}
+\end{equation}
+
+%%%%% NEED FORWARD REFERENCE to theory about how to go (in general)
+%%%%% from with to without
+
+\subsection{Notation for Graphs With and Without Subsampling}
+\label{sec:with-and-without-notation}
+
+We are going to use mathematical notation that distinguishes analogous
+concepts for the full graphs with and without subsampling by decorating
+notation for the former with stars.
+
+\subsubsection{Sets of Nodes}
+
+The set of nodes of the full aster graph with subsampling is denoted $N^*$.
+The set of non-subsampling nodes in $N^*$ is denoted $N$.  This is the set
+of nodes of the full graph without subsampling.
+
+The set of non-initial nodes in $N^*$ is denoted $J^*$.
+The set of non-initial nodes in $N$ is denoted $J$.
+($J = N \cap J^*$.)
+
+\subsubsection{Families of Sets of Nodes}
+
+The set of dependence groups
+(Section~\ref{sec:factorization} above)
+for the aster model with subsampling is denoted $\mathcal{G}^*$.
+The set of dependence groups
+for the aster model without subsampling is denoted $\mathcal{G}$.
+
+Subsampling nodes are always dependence groups by themselves.
+No dependence group with more than one node can have any subsampling nodes.
+Thus the set of all subsampling nodes is $J^* \setminus J$.
+
+\subsubsection{Predecessor Functions}
+
+We already have two kinds of predecessor functions:
+set-to-index predecessor functions denoted $q$
+(Section~\ref{sec:factorization} above) and
+index-to-index predecessor functions denoted $p$
+(Section~\ref{sec:other} above).
+Now we have another two-way classification.
+We will have these functions with stars to denote with subsampling
+and without stars to denote without subsampling.
+
+For example, in \eqref{graph:with} we have $p^*(m) = k$ but $p(m) = j$.
+The latter agrees with \eqref{graph:without}, as it must.
+
+For another example, in \eqref{graph:with-with} we have
+\begin{align*}
+   p^*(6) & = 4
+   \\
+   p^*(5) & = 3
+   \\
+   p^*(4) & = 2
+   \\
+   p^*(3) & = 2
+   \\
+   p^*(2) & = 1
+   \\
+   p^*(1) & = 0
+\end{align*}
+but
+\begin{align*}
+   p(6) & = 4
+   \\
+   p(5) & = 1
+   \\
+   p(4) & = 1
+   \\
+   p(1) & = 0
+\end{align*}
+The latter agrees with \eqref{graph:with-with-stripped}, as it must.
+
+We have not given examples of graphs with subsampling and dependence
+groups, but the set-to-index predecessor functions work the same way
+\begin{alignat*}{2}
+   p(j) & = q(G), & \qquad & j \in G \in \mathcal{G}
+   \\
+   p^*(j) & = q^*(G), & & j \in G \in \mathcal{G}^*
+\end{alignat*}
+
+\subsubsection{Partial Orders}
+
+In Section~\ref{sec:closure} above we introduced partial orders on the
+node set of the graph that tell us about predecessors, predecessors of
+predecessors, and so forth.  Unlike the case with the other mathematical
+objects just discussed, we do not need starred and unstarred versions
+for these.
+
+As in Section~\ref{sec:closure} above, let $\succ$ denote the transitive
+closure of the predecessor relation on $N^*$.  Then the transitive
+closure of the predecessor relation on $N$ is just the same relation
+as on $N^*$ but restricted to $N$, that is $j \succ k$ in $N$ if and only
+$j \succ k$ when $j$ and $k$ are considered elements of $N^*$.
+
+And similarly for $\succeq$, $\prec$, and $\preceq$.
+
+\subsubsection{Going from One to the Other}
+
+The user specifies the graph with subsampling.  The computer should figure
+out the corresponding graph without subsampling (so no mistakes about that
+are made).
+
+For this we use the notation $p^k$ for $k$-fold composition of a function
+with itself from dynamical systems theory that is also explained in
+Section~\ref{sec:closure} above.
+
+Suppose we are trying to determine $p(j)$ for $j \in J$.
+Define
+$$
+   m = \min \set{ k > 0 : (p^*)^k(j) \in N }
+$$
+Then $p(j) = (p^*)^m(j)$.
+
+In words, we go back in the graph with subsampling looking at the predecessor,
+predecessor of predecessor, and so forth until we find one that is not a
+subsampling node, and that is the predecessor in the graph without subsampling.
+
+\subsection{Models With and Without Subsampling}
+\label{sec:models-with-and-without}
+
+Now that we have the relationship between the graph with and without
+subsampling, and hence the factorization (Section~\ref{sec:factorization}
+above) with and without subsampling we need to consider statistical models
+that go with these factorizations.  Models without subsampling are those
+already described (Chapter~\ref{ch:introduction} above).
+
+So we have to describe models with subsampling here.
+There are two key ideas.
+\begin{itemize}
+\item The conditional distributions for subsampling arrows are considered
+\emph{known}.
+Thus they have \emph{no} unknown parameter values to estimate.
+\item The conditional distributions for non-subsampling arrows should be
+the same for the models with and without subsampling.  They should have
+the same statistical models parameterized in the same way
+(this statement is imprecise; it depends on which parameters
+we are talking about).
+\end{itemize}
+
+\subsubsection{Data}
+
+First we introduce new notation for data (not used above) to distinguish
+the models with and without subsampling.  Let $y^*$ denote the response
+vector for the model with subsampling and $y$ the response
+vector for the model without subsampling.
+
+\subsubsection{Factorization}
+
+Then the model with subsampling factorizes as
+\begin{equation} \label{eq:factorization-with}
+   f^*(y^*) = \prod_{G \in \mathcal{G}^*} f^*_G(y^*_G \mid y^*_{q^*(G)})
+\end{equation}
+and the model without subsampling factorizes as
+\begin{equation} \label{eq:factorization-without}
+   f(y) = \prod_{G \in \mathcal{G}} f_G(y_G \mid y_{q(G)}).
+\end{equation}
+Now our first principle above says that for $G \notin \mathcal{G}$
+$f^*_G(\fatdot \mid \fatdot)$ has no parameters,
+and our second principle above says that for $G \in \mathcal{G}$
+$$
+   f^*_{G, \theta_G}(\fatdot \mid \fatdot)
+   =
+   f_{G, \theta_G}(\fatdot \mid \fatdot)
+$$
+that is, these are the same conditional distributions (the same functions
+of the variables on each side of the vertical bar) for the same parameter
+values.
+
+\subsubsection{Parameterization}
+
+This also makes clear what parameters we are talking about.
+The \emph{conditional canonical parameter vector} $\theta$
+(Section~\ref{sec:aster-transform} above)
+is the same for the models with and without subsampling.
+But we also want the aster transform to be the same
+(also Section~\ref{sec:aster-transform} above), so
+the \emph{unconditional canonical parameter vector} $\varphi$ will also be
+the same for the models with and without subsampling.
+
+\subsubsection{Mean Value Parameters}
+
+The \emph{conditional mean value parameter vector} $\xi$ will differ
+for the models with and without subsampling simply because the model
+with subsampling has more arrows.  The components of $\xi$ will be the
+same for the same arrows
+(Sections~\ref{sec:conditional-and-unconditional-mean-values}
+and~\ref{sec:aster-mean-value-parameters} above), that is, defining
+\begin{align*}
+   \xi_j & = E(y_j \mid y_{p(j)} = 1)
+   \\
+   \xi^*_j & = E(y_j^* \mid y^*_{p^*(j)} = 1)
+\end{align*}
+we have
+$$
+   \xi_j = \xi^*_j = \frac{\partial c_G(\theta_G)}{\partial \theta_j}
+$$
+whenever $j$ is not a subsampling node and $j \in G \in \mathcal{G}$.
+But when $j$ is a subsampling node there is no $\xi_j$ since there is
+no node $j$ in the model without subsampling, and $\xi^*_j$ is not a function
+of the parameters of the model ($\theta$ and $\varphi$); it is not an unknown
+parameter but rather a known constant (this will be revisited in the
+next section).
+
+Thus when we define
+\begin{align*}
+   \mu & = E(y)
+   \\
+   \mu^* & = E(y^*)
+\end{align*}
+we will still have the relationship between $\mu$ and $\xi$ discussed
+in Section~\ref{sec:mu-and-xi} above.
+And we will have the analogous equations with stars for the relationship
+between $\mu^*$ and $\xi^*$ but the relations between $\mu$ and $\mu^*$
+will be very complicated and depend on the whole aster graph.
+Moreover, these relations will depend on subsampling having the
+predecessor-is-sample-size property, which we will drop in the next section.
+
+\subsection{Generalizing Our Notion of Subsampling} \label{sec:generalize}
+
+So far, we have been assuming the conditional distributions for the
+subsampling arrows obey the predecessor-is-sample-size principle.  This
+means the conditional distribution for sample size one is Bernoulli,
+so subsampling arrows are Bernoulli arrows (but ones whose conditional
+canonical parameters are fixed and known rather than unknown parameters
+to be estimated).  And it means the conditional distribution of $y_j^*$
+given $y_{p^*(j)}^*$ is binomial (when $j$ is a subsampling node).
+Let $\xi_j^*$ be the usual parameter for the binomial distribution,
+which is also the mean value parameter for the Bernoulli distribution.
+Then, defining $\mu^* = E(y^*)$, we have
+the analog of \eqref{eq:mu-and-xi} with stars
+\begin{equation} \label{eq:mu-and-xi-star}
+   \mu_j^* = \xi_j^* \mu_{p(j)}^*, \qquad j \in J^*.
+\end{equation}
+and all of the consequences \eqref{eq:mu-and-xi} found in
+Section~\ref{sec:mu-and-xi} above, except with stars in the appropriate places.
+
+But when we drop the predecessor-is-sample-size principle for subsampling
+arrows \eqref{eq:mu-and-xi-star} no longer holds, and there is no longer
+any notion of $\xi^*_j$ for such arrows analogous to non-subsampling
+arrows.  We still do have conditional mean values,
+$$
+   E\bigl\{ y_j^* \mid y_{p^*(j)}^*\bigr\}
+$$
+but these do not satisfy
+$$
+   E\bigl\{ y_j^* \mid y_{p^*(j)}^*\bigr\}
+   =
+   \xi_j^* y_{p^*(j)}^*
+$$
+for any constant $\xi_j^*$ when $j$ is a subsampling node that does not
+obey the predecessor-is-sample-size principle, but rather are arbitrary
+functions of $y_{p^*(j)}^*$.
+
+This means that conditional mean value parameters
+for subsampling arrows make no sense for subsampling arrows that are not
+Bernoulli (do not obey the predecessor-is-sample-size principle).
+Since many biologists use forms of subsampling that are not Bernoulli
+(not simple random sample), we do not want to enforce the Bernoulli
+assumption.
+
+All we assume about subsampling distributions is that they are known,
+having no unknown parameters to estimate.
+We make no other assumptions about them.
+
+We do, of course, have an unconditional mean value parameter vector $\mu^*$
+with components
+\begin{equation} \label{eq:mu-star}
+   \mu^*_j = E(Y^*_j), \qquad j \in J^*
+\end{equation}
+but since the computer knows nothing about the subsampling distributions
+(they can be any distributions), the computer will be unable to compute
+them.  If users want to use $\mu^*$ somehow, they will have to provide
+it themselves.
+
+Thus $\xi^*$ is undefined, in general, and $\mu^*$, although defined,
+is no longer anything the computer can deal with.
+
+Fortunately $\xi^*$ and $\mu^*$ are unbiological.  So users will mostly,
+perhaps always, only be interested in $\xi$ or $\mu$, which the computer
+can deal with.
+
+\subsection{Log Likelihood}
+\label{sec:logl}
+
+When there is no subsampling, the saturated aster model log likelihood
+for $\theta$ is given by \eqref{eq:logl-aster-theta} which can be rewritten
+\begin{equation} \label{eq:logl}
+   l(\theta)
+   =
+   \sum_{j \in J} y_j \theta_j
+   - \sum_{G \in \mathcal{G}} y_{q(G)} c_G(\theta_G).
+\end{equation}
+
+\begin{theorem} \label{th:logl-theta}
+The log likelihood for a model with subsampling is given by
+\begin{equation} \label{eq:logl-with}
+   l(\theta)
+   =
+   \sum_{j \in J} y^*_j \theta_j
+   - \sum_{G \in \mathcal{G}} y^*_{q^*(G)} c_G(\theta_G).
+\end{equation}
+\end{theorem}
+In \eqref{eq:logl} and \eqref{eq:logl-with}
+$c_G$ is the cumulant function for the exponential family
+for dependence group $G$.
+\begin{proof}
+To be clear, we write down the log likelihood for all the data
+using the notation of Section~\ref{sec:generalize} above
+$$
+   l(\theta^*)
+   =
+   \sum_{j \in J} y_j^* \theta_j
+   - \sum_{G \in \mathcal{G}} y_{q^*(G)}^* c_G(\theta_G)
+   +
+   \sum_{j \in J^* \setminus J} \log f_j(y_j^* \mid y_{p^*(j)}^*)
+$$
+and we are allowed to drop terms that do not contain unknown parameters from the
+log likelihood because this makes no difference to either frequentist or
+Bayesian inference.  This gives \eqref{eq:logl-with}.
+\end{proof}
+
+The cumulant function $c_G$ satisfies
+\begin{equation} \label{eq:theta-to-xi}
+\begin{split}
+   \frac{\partial c_G(\theta_G)}{\partial \theta_j}
+   & =
+   E_\theta(y_j \mid y_{q(G)} = 1)
+   \\
+   & =
+   E_\theta(y^*_j \mid y_{q^*(G)} = 1)
+   \\
+   & =
+   \xi_j
+   \\
+   & =
+   \xi^*_j,
+   \qquad j \in G \in \mathcal{G},
+\end{split}
+\end{equation}
+and
+\begin{equation} \label{eq:gamma-pre}
+\begin{split}
+   \frac{\partial^2 c_G(\theta_G)}{\partial \theta_j \partial \theta_k}
+   & =
+   \cov_\theta(y_j, y_k \mid y_{q(G)} = 1)
+   \\
+   & =
+   \cov_\theta(y^*_j, y^*_k \mid y^*_{q^*(G)} = 1),
+   \qquad j, k \in G \in \mathcal{G},
+\end{split}
+\end{equation}
+and these derivatives are zero if $j \notin G$ or (in the latter)
+$k \notin G$.
+
+If the conditioning event in these equations has probability
+zero (which happens in actual aster models if the family in question is
+$k$-truncated with $k > 0$, \citealp{aster2}, have an example), then the
+conditional expectations are not well defined, but we still have
+\begin{equation} \label{eq:xi-from-c}
+   \frac{\partial c_G(\theta_G)}{\partial \theta_j}
+   =
+   \xi_j
+   =
+   \xi^*_j
+\end{equation}
+with $\xi_j$ being defined by the more long winded and careful
+definition given in Section~\ref{sec:xi} above when the conditioning
+event in \eqref{eq:theta-to-xi} has probability zero.
+
+The reason for the equality of starred and unstarred quantities is that
+we want the model without subsampling to be the same as the model
+with subsampling when the subsampling arrows are removed as explained
+in Section~\ref{sec:with-and-without} above and in this section.
+The distribution of $y_G$ given $y_{q(G)} = n$ is the same as
+the distribution of $y^*_G$ given $y^*_{q^*(G)} = n$.
+
+There is a similar adjustment to be made for the conditional covariances above
+when their conditioning events have probability zero.
+We still have that $y_G$ is the sum of $y_{q(G)}$ IID random vectors
+and $\partial^2 c_G(\theta_G) / \partial \theta_j \partial \theta_k$
+is the unconditional covariance of the $j$ and $k$ components of one
+of those random vectors.
+
+\subsection{Aster Transform}
+\label{sec:aster-transform-subsampling}
+
+We have the aster transform and inverse aster transform
+(Section~\ref{sec:aster-transform}) and these hold for models with
+subsampling because they are the same (we assume) as for models
+without subsampling.  And these determine $\mu$ and $\xi$ as discussed
+in the preceding section.  And we are generally uninterested in
+$\mu^*$ and $\xi^*$ as discussed in the preceding section.  Thus
+we only have parameters without stars.  We have aster graphs with
+stars and aster data with stars, but not parameters.
+
+\subsection{Canonical Affine Submodels}
+
+As is the situation without subsampling, we are interested in
+canonical affine submodels (Section~\ref{sec:canonical-affine-submodels}
+above) when we have subsampling.  And we want them to be the same models
+with the same parameterizations with and without subsampling.  Thus they
+are the same as in Section~\ref{sec:canonical-affine-submodels} above.
+Unconditional canonical affine submodels make $\varphi$ an affine function
+of the submodel parameters $\beta$.
+Conditional canonical affine submodels make $\theta$ an affine function
+of the submodel parameters $\beta$.
+
+\subsubsection{Conditional}
+
+With subsampling, a conditional aster model still has a concave log likelihood
+for the reasons discussed in Section~\ref{sec:conditional-aster-model-mle}
+above.  The saturated model log likelihood \eqref{eq:logl} is a sum
+of linear and concave functions of $\theta$.  Therefore the submodel
+log likelihood is the composition of a concave function and an affine
+function, which is again a convex function.  This means the MLE will
+be easily found by the computer (by any algorithm that always checks
+that it goes uphill on the likelihood in every iteration).  It does
+not mean that conditional aster models have any other properties of
+regular full exponential families (but this is true with or without
+subsampling, as was discussed in Chapter~\ref{ch:introduction}).
+
+\subsubsection{Unconditional}
+
+With subsampling, an unconditional aster model is no longer an exponential
+family and does not have any exponential family properties.  All it has
+is the usual asymptotics of maximum likelihood.
+%%%%% NEED FORWARD REFERENCE to veryfying that
+
+\subsection{Differentiating the Aster Transform and Its Inverse}
+\label{sec:aster-transform-deriv}
+
+Here we follow Section~A.2 of the technical report \citet{aster1-tr} which
+backs up the paper \citet{aster1}.  Our notation is different from their
+notation, our notation here is what we have used for aster models since
+\citet{aster-philosophical}.
+
+\subsubsection{Aster Transform}
+
+Let $\Delta \theta_j$ denote an infinitesimal increment of $\theta_j$
+and similarly for $\Delta \varphi_j$.  Then
+differentiating \eqref{eq:aster-transform} and using \eqref{eq:xi-from-c} and
+the chain rule gives
+\begin{equation} \label{eq:aster-transform-deriv}
+\begin{split}
+   \Delta \varphi_j
+   & =
+   \Delta \theta_j
+   -
+   \sum_{\substack{G \in \mathcal{G} \\ q(G) = j}} \sum_{k \in G}
+   \xi_k \Delta \theta_k
+   \\
+   & =
+   \Delta \theta_j
+   -
+   \sum_{\substack{k \in J \\ p(k) = j}}
+   \xi_k \Delta \theta_k
+\end{split}
+\end{equation}
+
+In language that does not refer to infinitesimals and using the
+sophisticated view that derivatives are linear transformations
+(\citealp[Definition~8.9]{browder}; \citealp[p.~334]{lang}),
+ the derivative of the
+aster transform is the linear transformation that maps
+the vector $\Delta \theta$ having components $\Delta \theta_j$ to
+the vector $\Delta \varphi$ having components $\Delta \varphi_j$.
+
+We can think of this linear transformation as being represented by the matrix
+of partial derivatives, which can be read off \eqref{eq:aster-transform-deriv},
+\begin{equation} \label{eq:aster-transform-deriv-partial}
+   \frac{\partial \varphi_j}{\partial \theta_k}
+   =
+   \begin{cases}
+   1, & j = k \\
+   - \xi_k, & j = p(k) \\
+   0, & \text{otherwise}
+   \end{cases}
+\end{equation}
+
+\subsubsection{Inverse Aster Transform}
+\label{sec:inverse-aster-transform-deriv}
+
+By the inverse function theorem, the derivative of the inverse is the
+inverse of the derivative (considered as a linear transformation), assuming
+it exists, which it does if the derivative is invertible
+\cite[p.~361--363]{lang}.  We will prove the derivative is invertible by
+inverting it.
+
+As discussed in Section~\ref{sec:aster-transform} above,
+the formula \eqref{eq:inverse-aster-transform}
+gives an inductive definition that works when nodes of the graph are visited
+in any order that visits successors before predecessors.
+
+The same is true of the derivative of the inverse aster transform.
+Moving a term from one side of \eqref{eq:aster-transform-deriv}
+to the other gives
+\begin{equation} \label{eq:inverse-aster-transform-deriv}
+   \Delta \theta_j
+   =
+   \Delta \varphi_j
+   +
+   \sum_{\substack{k \in J \\ p(k) = j}} \xi_k \Delta \theta_k.
+\end{equation}
+When $\Delta \theta_j$ on the left-hand side is computed,
+all of the $\Delta \theta_k$ on the
+right-hand side will already have been computed (when we visit successors
+before predecessors).
+
+As before, the derivative of the inverse
+aster transform is the linear transformation that maps
+the vector $\Delta \varphi$ having components $\Delta \varphi_j$ to
+the vector $\Delta \theta$ having components $\Delta \theta_j$.
+
+Because of the nature of inductive definitions, the analog
+of \eqref{eq:aster-transform-deriv-partial} is a bit more complicated.
+To help with it we introduce the following notation and conventions.
+Let $\bone(\fatdot)$ denote the function that maps logical formulas
+to numbers, mapping false formulas to zero and true formulas to one,
+and define empty sums (those having no terms) to be equal to zero
+(the identity for addition)
+and empty products (those having no terms) to be equal to one
+(the identity for multiplication).
+
+\begin{theorem} \label{th:inverse-aster-transform-deriv-partial}
+Partial derivatives of the inverse aster transform are given by
+\begin{equation} \label{eq:inverse-aster-transform-deriv-partial}
+   \frac{\partial \theta_j}{\partial \varphi_k}
+   =
+   \bone(j \preceq k)
+   \prod_{\substack{i \in J \\ j \prec i \preceq k}} \xi_i.
+\end{equation}
+\end{theorem}
+In \eqref{eq:inverse-aster-transform-deriv-partial} the product is empty
+when $j = k$.
+\begin{proof}
+What is to be shown is that \eqref{eq:inverse-aster-transform-deriv-partial}
+agrees with \eqref{eq:inverse-aster-transform-deriv} in the case
+$\Delta \varphi$ has only one nonzero component, say $\Delta \varphi_n$.
+In this case \eqref{eq:inverse-aster-transform-deriv} says
+\begin{alignat*}{2}
+   \Delta \theta_j & = 0, & \qquad & j \not\preceq n
+   \\
+   \Delta \theta_j
+   & =
+   \Delta \varphi_n, & & j = n
+   \\
+   \Delta \theta_j
+   & =
+   \sum_{\substack{k \in J \\ p(k) = j}} \xi_k \Delta \theta_k,
+   & & j \prec n
+\end{alignat*}
+or
+\begin{alignat*}{2}
+   \frac{\partial \theta_j}{\partial \varphi_n} & = 0,
+   & \qquad & j \not\preceq n
+   \\
+   \frac{\partial \theta_j}{\partial \varphi_n} & = 1, & & j = n
+   \\
+   \frac{\partial \theta_j}{\partial \varphi_n}
+   & =
+   \sum_{\substack{k \in J \\ p(k) = j}} \xi_k 
+   \frac{\partial \theta_k}{\partial \varphi_n},
+   & & j \prec n
+\end{alignat*}
+Clearly the first two lines agree with
+\eqref{eq:inverse-aster-transform-deriv-partial}.
+That leaves only the third line to check.
+We note in this line that the partial derivative on the right-hand side
+is zero unless $j \prec k \preceq n$ and that there is hence exactly one
+term in the sum.
+Thus the third line just above agrees with
+\eqref{eq:inverse-aster-transform-deriv-partial} by mathematical induction.
+\end{proof}
+
+\subsection{Log Likelihood Derivatives}
+\label{sec:log-likelihood-derivatives}
+
+\subsubsection{First Derivatives With Respect To $\boldsymbol{\theta}$}
+\label{sec:wrt-theta}
+
+Applying \eqref{eq:xi-from-c} and \eqref{eq:theta-to-xi}
+to \eqref{eq:logl-with}, we obtain
+\begin{equation} \label{eq:logl-deriv-wrt-theta}
+   \frac{\partial l(\theta)}{\partial \theta_j}
+   =
+   y^*_j - y^*_{p^*(j)} \xi_j,
+   \qquad j \in J.
+\end{equation}
+These are the first derivatives of the log likelihood for a saturated model
+with subsampling with respect to components of $\theta$.
+
+Notice that, as always, there is the curious mix of starred and unstarred
+thingummies.  The data and the predecessor function have stars because this
+is for models with subsampling.  The parameters do not have stars because
+we insist that models have the same parameters with and without subsampling.
+The index set for \eqref{eq:logl-deriv-wrt-theta} is $J$ because that is
+the index set for $\theta$.
+
+\subsubsection{First Derivatives for CAM}
+\label{sec:logl-cam-deriv}
+
+In conditional aster models (CAM) with model equation
+\eqref{eq:affine-conditional}
+we have $\partial \theta_j / \partial \beta_k = m_{j k}$
+where $M$ has components $m_{j k}$.
+Thus, by \eqref{eq:logl-deriv-wrt-theta} and the chain rule
+$$
+   \frac{\partial l(\beta)}{\partial \beta_k}
+   =
+   \sum_{j \in J}
+   \frac{\partial l(\theta)}{\partial \theta_j}
+   \frac{\partial \theta_j}{\partial \beta_k}
+   =
+   \sum_{j \in J} ( y^*_j - y^*_{p^*(j)} \xi_j ) m_{j k}
+$$
+MLE are derived by setting these equal to zero, considering the $\xi$'s
+as functions of $\beta$, and solving for $\beta$.
+
+\subsubsection{First Derivatives With Respect To $\boldsymbol{\varphi}$}
+\label{sec:wrt-phi}
+
+\begin{theorem} \label{th:partial-like-wrt-phi}
+For $k \in J$ define
+\begin{equation} \label{eq:infimum}
+   n = \inf \set{ j \in J : j \preceq k }.
+\end{equation}
+Then
+\begin{equation} \label{eq:partial-like-wrt-phi}
+   \frac{\partial l(\varphi)}{\partial \varphi_k}
+   =
+   y^*_k
+   -
+   y^*_{p^*(n)}
+   \left(
+   \prod_{\substack{i \in J \\ n \preceq i \preceq k}} \xi_i
+   \right)
+   +
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   \left[ y^*_{p(m)} - y^*_{p^*(m)} \right]
+   \left(
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \right)
+\end{equation}
+\end{theorem}
+The infimum in \eqref{eq:infimum} means $j \preceq k$ implies $n \preceq j$.
+The at-most-one-predecessor property
+(Section~\ref{sec:with-and-without-notation} above)
+makes the set $\set{ j \in J : j \preceq k }$ totally ordered by $\preceq$.
+This set is also nonempty (it contains $k$)
+and finite (aster graphs are finite).
+Hence the infimum in \eqref{eq:infimum} is always well defined.
+
+The conventions that
+empty sums are zero and empty products are one (established in
+Section~\ref{sec:inverse-aster-transform-deriv} above) are still in force.
+
+If a node $p^*(m)$ is not a subsampling node, then $p(m) = p^*(m)$.
+Hence, if there is no subsampling,
+all terms $y^*_{p(m)} - y^*_{p^*(m)}$ in \eqref{eq:partial-like-wrt-phi}
+are zero, and \eqref{eq:partial-like-wrt-phi} reduces to
+$$
+   \frac{\partial l(\varphi)}{\partial \varphi_k}
+   =
+   y_k - y_{p(n)}
+   \prod_{\substack{i \in J \\ n \preceq i \preceq k}} \xi_i
+   =
+   y_k - \mu_k
+$$
+by \eqref{eq:xi-mu-prod}, and this
+agrees with previous aster theory \citep[Section~3.2]{aster1}.
+
+Node $p(n)$ is the unique initial node of the full aster graph satisfying
+$p(n) \prec k$.  If $p^*(n) \neq p(n)$, then $p^*(n)$ is a subsampling node.
+
+\begin{proof}
+\begin{align*}
+   \frac{\partial l(\varphi)}{\partial \varphi_k}
+   & =
+   \sum_{j \in J}
+   \frac{\partial l(\theta)}{\partial \theta_j}
+   \frac{\partial \theta_j}{\partial \varphi_k}
+   \\
+   & =
+   \sum_{\substack{j \in J \\ j \preceq k}}
+   ( y^*_j - y^*_{p^*(j)} \xi_j )
+   \prod_{\substack{i \in J \\ j \prec i \preceq k}} \xi_i
+   \\
+   & =
+   \left(
+   \sum_{\substack{j \in J \\ j \preceq k}}
+   y^*_j
+   \prod_{\substack{i \in J \\ j \prec i \preceq k}} \xi_i
+   \right)
+   -
+   \left(
+   \sum_{\substack{j \in J \\ j \preceq k}}
+   y^*_{p^*(j)}
+   \prod_{\substack{i \in J \\ j \preceq i \preceq k}} \xi_i
+   \right)
+   \\
+   & =
+   y^*_k
+   -
+   y^*_{p^*(n)}
+   \left(
+   \prod_{\substack{i \in J \\ n \preceq i \preceq k}} \xi_i
+   \right)
+   \\
+   & \qquad
+   +
+   \left(
+   \sum_{\substack{j \in J \\ n \preceq j \prec k}}
+   y^*_j
+   \prod_{\substack{i \in J \\ j \prec i \preceq k}} \xi_i
+   \right)
+   -
+   \left(
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   y^*_{p^*(m)}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \right)
+   \\
+   & =
+   y^*_k
+   -
+   y^*_{p^*(n)}
+   \left(
+   \prod_{\substack{i \in J \\ n \preceq i \preceq k}} \xi_i
+   \right)
+   \\
+   & \qquad
+   +
+   \left(
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   y^*_{p(m)}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \right)
+   -
+   \left(
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   y^*_{p^*(m)}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \right)
+   \\
+   & =
+   y^*_k
+   -
+   y^*_{p^*(n)}
+   \left(
+   \prod_{\substack{i \in J \\ n \preceq i \preceq k}} \xi_i
+   \right)
+   +
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   \left[ y^*_{p(m)} - y^*_{p^*(m)} \right]
+   \left(
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \right)
+\end{align*}
+where the first equality is the chain rule,
+the second equality is \eqref{eq:inverse-aster-transform-deriv-partial}
+and \eqref{eq:logl-deriv-wrt-theta}, and the rest are just algebra.
+\end{proof}
+
+\subsubsection{First Derivatives for UAM}
+\label{sec:logl-uam-deriv}
+
+Hence, for unconditional aster models (UAM),
+$$
+   \frac{\partial l(\beta)}{\partial \beta_n}
+   =
+   \sum_{k \in J}
+   \frac{\partial l(\varphi)}{\partial \varphi_k}
+   m_{k n}.
+$$
+
+\subsubsection{Second Derivatives With Respect To $\boldsymbol{\theta}$}
+\label{sec:wrt-theta-theta}
+
+Because the R function \texttt{mlogl} in R package \texttt{aster} calculates
+\emph{minus} the log likelihood and its first and second derivatives, we do
+the same.
+Negating and differentiating \eqref{eq:logl-deriv-wrt-theta} gives
+\begin{equation} \label{eq:logl-deriv-wrt-theta-theta}
+   - \frac{\partial^2 l(\theta)}{\partial \theta_j \partial \theta_k}
+   =
+   y^*_{p^*(j)} \gamma_{j k},
+   \qquad j, k \in J,
+\end{equation}
+where
+\begin{equation} \label{eq:gamma}
+   \gamma_{j k} = \begin{cases}
+   \partial^2 c_G(\theta_G) / \partial \theta_j \partial \theta_k,
+   & j, k \in G \in \mathcal{G}
+   \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+See \eqref{eq:gamma-pre} above for more on $\gamma_{j k}$.
+
+\subsubsection{Hessian for CAM}
+\label{sec:mlogl-hessian-cam}
+
+Second derivative matrices are commonly called Hessian matrices in optimization
+theory.  If the matrix having components \eqref{eq:logl-deriv-wrt-theta-theta}
+is denoted $H(\theta)$, then the Hessian for $\beta$ is given by
+\begin{equation} \label{eq:hessian-beta}
+   H(\beta) = M^T H(\theta) M, \qquad \text{when $\theta = a + M \beta$},
+\end{equation}
+where, as usual, $a$ is the offset vector and $M$ is the model matrix.
+This is because $M$ is the Jacobian matrix of the parameter transformation
+$\beta \to \theta$ in a CAM, and \eqref{eq:hessian-beta} is just the chain
+rule.
+
+\subsubsection{Hessian for UAM}
+\label{sec:mlogl-hessian-uam}
+
+If we follow the preceding section in denoting the Hessian for $\beta$
+by $H(\beta)$, the Hessian for $\theta$ by $H(\theta)$, and the Hessian
+for $\varphi$ by $H(\varphi)$, then
+\begin{equation} \label{eq:hessian-beta-uam}
+   H(\beta) = M^T H(\varphi) M, \qquad \text{when $\varphi = a + M \beta$},
+\end{equation}
+and the argument is exactly the same as in the preceding section.
+
+\subsection{Second Derivatives With Respect To $\boldsymbol{\varphi}$}
+\label{sec:wrt-phi-phi}
+
+That leaves us with having to derive $H(\varphi)$, which is complicated.
+Before differentiating \eqref{eq:partial-like-wrt-phi} again, it will
+simplify computations if we recognize that the terms in big round brackets
+are ``parameterized common sub-expressions'' (one has $n$ where the other
+has $m$).  Using \eqref{eq:inverse-aster-transform-deriv-partial}, we can
+give one of these another notation
+\begin{equation} \label{eq:product-subexpression}
+   \frac{\partial \theta_{p(m)}}{\partial \varphi_k}
+   =
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i,
+\end{equation}
+but when we change $m$ to $n$ in \eqref{eq:product-subexpression}
+to get a notation for the other
+term in big round brackets in \eqref{eq:partial-like-wrt-phi} this
+does not work, because $p(n)$ is an initial node so there is no
+parameter $\theta_{p(n)}$.
+This would work, however, if we imagine that the aster graph we are
+working with is part of a larger aster graph in which $p(n)$ is not
+initial and not a subsampling node.
+If we work under this fiction, we should get correct mathematics.
+
+\begin{lemma} \label{lem:kumquat}
+\begin{equation} \label{eq:kumquat}
+   \frac{\partial^2 \theta_{p(m)}}{\partial \varphi_j \partial \varphi_k}
+   =
+   \sum_{\substack{r \in J \\ p(m) \prec r \preceq k}}
+   \sum_{\substack{s \in J \\ p(m) \prec s \preceq j}}
+   \gamma_{r s}
+   \prod_{\substack{t \in J \\ p(m) \prec t \prec r}} \xi_t
+   \prod_{\substack{u \in J \\ s \prec u \preceq j}} \xi_u
+   \prod_{\substack{v \in J \\ r \prec v \preceq k}} \xi_v
+\end{equation}
+When all dependence groups are singletons, as with R package {\tt aster},
+this specializes to
+\begin{equation} \label{eq:kumquat-no-groups}
+   \frac{\partial^2 \theta_{p(m)}}{\partial \varphi_j \partial \varphi_k}
+   =
+   \sum_{\substack{r \in J \\ p(m) \prec r \preceq k \\ p(m) \prec r \preceq j}}
+   \gamma_{r r}
+   \prod_{\substack{t \in J \\ p(m) \prec t \prec r}} \xi_t
+   \prod_{\substack{u \in J \\ r \prec u \preceq j}} \xi_u
+   \prod_{\substack{v \in J \\ r \prec v \preceq k}} \xi_v
+\end{equation}
+\end{lemma}
+
+\begin{lemma} \label{lem:quince}
+If $m \prec r$ and $\gamma_{r s} \neq 0$, then $m \prec s$.
+\end{lemma}
+\begin{proof}
+If $r = s$ the assertion is trivial.
+Otherwise, $\gamma_{r s} \neq 0$ implies that $r$ and $s$ are in the
+same dependence group, say $G$, and none of the arrows for this dependence
+group are subsampling arrows.  It follows that $p(r) = p(s) = q(G)$.
+So $m \prec r$ implies $m \preceq q(G)$ implies $m \prec s$.
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:kumquat}]
+\begin{align*}
+   \frac{\partial^2 \theta_{p(m)}}{\partial \varphi_j \partial \varphi_k}
+   & =
+   \frac{\partial}{\partial \varphi_j}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k}} \xi_i
+   \\
+   & =
+   \sum_{\substack{r \in J \\ m \preceq r \preceq k}}
+   \frac{\partial \xi_r}{\partial \varphi_j}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k \\ i \neq r}} \xi_i
+   \\
+   & =
+   \sum_{\substack{r \in J \\ m \preceq r \preceq k}}
+   \sum_{s \in J}
+   \frac{\partial \xi_r}{\partial \theta_s}
+   \frac{\partial \theta_s}{\partial \varphi_j}
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k \\ i \neq r}} \xi_i
+   \\
+   & =
+   \sum_{\substack{r \in J \\ m \preceq r \preceq k}}
+   \sum_{\substack{s \in J \\ s \preceq j}}
+   \gamma_{r s}
+   \prod_{\substack{u \in J \\ s \prec u \preceq j}} \xi_u
+   \prod_{\substack{i \in J \\ m \preceq i \preceq k \\ i \neq r}} \xi_i
+   \\
+   & =
+   \sum_{\substack{r \in J \\ m \preceq r \preceq k}}
+   \sum_{\substack{s \in J \\ s \preceq j}}
+   \gamma_{r s}
+   \prod_{\substack{u \in J \\ s \prec u \preceq j}} \xi_u
+   \prod_{\substack{t \in J \\ m \preceq t \prec r}} \xi_t
+   \prod_{\substack{v \in J \\ r \prec v \preceq k}} \xi_v
+   \\
+   & =
+   \sum_{\substack{r \in J \\ p(m) \prec r \preceq k}}
+   \sum_{\substack{s \in J \\ s \preceq j}}
+   \gamma_{r s}
+   \prod_{\substack{u \in J \\ s \prec u \preceq j}} \xi_u
+   \prod_{\substack{t \in J \\ p(m) \prec t \prec r}} \xi_t
+   \prod_{\substack{v \in J \\ r \prec v \preceq k}} \xi_v
+\end{align*}
+where the first equality is \eqref{eq:product-subexpression},
+the second equality is the product rule,
+the third equality is the chain rule,
+the fourth equality is \eqref{eq:xi-from-c}, \eqref{eq:gamma}, and
+\eqref{eq:inverse-aster-transform-deriv-partial},
+the fifth equality just splits one product into two products.
+and the last equality is $m \preceq r$ if and only if $p(m) \prec r$
+and similarly for $t$.  Finally we use Lemma~\ref{lem:quince} to get
+$p(m) \prec r$ and $\gamma_{r s} \neq 0$ implies $p(m) \prec s$.
+
+Going from \eqref{eq:kumquat} to \eqref{eq:kumquat-no-groups} is just that,
+when all dependence groups are singletons, $\gamma_{r s} \neq 0$ implies
+$r = s$.
+\end{proof}
+
+\begin{theorem} \label{th:hessian-uam}
+Define $n$ by \eqref{eq:infimum}.
+For an unconditional aster model with subsampling,
+the $j, k$ component of $H(\varphi)$ is
+\begin{equation} \label{eq:hessian-groups}
+   - \frac{\partial^2 l(\varphi)}{\partial \varphi_j \partial \varphi_k}
+   =
+   y^*_{p^*(n)}
+   \frac{\partial^2 \theta_{p(n)}}{\partial \varphi_j \partial \varphi_k}
+   -
+   \sum_{\substack{m \in J \\ n \prec m \preceq k}}
+   \left[ y^*_{p(m)} - y^*_{p^*(m)} \right]
+   \frac{\partial^2 \theta_{p(m)}}{\partial \varphi_j \partial \varphi_k}
+\end{equation}
+where the second partial derivatives of $\theta$ with respect to $\varphi$
+are given by \eqref{eq:kumquat} or \eqref{eq:kumquat-no-groups}
+and where these equations are to be used regardless of whether $p(n)$
+actually indexes a parameter.
+\end{theorem}
+\begin{proof}
+Immediate from \eqref{eq:partial-like-wrt-phi}.
+\end{proof}
+As was remarked after Theorem~\ref{th:partial-like-wrt-phi},
+a node $p^*(m)$ is not a subsampling node if and only if $p(m) = p^*(m)$,
+in which case the term containing $y^*_{p(m)} - y^*_{p^*(m)}$ is exactly zero.
+
+Since cumulant functions are infinitely differentiable,
+so is the aster transform, the inverse aster transform,
+and aster log likelihoods.  Thus formulas \eqref{eq:kumquat},
+\eqref{eq:kumquat-no-groups} and \eqref{eq:hessian-groups}
+must be equal when $j$ and $k$ are interchanged.
+We have written them in a form so that this is almost obvious.
+The only non-obvious spot is when we interchange $j$ and $k$
+in \eqref{eq:kumquat} we (in effect) change $p(m) \prec t \prec r$
+into $p(m) \prec t \prec s$, but this agrees with Lemma~\ref{lem:quince}:
+$t \prec r$ and $\gamma_{r s} \neq 0$ implies $t \prec s$.
+
+\subsection{Fisher Information}
+\label{sec:fisher}
+
+\subsubsection{Change of Parameter}
+
+We begin with a theorem about change of Fisher information under smooth change
+of parameter that is for general likelihood inference under the ``usual
+regularity conditions.''  It has nothing in particular to do with
+exponential families.  The ``usual regularity conditions'' hold for all
+regular exponential families including curved exponential families.
+So they hold for all models in this article.   But they hold for many
+other models too.
+
+The only regularity condition we need is the so-called Bartlett identities,
+which are usually derived by differentiating the integral of the probability
+densities twice with respect to the parameters
+\begin{align}
+   E_\theta\{ \nabla l(\theta) \} & = 0
+   \label{eq:bartlett-general-one}
+   \\
+   \var_\theta\{ \nabla l(\theta) \} & = - E_\theta \{ \nabla^2 l(\theta) \}
+   \label{eq:bartlett-general-two}
+\end{align}
+where $\nabla l(\theta)$ denotes the vector of first partial derivatives
+of the log likelihood, $\nabla^2 l(\theta)$ denotes the matrix of second
+partial derivatives of the log likelihood,
+and $\var$ denotes the variance operator that produces a variance matrix
+(also called variance-covariance matrix, covariance matrix,
+and dispersion matrix).
+
+Expected Fisher information is either side of \eqref{eq:bartlett-general-two}.
+Observed Fisher information is $- \nabla^2 l(\theta)$.
+
+The theorem is about what happens under a change of parameter
+$\theta = g(\psi)$.  In short, the theorem says Fisher information
+transforms like a tensor.
+If expected Fisher information for $\theta$ is denoted $I(\theta)$,
+and observed Fisher information for $\theta$ is denoted $J(\theta)$
+(note that the latter is a random quantity despite there being no
+explicit indication of this), and the Jacobian of the transformation
+is $B(\psi) = \nabla g(\psi)$, then
+\begin{equation} \label{eq:transform-like-tensor-expected}
+   I(\psi) = B(\psi)^T I(\theta) B(\psi), \qquad \text{when $\theta = g(\psi)$}.
+\end{equation}
+This is reminiscent of and ultimately derives from the formula for change
+of variance under a linear transformation.  If $y = B x$, where $x$ and $y$
+are random vectors and $B$ is a known matrix, then
+\begin{equation} \label{eq:transform-like-tensor-variance}
+   \var(y) = B \var(x) B^T.
+\end{equation}
+The analogous result for observed Fisher information is a bit trickier.
+Changing $I$ to $J$ in \eqref{eq:transform-like-tensor-expected} gives
+a statement that is, in general, false.  But it is true when MLE are
+plugged in
+\begin{equation} \label{eq:transform-like-tensor-observed}
+   J(\hat{\psi}) = B(\hat{\psi})^T J(\hat{\theta}) B(\hat{\psi}),
+   \qquad \text{when $\hat{\theta} = g(\hat{\psi})$}.
+\end{equation}
+When $\hat{\theta} = g(\hat{\psi})$ and $\hat{\psi}$ is an MLE, then
+$\hat{\theta}$ is also an MLE by by invariance of MLE under
+parameter transformation.
+\begin{theorem}
+Assume \eqref{eq:bartlett-general-one} and \eqref{eq:bartlett-general-two}.
+Then statement \eqref{eq:transform-like-tensor-expected} is correct.
+If $\hat{\theta} = g(\hat{\psi})$ is a zero of the first derivative of
+the log likelihood for $\theta$,
+then statement \eqref{eq:transform-like-tensor-observed} is correct.
+The change of parameter function $g$ must be injective and differentiable
+but need not be surjective.
+\end{theorem}
+\begin{proof}
+By the chain rule
+$$
+   \nabla l(\psi)
+   = \nabla l(\theta) B(\psi), \qquad \text{when $\theta = g(\psi)$}.
+$$
+Take the variance of both sides and
+use \eqref{eq:transform-like-tensor-variance}
+to obtain \eqref{eq:transform-like-tensor-expected}.
+
+The situation is more complicated with second derivatives
+$$
+   - \frac{\partial^2 l(\psi)}{\partial \psi_i \partial \psi_j}
+   =
+   -
+   \left(
+   \sum_k \sum_m
+   \frac{\partial^2 l(\theta)}{\partial \theta_k \partial \theta_m}
+   \frac{\partial \theta_k}{\partial \psi_i}
+   \frac{\partial \theta_m}{\partial \psi_j}
+   \right)
+   -
+   \sum_k
+   \frac{\partial l(\theta)}{\partial \theta_k}
+   \frac{\partial^2 \theta_k}{\partial \psi_i \partial \psi_j}.
+$$
+When MLE are plugged in,
+$$
+   \left. \frac{\partial l(\theta)}{\partial \theta_k}
+   \right|_{\theta = \hat{\theta}} = 0
+$$
+so this gives \eqref{eq:transform-like-tensor-observed}.
+\end{proof}
+
+\subsubsection{Fisher Information for $\boldsymbol{\theta}$}
+\label{sec:I-J-theta}
+
+Returning to aster models with subsampling, from
+\eqref{eq:logl-deriv-wrt-theta-theta} we get:
+\begin{itemize}
+\item observed Fisher information for $\theta$ is the matrix having
+components $y^*_{p^*(j)} \gamma_{j k}$ and
+\item
+expected Fisher information for $\theta$ is the matrix having
+components $\mu^*_{p^*(j)} \gamma_{j k}$.
+\end{itemize}
+Note that, since expected Fisher information depends on
+components of $\mu^*$, which cannot, in general, be calculated
+by the computer,
+use of expected Fisher information depends on those subsampling probability
+distributions,
+whereas the log likelihood, its derivatives, and observed Fisher information
+do not depend on them.
+
+Thus, in general, we can only use observed Fisher information.
+
+\subsubsection{Fisher Information for $\boldsymbol{\beta}$ for CAM}
+\label{sec:I-J-cam}
+
+If $I(\theta)$ is expected Fisher information for $\theta$ derived
+in the preceding section, then expected Fisher information for $\beta$ is
+$$
+   I(\beta) = M^T I(\theta) M, \qquad \text{when $\theta = a + M \beta$},
+$$
+because $M$ is the derivative of $\theta$ with respect to $\beta$.
+We also have the analogous relationship for observed Fisher information
+when MLE are plugged in
+$$
+   J(\hat{\beta})
+   =
+   M^T J(\hat{\theta}) M,
+   \qquad \text{when $\hat{\theta} = a + M \hat{\beta}$}.
+$$
+
+\subsubsection{Fisher Information for $\boldsymbol{\beta}$ for UAM}
+\label{sec:I-J-uam}
+
+As in the preceding section, let $I(\theta)$ and $J(\theta)$ be expected
+and observed Fisher information for $\theta$ for the saturated model with
+subsampling, which were derived in Section~\ref{sec:I-J-theta} above.
+Now let $a(\varphi)$ denote the inverse aster transform described in
+Section~\ref{sec:aster-transform} above, and let $A(\varphi)$ denote
+its derivative,
+whose components are given by \eqref{eq:inverse-aster-transform-deriv-partial}.
+Now the model equation is \eqref{eq:affine-unconditional}
+so $M$ is the derivative of $\varphi$ with respect to $\beta$.
+
+So now expected Fisher information for $\beta$ is
+$$
+   I(\beta) = M^T A(\varphi)^T I(\theta) A(\varphi) M,
+   \qquad \text{when $\varphi = a + M \beta$ and $\theta = a(\varphi)$},
+$$
+and the analogous relationship for observed Fisher information
+when MLE are plugged in is
+$$
+   J(\hat{\beta})
+   =
+   M^T A(\hat{\varphi})^T I(\hat{\theta}) A(\hat{\varphi}) M,
+   \qquad \text{when $\hat{\varphi} = a + M \hat{\beta}$
+   and $\hat{\theta} = a(\hat{\varphi})$}.
+$$
+
+\REVISED
+
+\subsection{Prediction}
+\label{sec:predict}
+
+Prediction for all six parameterizations of UAM discussed in
+Section \ref{sec:revisited} above can be handled by the \texttt{aster}
+and \texttt{aster.formula} methods of the R generic function \texttt{predict}
+(that is, the functions \texttt{predict.aster}
+and \texttt{predict.aster.formula} considered as non-generic functions).
+One calls these functions by the name \texttt{predict} but must look up the
+help page with \texttt{help(predict.aster)}.
+These functions are in R package \texttt{aster}.
+(A referee for \citet{aster1} complained that these are not predictions
+but rather parameter transformations and we agreed, but users expect to use
+the R generic function \texttt{predict} to do this job.)
+
+Since version 1.0 of the package, these functions have a new optional argument
+\texttt{is.always.parameter = TRUE} which makes them ``predict'' $\xi$
+rather than the vector having components $E(y_j \mid y_{p(j)})$, which
+is not a parameter.
+If we always use this option, this function can make predictions for all
+parameters in the chain $\beta \to \varphi \to \theta \to \xi \to \mu$,
+and if we add $\tau = M^T \mu$, which we can do ourselves (given $\mu$
+calculated by \texttt{predict}), we have all six parameters.
+
+As parameters, none of these depend on the response vector, although they
+do depend on covariates because the model matrix depends on covariates.
+Thus if the R function \texttt{predict} is provided an object of class
+\texttt{"aster"} or \texttt{"aster.formula"}
+that has the MLE $\hat{\beta}$ for the aster model with subsampling
+as its \texttt{coefficients} component, and corresponding expected and observed
+Fisher information matrices as its \texttt{fisher} and \texttt{hessian}
+components but every other component as if subsampling had not been done,
+then \texttt{predict} will operate to make predictions without subsampling.
+
+We also want the \texttt{deviance} component of our object of
+class \texttt{"aster"} or \texttt{"aster.formula"} containing the result
+of fitting the model with subsampling to be reflect the subsampling
+(be minus twice the maximized log likelihood) so that the R generic
+function \texttt{anova} does the right thing with these objects.
+
+\subsection{Parameter Transformation}
+\label{sec:parameter-transformation}
+
+The methods for the R generic function \texttt{predict} in R package
+\texttt{aster} cannot do all of the parameter
+transformations discussed in Sections~\ref{sec:plethora} and~\ref{sec:revisited}
+above.  A function \texttt{astertransform} was added to this package, but
+it only does transformations from $\theta$ and $\varphi$ to any of
+$\theta$, $\varphi$, $\xi$, or $\mu$.
+
+R package \texttt{aster2} does do all of these parameter transformations.
+The function \texttt{transformSaturated} does any of the transformations
+from $\theta$, $\varphi$, $\xi$, or $\mu$ to any of these.
+The function \texttt{transformConditional} does any of the transformations
+for a CAM without subsampling from $\beta$
+to $\theta$, $\varphi$, $\xi$, or $\mu$ (but not vice versa).
+The function \texttt{transformUnconditional} does any of the transformations
+from $\beta$ or $\tau$ (the only parameters that are unconstrained)
+to $\beta$, $\theta$, $\varphi$, $\xi$, $\mu$, or $\tau$.
+
+Both \texttt{transformSaturated} and \texttt{transformUnconditional} are
+able to transform from mean value to canonical parameters.
+
+Calculating the parameter transformations
+$\xi \to \theta$ or $\mu \to \varphi$ for saturated aster models without
+subsampling and $\tau \to \beta$ for UAM without subsampling is
+equivalent to doing maximum likelihood
+with data replaced by unconditional mean value parameters.
+Theorem~\ref{th:mean-value-inversion} covers all of these cases.
+

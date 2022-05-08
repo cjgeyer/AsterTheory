@@ -1,6 +1,7 @@
 
 TEXFILES = macros.tex intro.tex complete.tex \
-    factorize.tex markov.tex regular.tex families.tex notation.tex
+    factorize.tex markov.tex regular.tex families.tex notation.tex \
+    sampling.tex
 
 BIBFILES = tpa.bib
 

@@ -1,0 +1,2 @@
+#!/bin/sh
+scp theory.pdf ssh.stat.umn.edu:public_html/aster

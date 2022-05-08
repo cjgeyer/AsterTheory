@@ -518,6 +518,7 @@ Degenerate distributions concentrated at $a_j$ or $b_j$ are further
 discussed in the appropriate section of Appendix~\ref{app:families}
 (the details depend on the family the degenerate distribution is derived
 from).
+R package \code{aster2} implements them.
 
 In the case considered last in the theorem where $y_{p(j)} = 0$ and
 \eqref{eq:dor-lower-bound} and \eqref{eq:dor-upper-bound} are both
@@ -747,7 +748,7 @@ normal-location-scale dependence groups, but then it is the job of the
 computer to catch situations in which this leads to directions of recession
 described by the theorem.
 
-Fortunately, we can separate these two kinds of problems
+Fortunately, we can separate these two kinds of problems.
 All normal dependence groups must be terminal (so not really
 ``fortunately'' because this follows from the predecessor-is-sample-size
 principle). 
@@ -1051,8 +1052,229 @@ is $\eta_k = 1$ to the list of directions of constancy.
 Finally, from Theorem~\ref{th:dor-normal} we know that those
 with $y_{q(G)} = 1$ have exactly one direction of recession that is not
 a direction of constancy given by \eqref{eq:dor-normal}.
-have no directions of recession to add to our problem.
+There are no further directions of recession to add to our problem.
 
 So we throw all of this back into linear program \eqref{prog:foo}.
 It had better have optimal value zero.
 Otherwise users get rude error messages.
+
+\section{Conditional Aster Models}
+
+Saturated aster models are regular full exponential families.
+Unconditional canonical affine submodels of aster models are
+regular full exponential families.
+So the theory in this chapter up to now applies to them.
+
+Conditional canonical affine submodels of aster models are not
+regular full exponential families.
+As smooth submodels of saturated aster models, they are what the
+jargon calls curved exponential families.
+But that does not tell us much about existence or non-existence of MLE.
+We know that all possible limits have to be limits of distributions
+in the saturated model (because it is a submodel of the saturated model).
+But when those limits are MLE is something for which there is no general
+theory for curved exponential families.
+
+\subsection{Associated Independence Models}
+
+A cheap trick, however, does crack the problem of conditional aster models.
+This is the notion of associated independence models
+(Section~\ref{sec:conditional-aster-model-mle} above).
+For reference, we repeat \eqref{eq:logl-aster-theta-tricky} above
+\begin{equation} \label{eq:logl-aster-theta-tricky-duplicate}
+   l(\theta)
+   =
+   \sum_{G \in \mathcal{G}}
+   \left[ \inner{y_G, \theta_G} - n_{q(G)} c_G(\theta_G) \right]
+\end{equation}
+(so this equation now has two equation numbers, one here and one there).
+
+The actual conditional model has (saturated model) log likelihood
+that is \eqref{eq:logl-aster-theta-tricky-duplicate}
+with $n_{q(G)}$ replaced by $y_{q(G)}$.
+The associated independence model (AIM) has (saturated model) log likelihood
+that is \eqref{eq:logl-aster-theta-tricky-duplicate}
+with $n_{q(G)}$ constant and $y_j$ random.
+
+As Section~\ref{sec:conditional-aster-model-mle} above says,
+the AIM makes no sense when considered statistically, probabilistically,
+because it pretends that variables that are actually the same
+($n_{q(G)}$ and $y_{q(G)}$) are different, and one is constant
+and the other random.  But,
+as Section~\ref{sec:conditional-aster-model-mle} above also says,
+the AIM makes perfect sense when considered numerically, algebraically
+when we are considering maximum likelihood estimation.
+Then $n_{q(G)}$ and $y_{q(G)}$ are just numbers, fixed at their observed
+values, and if we use different notation for the same number in different
+parts of the expression, that is OK.
+
+In Section~\ref{sec:conditional-aster-model-mle}
+we used the AIM to reach the conclusion that the log likelihood of
+a conditional aster model is concave, something that is not generally
+true of curved exponential family models.
+
+In this section,
+we will use the AIM to completely characterize existence and uniqueness
+of MLE for conditional aster models and directions of recession and constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate} and for its canonical
+affine submodels (conditional aster models).
+
+What puts the I (for independence) in AIM is that the AIM makes
+the $Y_G$ for $G \in \mathcal{G}$ independent random vectors.
+This makes the AIM much easier to reason about than the actual conditional
+aster model.
+
+So now we repeat the preceding section, \emph{mutatis mutandis} reasoning
+about AIM rather than unconditional aster models.
+
+\begin{theorem} \label{th:dor-aim-arrow}
+Suppose $\{j\}$ is a univariate dependence group in an AIM, and
+the one-parameter exponential family of distributions for the arrow
+$n_{p(j)} \longrightarrow y_j$ has closed convex support that is an
+interval with endpoints $a_j$ and $b_j$ (either of which may be infinite and
+which satisfy $a_j \le b_j$ with equality possible, in which case this
+distribution is concentrated at one point).  Let $J$
+be the set of non-initial nodes of the aster graph,
+let $Y$ denote the response vector and $y$ its observed value,
+and let $n$ denote the vector of sample sizes whose components are $n_j$.
+
+If $n_{p(j)} = 0$ or $a_j = b_j$,
+then the vector $\eta$ whose only nonzero component
+is $\eta_j = 1$ is a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate}.
+
+If $n_{p(j)} > 0$ and $a_j < b_j$ and $y_j = a_j n_{p(j)}$,
+then the vector $\eta$ whose only nonzero component
+is $\eta_j = -1$ is a direction of recession
+that is not a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate}.
+
+Taking the limit in this direction of recession
+gives the LCM that is the same as the OM except the arrow
+$n_{p(j)} \longrightarrow y_j$ has the degenerate family of distributions
+concentrated at $a_j$.
+This LCM is the OM (of the AIM) conditioned on the event $Y_j = a_j n_{p(j)}$.
+
+If $n_{p(j)} > 0$ and $a_j < b_j$ and $y_j = b_j n_{p(j)}$,
+then the vector $\eta$ whose only nonzero component
+is $\eta_j = 1$ is a direction of recession
+that is not a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate}.
+
+Taking the limit in this direction of recession
+gives the LCM that is the same as the OM except the arrow
+$n_{p(j)} \longrightarrow y_j$ has the degenerate family of distributions
+concentrated at $b_j$.
+This LCM is the OM (of the AIM) conditioned on the event $Y_j = b_j n_{p(j)}$.
+\end{theorem}
+
+\begin{theorem} \label{th:dor-aim-multinomial}
+Suppose $G$ is a multinomial dependence group in an AIM.
+Let $J$ be the set of non-initial nodes of the aster graph,
+let $Y$ denote the response vector and $y$ its observed value,
+and let $n$ denote the vector of sample sizes whose components are $n_j$.
+
+If $n_{p(j)} = 0$ then the vector $\eta$ whose only nonzero component
+is $\eta_j = 1$ is a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate},
+and this is true for each $j \in G$.
+
+If $n_{p(j)} > 0$ and $y_j = 0$,
+then the vector $\eta$ whose only nonzero component
+is $\eta_j = -1$ is a direction of recession
+that is not a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate},
+and this is true for each $j \in G$.
+
+Taking the limit in any of these directions of recession,
+say the one having $\eta_j$ nonzero,
+gives the LCM that is the same as the OM (of the AIM) except the arrow
+$n_{p(j)} \longrightarrow y_j$ has
+the degenerate family of distributions
+concentrated at zero.
+
+The vector $\eta$ having index set $J$ and coordinates
+\begin{equation} \label{eq:doc-aim-multinomial}
+   \eta_i = \begin{cases} 1, & i \in G \\
+   0, & \text{otherwise} \end{cases}
+\end{equation}
+is a direction of constancy of
+of \eqref{eq:logl-aster-theta-tricky-duplicate}.
+\end{theorem}
+
+As in the discussion following Theorem~\ref{th:dor-multinomial}
+(which this theorem duplicates \emph{mutatis mutandis}),
+we note that any nonnegative combination of directions of recession is
+another direction of recession.  Hence the directions of recession
+described by this theorem are vectors $\eta$ whose only nonzero components
+are in the subvector $\eta_G$ and such a vector is a direction of recession
+of \eqref{eq:logl-aster-theta-tricky-duplicate} if
+$$
+   \eta_j < \max_{i \in G} \eta_i \quad \text{implies} \quad y_j = 0
+$$
+and such a vector is a direction of constancy
+of \eqref{eq:logl-aster-theta-tricky-duplicate} if $n_{q(G)} = 0$ or if
+its nonzero components are all the same.
+
+\begin{theorem} \label{th:dor-aim-normal}
+Suppose $G = \{j, k\}$ is a normal-location-scale dependence group
+in an AIM.
+Let $J$ be the set of non-initial nodes of the aster graph,
+let $Y$ denote the response vector and $y$ its observed value,
+and let $n$ denote the vector of sample sizes whose components are $n_j$.
+
+If $n_{q(G)} = 0$, then any vector $\eta$ whose only nonzero components
+are $\eta_j$ and $\eta_k$ is a direction of constancy of
+of \eqref{eq:logl-aster-theta-tricky-duplicate}.
+
+If $n_{q(G)} = 1$, then \eqref{eq:dor-normal} is a direction of recession
+of \eqref{eq:logl-aster-theta-tricky-duplicate}
+that is not a direction of constancy.
+
+But this direction of recession does not produce a limiting conditional model
+because it corresponds to the case $\Pr_\theta(Y \in H_\delta) = 0$ in
+in Theorem~\ref{th:completion-fundamental}.
+
+If $n_{q(G)} \ge 2$, then, almost surely,
+there are no directions of recession for this family.
+\end{theorem}
+
+\begin{theorem} \label{th:dor-aim}
+In addition to the general properties of directions of recession
+and constancy found in Theorem~\ref{th:dor-aster},
+the set of all directions of recession of AIM
+having families described by Theorems~\ref{th:dor-aim-arrow},
+\ref{th:dor-aim-multinomial}, and~\ref{th:dor-aim-normal}
+is the smallest closed convex cone containing all of the directions
+of recession described by those theorems.
+
+The set of all directions of constancy of such aster models
+is the smallest vector subspace containing all of the directions
+of constancy described by those theorems.
+\end{theorem}
+
+\begin{theorem} \label{th:dor-aim-explicit}
+For an AIM with normal dependence groups trimmed off define
+\begin{align*}
+   J_\text{\normalfont up}
+   & =
+   \set{ j \in J : y_j = a_j n_{p(j)} }
+   \\
+   J_\text{\normalfont dn}
+   & =
+   \set{ j \in J : y_j = b_j n_{p(j)} }
+\end{align*}
+where these include multinomial dependence groups with the convention
+$a_j = 0$ and $b_j = \infty$ for them.
+Then a vector $\eta$ is a direction of recession of this model if
+\begin{alignat*}{2}
+   \eta_j & \le 0, & \qquad &
+   j \in J_\text{\normalfont dn} \setminus J_\text{\normalfont up}
+   \\
+   \eta_j & \ge 0, & \qquad &
+   j \in J_\text{\normalfont up} \setminus J_\text{\normalfont dn}
+\end{alignat*}
+Conversely, any direction of recession of this model satisfies these
+conditions if we modify it by subtracting $\max(\eta_G)$ from the elements
+of $\eta_G$ for each multinomial dependence group $G$.
+\end{theorem}

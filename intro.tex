@@ -15,7 +15,7 @@ Poisson regression with log link) in two ways
 \begin{itemize}
 \item in GLM components of the response vector are
     conditionally independent given covariate data
-    but in aster models they need not, and
+    but in aster models they need not be, and
 \item in GLM the conditional distributions of components of the
     response vector given covariate data all come from the same family
     but in aster models they need not.
@@ -87,7 +87,7 @@ be done with that package.
 
 \section{Summary}
 
-Aster models combine three ideas
+Aster models combine three ideas,
 \begin{itemize}
 \item factorization of a joint distribution into a product of marginals
     and conditionals (Section~\ref{sec:factorization} below),
@@ -261,7 +261,7 @@ each $j \in J$ is in exactly one $G \in \mathcal{G}$).
 So every component of $y$ is treated as random (the joint distribution
 of $y$ is modeled).
 Random variables $y_{q(G)}$ that appear ``behind the bar'' in a conditional
-on the right-hand side may or may not be elements of $y$.  They are not
+on the right-hand side may or may not be components of $y$.  They are not
 if $q(G) \notin J$.  The distribution of such random variables is not
 modeled by \eqref{eq:factorize}.  So they are treated as constant random
 variables.
@@ -831,6 +831,7 @@ predecessor-is-sample-size property, but we don't yet know anything more.
 For now we will just assume these means exist.
 
 \subsection{Conditional}
+\label{sec:xi}
 
 We define another parameter vector $\xi$ having components
 \begin{equation} \label{eq:conditional-mean-values}
@@ -865,11 +866,11 @@ expectation that
    E(Y_j \mid y_{p(j)}) = \xi_j y_{p(j)}, \qquad j \in J.
 \end{equation}
 Then it follows from the iterated expectation axiom of conditional probability
-$$
+\begin{equation} \label{eq:iterated-expectation}
    E(Y_j)
    =
    E\{E(Y_j \mid Y_{p(j)})\}
-$$
+\end{equation}
 that
 \begin{equation} \label{eq:mu-and-xi}
    \mu_j = \xi_j \mu_{p(j)}, \qquad j \in J.
@@ -2729,6 +2730,7 @@ from any $\theta$.  This is the subject
 of Section~\ref{sec:direction-of-recession} and Chapter~\ref{chap:completion}.
 
 \section{Aster Mean Value Parameters}
+\label{sec:aster-mean-value-parameters}
 
 We have already met the mean value parameters of aster models in
 Section~\ref{sec:conditional-and-unconditional-mean-values} above.
@@ -3061,6 +3063,7 @@ and Sections~\ref{sec:revisited} and~\ref{sec:re-revisited} below
 discuss their transformations similar to how this section does.
 
 \section{Aster Canonical Affine Submodels}
+\label{sec:canonical-affine-submodels}
 
 It may come as a shock to the reader that all of the work done so far
 concerns models that are of no interest in applications.
