@@ -6,7 +6,7 @@
 In aster models the ideal is to actually measure
 all components of fitness and make them nodes in the graphical model.
 Sometimes, however, it is just too much work to count all of some component
-of fitness, all seeds produced by a plant, for example.
+of fitness, for example, all seeds produced by a plant.
 
 For a part of an aster graph
 $$
@@ -14,11 +14,12 @@ $$
    \cdots @>>> y_\text{this} @>>> y_\text{that} @>>> \cdots
 \end{CD}
 $$
-suppose that $y_\text{that}$ is typically too large to count (cost effectively).
+suppose that $y_\text{that}$ is typically too large to count
+(by available methods, in available time).
+
 The conditional distribution of $y_\text{that}$ given $y_\text{this}$ is
 the sum of $y_\text{this}$
 independent and identically distributed (IID) random variables.
-
 This is the predecessor-is-sample-size property
 (Section~\ref{sec:piss} above).
 In short, $y_\text{that}$ is a random ``sample''
@@ -89,7 +90,7 @@ With subsampling there are two models we have to consider: the model with
 subsampling, which reflects the experiment actually done, and the same model
 with subsampling removed, which reflects biology of the organisms being
 studied.  We give both of these models the same parameterization (subsampling
-arrows in the aster graph have no (unknown) parameters because the subsampling
+arrows in the aster graph have no unknown parameters because the subsampling
 probabilities are known).  Once this fundamental realization is made,
 everything else about aster models with subsampling follows from well
 known likelihood theory.
@@ -387,8 +388,9 @@ in Section~\ref{sec:mu-and-xi} above.
 And we will have the analogous equations with stars for the relationship
 between $\mu^*$ and $\xi^*$ but the relations between $\mu$ and $\mu^*$
 will be very complicated and depend on the whole aster graph.
-Moreover, these relations will depend on subsampling having the
-predecessor-is-sample-size property, which we will drop in the next section.
+But everything in this section depends on subsampling having the
+predecessor-is-sample-size property, which we drop in the next section.
+So nothing in this section holds for general aster models with subsampling.
 
 \subsection{Generalizing Our Notion of Subsampling} \label{sec:generalize}
 
@@ -416,7 +418,7 @@ arrows.  We still do have conditional mean values,
 $$
    E\bigl\{ y_j^* \mid y_{p^*(j)}^*\bigr\}
 $$
-but these do not satisfy
+but these do not need to satisfy
 $$
    E\bigl\{ y_j^* \mid y_{p^*(j)}^*\bigr\}
    =
@@ -451,7 +453,7 @@ Thus $\xi^*$ is undefined, in general, and $\mu^*$, although defined,
 is no longer anything the computer can deal with.
 
 Fortunately $\xi^*$ and $\mu^*$ are unbiological.  So users will mostly,
-perhaps always, only be interested in $\xi$ or $\mu$, which the computer
+perhaps always, only be interested in $\xi$ and $\mu$, which the computer
 can deal with.
 
 \subsection{Log Likelihood}
@@ -687,7 +689,8 @@ the vector $\Delta \varphi$ having components $\Delta \varphi_j$ to
 the vector $\Delta \theta$ having components $\Delta \theta_j$.
 
 Because of the nature of inductive definitions, the analog
-of \eqref{eq:aster-transform-deriv-partial} is a bit more complicated.
+of \eqref{eq:aster-transform-deriv-partial} for the inverse transform
+is a bit more complicated.
 To help with it we introduce the following notation and conventions.
 Let $\bone(\fatdot)$ denote the function that maps logical formulas
 to numbers, mapping false formulas to zero and true formulas to one,
@@ -707,6 +710,9 @@ Partial derivatives of the inverse aster transform are given by
 \end{theorem}
 In \eqref{eq:inverse-aster-transform-deriv-partial} the product is empty
 when $j = k$.
+(The product is also empty when $j \succ k$ but then we have 
+$\bone(j \preceq k) = 0$ so it does not matter what the value of the product
+is.)
 \begin{proof}
 What is to be shown is that \eqref{eq:inverse-aster-transform-deriv-partial}
 agrees with \eqref{eq:inverse-aster-transform-deriv} in the case
@@ -1320,8 +1326,6 @@ $$
    \qquad \text{when $\hat{\varphi} = a + M \hat{\beta}$
    and $\hat{\theta} = a(\hat{\varphi})$}.
 $$
-
-\REVISED
 
 \subsection{Prediction}
 \label{sec:predict}

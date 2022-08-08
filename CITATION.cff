@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Aster Models
+abstract: This is a book about the theory of aster models.  It is still incomplete.
+authors:
+  - family-names: Geyer
+    given-names: Charles James
+    orcid: "https://orcid.org/0000-0003-1471-1703"
+  - name: "Aster Theory"
+version: "no version numbers, cite git sha1 for commit"
+date-released: "not yet released"
+license: Creative Commons Attribution-ShareAlike 4.0 International License
+repository-code: "https://github.com/cjgeyer/AsterTheory"
