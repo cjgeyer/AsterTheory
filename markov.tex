@@ -14,6 +14,7 @@ A Markov property is a conditional independence relation derived from a
 \index{Markov property|seeunder{aster model}}
 graph (or for aster models from the fundamental factorization
 \eqref{eq:factorize}).
+There are many more Markov properties than we bother to prove here.
 
 \begin{lemma} \label{lem:markov}
 Let $\mathcal{H}$ be any subset of $\mathcal{G}$.  Then the random vectors
@@ -33,18 +34,13 @@ including itself.  Thus for any sets $A$ and $B$, we have
 \end{equation}
 
 In \eqref{eq:before-and-after}, the case $A \setminus B = \emptyset$
-is possible,
-so we have to say what we mean by the random vector $y_\emptyset$.
-Our view of vectors and subvectors as really
-being functions (Section~\ref{sec:subvector} above) says that $y_\emptyset$
-denotes the only function $\emptyset \to \real$, which is the empty function
-(which has the empty graph).  Hence $y_\emptyset$ has only one possible
-value (the empty function) and must be a constant random vector.
+is possible, in which case $y_\emptyset$ is the constant random vector
+discussed in Section~\ref{sec:subvector} above.
 Thus $\pr(y_\emptyset \mid y_B) = 1$ regardless of what $y_B$ is.
 
 This lemma does not say that the components of the random vectors $y_H$ are
 conditionally independent.  The components of $y_G$ are dependent given
-$y_{q(G)}$.  That is the whole point of dependence groups.
+$y_{q(G)}$ for any $G$.  That is the whole point of dependence groups.
 
 \begin{proof}
 Use the total order on $\mathcal{G}$ guaranteed
@@ -65,7 +61,7 @@ $$
 $$
 and keep going repeating this again and again obtaining
 \begin{align*}
-   \pr(y_{\set{G \in \mathcal{G} : G \ge H_1}})
+   \pr(y_{\bigcup \set{G \in \mathcal{G} : G \ge H_1}})
    & =
    \prod_{\substack{G \in \mathcal{G} \\ G \ge H_1}}
    \pr(y_G \mid y_{q(G)})
@@ -127,7 +123,7 @@ And now integrating out $y_{H \setminus Q}$ in order gives
    \prod_{G \in \mathcal{G} \setminus \mathcal{H}}
    \pr(y_{G \cap Q} \mid y_{q(G)})
 \end{align*}
-(Note that every $j \in Q$ appears ``in front of the bar'' in
+(Note that every $y_j$ for $j \in Q$ appears ``in front of the bar'' in
 exactly one of these conditional probabilities because $\mathcal{G}$
 is a partition.)
 So
@@ -166,7 +162,7 @@ Suppose $\mathcal{G}$ and $q$ are as in \eqref{eq:factorize}
 and Theorem~\ref{th:factorize}, and suppose $\mathcal{H}$ is a coarser
 partition than $\mathcal{G}$.  Define
 \begin{equation} \label{eq:q-markov}
-   Q = \set{ q(G) : G \in \mathcal{G} \opand H \in \mathcal{H}
+   Q = \set{ q(G) : (G, H) \in \mathcal{G} \times \mathcal{H}
    \opand G \subset H \opand q(G) \notin H }
 \end{equation}
 then the random vectors $y_H$, $H \in \mathcal{H}$, are conditionally
@@ -336,13 +332,13 @@ aster graphs for ``individuals'' (in scare quotes)
 \index{aster graph!for ``individual''}
 in Section~\ref{sec:scare-quotes} above.
 Let
-$$
+\begin{equation} \label{eq:individuals}
    \mathcal{H} = \set{ H_G : G \in \mathcal{G}_\text{initial} }.
-$$
+\end{equation}
 
 \begin{corollary} \label{cor:markov}
-The random vectors $y_H$, $H \in \mathcal{H}$ with $\mathcal{H}$ as
-defined above are (unconditionally) independent.
+The random vectors $y_H$, $H \in \mathcal{H}$, with $\mathcal{H}$
+defined by \eqref{eq:individuals} are (unconditionally) independent.
 \end{corollary}
 \begin{proof}
 Immediate from the theorem because the $Q$ corresponding to this $\mathcal{H}$

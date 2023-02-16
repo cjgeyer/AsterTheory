@@ -330,13 +330,16 @@ and the model without subsampling factorizes as
 \begin{equation} \label{eq:factorization-without}
    f(y) = \prod_{G \in \mathcal{G}} f_G(y_G \mid y_{q(G)}).
 \end{equation}
-Now our first principle above says that for $G \notin \mathcal{G}$
+Now our first principle above says that
 $f^*_G(\fatdot \mid \fatdot)$ has no parameters,
-and our second principle above says that for $G \in \mathcal{G}$
+for $G \notin \mathcal{G}$,
+and our second principle above says that
 $$
    f^*_{G, \theta_G}(\fatdot \mid \fatdot)
    =
-   f_{G, \theta_G}(\fatdot \mid \fatdot)
+   f_{G, \theta_G}(\fatdot \mid \fatdot),
+   \qquad
+   G \in \mathcal{G}
 $$
 that is, these are the same conditional distributions (the same functions
 of the variables on each side of the vertical bar) for the same parameter

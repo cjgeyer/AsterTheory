@@ -621,7 +621,7 @@ of as a relation, that is, thinking set-theoretically
 $$
    \set{ (j, p(j)) : j \in J }
 $$
-of its argument-value pairs.
+of pairs that satisfy the relation.
 
 We need a notation from dynamical systems theory for repeated application
 of a function.  If $f$ is any function whose domain and codomain are the same,
@@ -1045,7 +1045,7 @@ Of course,
 the ``rows'' and ``columns'' are not part of the graphical structure.
 The only thing that matters is which nodes are connected by which arrows.
 
-Aster graphs can get a lot bigger than \eqref{gr:aster1}.
+Aster graphs for ``individuals'' can get a lot bigger than \eqref{gr:aster1}.
 The Echinacea Project now has data for years since 2004 (which extends
 the graph with many more ``columns'') and data for more life history
 stages (which extends the graph with more ``rows'').
@@ -1448,6 +1448,15 @@ don't we need different graphs for individuals to reflect this?  No.
 We just have a long enough graph to accommodate all life spans.  After
 the individual is dead the data are just zero (not \code{NA}).
 
+As we shall see (Section~\ref{sec:aster-expfam} below)
+the property that predecessor zero implies successor zero
+makes likelihood inference automatically do the Right Thing.
+We do not have to go into contortions to get it to do the Right Thing.
+It just does the Right Thing automatically.
+
+\subsection{Really Missing Data}
+\label{sec:miss-too}
+
 If we did have truly missing data (not observable and not inferable),
 then we would have a problem that aster models are not equipped to solve.
 
@@ -1465,12 +1474,6 @@ values in the data it analyzes.  Its help page says
 \end{quotation}
 R function \code{asterdata} in R package \code{aster2} also does not
 allow \code{NA} values in aster data for analyses done by that package.
-
-As we shall see (Section~\ref{sec:aster-expfam} below)
-the property that predecessor zero implies successor zero
-makes likelihood inference automatically do the Right Thing.
-We do not have to go into contortions to get it to do the Right Thing.
-It just does the Right Thing automatically.
 
 \subsection{Bernoulli versus Multinomial}
 
@@ -2016,8 +2019,8 @@ $$
    \set{ \beta \in \real^K : c(a + M \beta) < \infty }
 $$
 where $K$ is the index set of $\beta$ and $c$ is the cumulant function
-of the saturated model.  Because the linear transformations are continuous
-functions and the preimage of an open set through a continuous function is open,
+of the saturated model.  Because affine functions are continuous
+and the preimage of an open set through a continuous function is open,
 the full canonical affine submodel is regular if the saturated model is
 a regular full exponential family.
 
@@ -2321,7 +2324,8 @@ on the other will be explained presently).
 Note that all of the $y_{q(G)}$ appearing in \eqref{eq:aster-cumfun}
 are constant random variables (because they are at initial nodes).
 Thus \eqref{eq:aster-cumfun} does define a deterministic (non-random)
-function of the parameter, as a cumulant function must be.
+function of the parameter, as the cumulant function of an unconditional
+distribution must be.
 
 This notation means that $\varphi$ is a vector with the same index set as
 the response vector $y$, that $\varphi_G$ are subvectors of $\varphi$
@@ -2479,11 +2483,12 @@ a computational nuisance'' so it is a big mistake to contort theory
 and applications to achieve identifiability too early.  The computer
 can put it in at the end with no help from humans
 (for how see Section~\ref{sec:dealing} below).
-\item Multinomial dependence groups require non-identifiable parameterization.
-%%%%%%%%%% NEED FORWARD REFERENCE multinomial family %%%%%%%%%%
+\item Multinomial dependence groups in aster models require
+non-identifiable parameterization
+(Section~\ref{app:sec:multinomial} in Appendix~\ref{app:families}).
 \item Limiting conditional models require non-identifiable parameterization
-if they are to use the same parameterization as the original model.
-%%%%%%%%%% NEED FORWARD REFERENCE multinomial family %%%%%%%%%%
+if they are to use the same parameterization as the original model
+(Chapter~\ref{chap:completion}).
 \end{itemize}
 
 Conditions (e) and (f) connect this concept with multivariate degeneracy.
