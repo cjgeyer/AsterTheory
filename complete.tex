@@ -1,5 +1,5 @@
 
-\chapter{Completion} \label{chap:completion}
+\chapter{Completion} \label{ch:completion}
 
 In this chapter we deal with what to do when maximum likelihood estimates
 do not exist in the exponential family or aster model we are initially given.
@@ -17,7 +17,7 @@ the statistical models studied in this chapter.
 \item \citet{geyer-gdor} calls this concept
     \emph{Barndorff-Nielsen completion}.
 \end{itemize}
-\citeauthor[personal communication]{brown} pointed out that the eponym chosen
+\citeauthor{brown} (personal communication) pointed out that the eponym chosen
 in \citet{geyer-gdor} was not quite correct, since \citet{barndorff-nielsen}
 works under more restrictive regularity conditions than \citet{brown}, and
 \citet{brown} works under more restrictive regularity conditions than
@@ -130,7 +130,7 @@ For a full exponential family having log likelihood \eqref{eq:logl-expfam},
 densities \eqref{eq:pmdf-expfam}, canonical statistic vector $Y$,
 full canonical parameter space $\Theta$, and closed convex support $C$,
 suppose $\delta$ is a direction in the vector space where the canonical
-parameter takes values,
+parameter takes values and
 \begin{equation} \label{eq:complete-fundamental-hyperplane}
    H_\delta = \set{ y \in \real^J : \inner{y, \delta} = \sigma_C(\delta) },
 \end{equation}
@@ -704,7 +704,7 @@ in this family are continuous, the interior of $n C$ actually supports
 the family for $n \ge 2$.  Hence (almost surely) it is not possible
 to observe data on the boundary of the convex support for $n \ge 2$.
 
-In case $y_{q(g)} = 0$, the convex support of the conditional distribution
+In case $y_{q(G)} = 0$, the convex support of the conditional distribution
 of $Y_G$ given $Y_{q(G)}$ is $0 \cdot C = \{ 0 \}$.
 Now we have to consider the three-dimensional set of all possible vectors
 $Y_{\{j, k, l\}}$ with $l = q(G)$.  Since limits of sequences of normal vectors
@@ -938,7 +938,8 @@ Linear program \eqref{prog:foo} always has a solution.
 Linear program \eqref{prog:foo} has optimal value zero if and only if
 there does
 not exist a direction of recession that is not a direction of constancy
-and the MLE exists in the originally given unconditional aster model.
+and the MLE exists in the originally given unconditional aster model
+with model matrix $M$.
 Otherwise, the optimal value is greater than or equal to one and the
 $\delta$ part of the solution is a direction of recession that is not
 a direction of constancy.

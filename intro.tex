@@ -45,7 +45,7 @@ and zero-inflated negative binomial regression.
 
 Aster models are a special case of graphical models \citep{lauritzen}.
 In particular, they are statistical models for which the joint distribution
-of the response vector factorizes completely as a product of marginal and
+of the response vector factorizes as a product of marginal and
 conditional distributions (equation~\eqref{eq:factorize} below).
 This makes aster models a special case of chain graph models
 \citep[Sections~2.1.1 and~3.2.3]{lauritzen}.
@@ -84,6 +84,8 @@ The only analyses known to us using R package \code{aster2} are
 
 So any aster model that can be done with R package \code{aster} should
 be done with that package.
+
+\pagebreak[3]
 
 \section{Summary}
 
@@ -198,7 +200,7 @@ to it.
 
 When we consider random vectors $Y$, then $Y_A$ is also a random vector
 for any $A$ that is a subset of the index set (domain) of $Y$.
-This includes $Y_\emptyset$.  But since this random vector has only one
+This includes $Y_\emptyset$.  But since $Y_\emptyset$ has only one
 possible value, the empty function $y_\emptyset$, this must be a constant
 random vector (one that takes the same value with probability one).
 
@@ -307,19 +309,31 @@ We can find such a total order using the algorithm called topological sort
 \index{topological sort}
 \citep[Section~6.6]{aho-et-al}.
 
+This algorithm, given a partial order on a set, finds a total order that
+extends the partial order, or proves that none exists (and gives an error
+message).
 R function \code{tsort} in R package \code{pooh}
 \citep{pooh-package} implements this algorithm.
 \index{R package!pooh@\code{pooh}}
-For each $G \in \mathcal{G}$ such that there exists
-a (necessarily unique) $H \in \mathcal{G}$ such that $q(G) \in H$
-let $G$ be a component of the vector \code{from} that is an argument to
-\code{tsort} and
-let $H$ be the corresponding component of the vector \code{to} that is another
-argument to \code{tsort} and
-neither vector has any other components.  Then invoking \code{tsort} with
-these \code{from} and \code{to} arguments and \code{domain} argument that is
-$\mathcal{G}$ strung out in a vector in any order
-will determine a (not necessarily unique) total order that agrees with
+
+The set we use here is $\mathcal{G}$ and the partial order on it is
+a list of pairs $(G, H)$ of elements of $\mathcal{G}$ such that
+$q(G) \in H$.  These are supplied to R function \code{tsort} as arguments
+\code{from} and \code{to}, which are vectors whose components are elements
+of $\mathcal{G}$ (coded somehow), that is, when \code{from[k]}
+is $G$, then \code{to[k]} is the $H$ that contains $q(G)$.
+And every $G$ such that $q(G) \in J$ occurs in \code{from}.
+
+Vectors \code{from} and \code{to} could have length zero.  This would happen
+if $q(G) \notin J$ for all $G \in \mathcal{G}$.  This is only the most extreme
+case where \code{from} does not contain all elements of $\mathcal{G}$.
+When this happens, and we want the result to be a total order on $\mathcal{G}$,
+we can provide $\mathcal{G}$ (in any order) as the \code{domain} argument of
+R function \code{tsort}.
+
+When invoked with these arguments, R function \code{tsort} returns
+a (not necessarily unique) total order on $\mathcal{G}$ compatible with
+the given partial order, that is, it agrees with
 Theorem~\ref{th:factorize}.  If the user has made a mistake and incorrectly
 specified the $q$ function so there is no total order that satisfies
 Theorem~\ref{th:factorize}, then \code{tsort} will give an error.
@@ -502,6 +516,8 @@ We hadn't completely thought through the terminology when that package
 was written, and we have kept this inconsistency for reasons of backward
 compatibility.
 
+R package \code{aster2} does the Right Thing: uses ``initial'' node.
+
 \section{Two Kinds of Aster Graphs}
 \label{sec:scare-quotes}
 
@@ -510,7 +526,8 @@ thousands of nodes, but usually they are composed of isomorphic subgraphs.
 So drawing one of these isomorphic subgraphs is enough.
 If you've seen one, you've seen them all.
 (Graphs are isomorphic if a drawing of one can be laid on a drawing of the
-other with everything --- nodes, lines, and arrows --- matching up.)
+other with everything --- nodes, lines, and arrows --- matching up.
+Only the names of the nodes are different.  And names of arrows, if any.)
 
 An aster graph need not be composed of all isomorphic subgraphs,
 but the only published example of that is, as far as I know,
@@ -580,7 +597,8 @@ individuals and perhaps their real biological descendants.
 If one does not like our terminology of ``individual'' in scare quotes,
 our advice is to just explain what data the graph is for.  It may actually
 be for a biological individual, for a biological individual
-and its offspring, or $n$ biological individuals.  Just say what it is.
+and its offspring, or $n$ biological individuals and perhaps their offspring.
+Just say what it is.
 
 Or we could use the characterization of Corollary~\ref{cor:markov} in
 Appendix~\ref{app:markov}, which says the subgraphs for ``individuals''
@@ -592,7 +610,8 @@ independent subvectors, in the sense that the data for an ``individual'' has
 no stochastically independent parts.  But when limiting conditional models
 %%%%%%%%%% NEED FORWARD REFERENCE to limiting conditional models %%%%%%%%%%
 come into play, this is no longer the case.
-Thus independence of data for ``individuals'' is an important property of
+Thus independence of data for ``individuals'' (in scare quotes)
+is an important property of
 aster models, but it does not (in general) characterize
 subgraphs for ``individuals.''
 
@@ -611,16 +630,16 @@ Clearly, $q$ determines $p$.
 The converse is not true because $p$ knows nothing about dependence groups.
 But $p$ and $\mathcal{G}$ together determine $q$.
 
-\section{The Transitive Closure of the Predecessor Relation}
+\section{Transitive Closure of Predecessor Relation}
 \label{sec:closure}
 
 The \emph{predecessor relation} on $N$ is the index-to-index predecessor
 function $p$ thought
 of as a relation, that is, thinking set-theoretically
 \citep[Section~7]{halmos-set-theory}, as the set
-$$
+\begin{equation} \label{eq:predecessor-relation}
    \set{ (j, p(j)) : j \in J }
-$$
+\end{equation}
 of pairs that satisfy the relation.
 
 We need a notation from dynamical systems theory for repeated application
@@ -639,6 +658,28 @@ So
    f^3(x) & = f(f(f(x)))
 \end{align*}
 and so forth.
+
+We want to use this notation with the index-to-index predecessor function
+$p$, but it does not have the same domain and codomain.  It is a function
+$J \to N$ and $J \subset N$, so its codomain is larger than its domain.
+(We could also consider $p$ to be a partial function on $N$, but this would
+not help, so we don't bother.)  This means
+\begin{itemize}
+\item $p^0(j) = j$ makes sense for all $j \in N$,
+\item $p^1(j) = p(j)$ makes sense for all $j \in J$, and
+\item $p^k(j) = p\bigl(p^{k - 1}(j)\bigr)$ makes sense whenever
+    $p^{k - 1}(j) \in J$ but not otherwise, that is, when
+    $p^{k - 1}(j)$ is an initial node.
+\end{itemize}
+So $p^k(j)$ always makes sense for $k = 0$, and if it makes sense for
+some $k > 0$, then it also makes sense for all $m$ such that $0 \le m \le k$.
+but it will never make sense for all nonnegative integers $k$, because
+for all $j$ there exists a $k$ such that $f^k(j)$ is an initial node
+(because all of our graphs have a finite number of nodes).
+
+As \eqref{eq:predecessor-relation} says,
+we are thinking of the predecessor relation as a relation on the set $J$.
+So in that context $p^k(j)$ only makes sense when $j \in J$ and $p^k(j) \in J$.
 
 The transitive closure of the predecessor relation
 is the smallest transitive relation $R$ containing it.
@@ -666,7 +707,7 @@ If $k \notin H$ for any $H \in \mathcal{G}$ then $k$ has no predecessor
 
 In either of the preceding cases we never have $k \succ j$ and $j \succ k$.
 Since $\succ$ is a transitive relation by definition, it is
-a strict partial order \citep[Section~14]{halmos-set-theory}
+a strict partial order \citep[Section~14]{halmos-set-theory}.
 \end{proof}
 \begin{corollary} \label{cor:compatible}
 The transitive closure of the predecessor relation is compatible with
@@ -775,7 +816,9 @@ $$
 why not just say the conditional distribution of $y_j$ given $y_i$ is binomial
 with sample size $y_i$ (because the sum of IID Bernoulli is binomial)?
 For one thing,
-it is not clear what sample size zero means without further explanation.
+it is not clear what sample size zero means without further explanation
+(although R functions for the binomial distribution do understand sample
+size zero to mean the same thing we do).
 For another thing, for an arrow
 $$
 \begin{CD}
@@ -893,7 +936,7 @@ To map from $\xi$ to $\mu$ we use \eqref{eq:mu-and-xi} recursively
 and so forth, with as many recursive applications as necessary.  In practice,
 the computer traverses the graph in any order that visits predecessors before
 successors using \eqref{eq:mu-and-xi} to determine $\mu_j$ as a function of
-$\xi$ ($\mu_{p(j)}$ having already been determined when its node was visited
+$\xi$ (having already determined $\mu_{p(j)}$ when its node was visited
 previously).  To get the recursion started, we need the mean values at initial
 nodes, which are given by
 \begin{equation} \label{eq:xi-mu-initial}
@@ -1180,7 +1223,8 @@ where the same graph could be for data about an animal rather than a plant.
 This graph did serve as a good example of what was possible.
 \citet*[in the on-line appendix]{stanton-geddes-tiffin-shaw}
 discuss an aster model with seven life history stages (one of which is
-artificial, modeling random sampling in the data collection process, hence
+artificial, modeling random sampling in the data collection process ---
+for more on this see Chapter~\ref{ch:subsampling} below --- hence
 only six are about life history of the organisms) and thus would be
 like the graph \eqref{gr:aster3} except with seven ``rows.''
 Because the organism in question (\emph{Chamaecrista fasciculata}, common
@@ -1364,8 +1408,16 @@ but does not require, modeling variance as a function of covariates.
 
 We see that the aster formalism suggests new possibilities.  In order to
 have a two-parameter normal distribution, we need two-node dependence groups.
-%%%%%%%%%% NEED FORWARD REFERENCE to two-parameter normal %%%%%%%%%%
-%%%%%%%%%% NEED FORWARD REFERENCE to one-parameter normal %%%%%%%%%%
+Why the normal distribution has two nodes in the graph is completely
+explained in Section~\ref{sec:normal-location-scale}
+in Appendix~\ref{app:families}.  If we had a one-parameter subfamily
+of the normal family, then that would have only one node; see
+Section~\ref{sec:normal-location} for that.
+
+An aster model with two-parameter normal dependence groups,
+like graph \eqref{gr:normal}, is seen in \citet{aster-microbial-symbionts}.
+An aster model with one-parameter normal arrows (normal location family)
+is seen in \citet{warwell-shaw}.
 
 \subsection{Zero-Inflated Poisson}
 \label{sec:zero-inflated}
@@ -1406,9 +1458,8 @@ in aster models, then this is the way we have to do it.
 
 Although we have zero-inflated Poisson distributions in aster models,
 we do not give them their usual parameterization \citep{lambert}.
-No aster model parameterization
-%%%%%%%%%% NEED FORWARD REFERENCE to plethora of parameters %%%%%%%%%%
-is this usual parameterization.
+No aster model parameterization (summarized in Section~\ref{sec:plethora}
+below) has this usual parameterization.
 
 \subsection{On Not Overusing Zero-Truncated Poisson}
 
@@ -1832,7 +1883,8 @@ where $\theta$ varies while $\psi$ is fixed at
 \index{exponential family!cumulant function}
 a possible value of the canonical parameter vector, and
 the expectation and hence $c(\theta)$ are assigned
-the value $\infty$ for $\theta$ such that the expectation does not exist.
+the value $\infty$ for $\theta$ such that the expectation does not exist
+\citep[equation (5)]{geyer-gdor}.
 
 The family is \emph{full} if its canonical parameter space is
 \begin{equation} \label{eq:full-expfam}
@@ -1930,14 +1982,16 @@ submodel parameterizations have the form
    \theta = a + M \beta,
 \end{equation}
 where $a$ is a known vector and $M$ is a known matrix; $a$ is called the
-\emph{offset} vector and $M$ is called the \emph{model matrix} in the
+\emph{offset vector} and $M$ is called the \emph{model matrix} in the
 terminology of R functions \texttt{lm} and \texttt{glm}.
 $M$ is called the \emph{design matrix} by others.
 We use the terminology favored by R.
 The submodel parameter vector $\beta$ is called the \emph{coefficients}
 vector by R.  We will find another name for it in this section.
 
-The term ``canonical affine submodel'' was introduced by \citet{aster1}.
+The term ``canonical affine submodel'' was introduced by \citet{aster1},
+but before that ``affine hypothesis'' was used
+by \citet[Section~8.2]{barndorff-nielsen}.
 Usually these are called linear models or generalized linear models or
 log-linear models in various settings.
 
@@ -1955,10 +2009,11 @@ a linear function plus a constant function.  If $a \neq 0$
 in \eqref{eq:affine}, then this is a linear change-of-parameter in the
 lower-level sense but an affine change-of-parameter in the higher-level sense.
 It is unclear (to me) whether the ``linear'' in linear models, generalized
-linear models, and log linear models is the lower-level sense allowing
+linear models, and log-linear models is the lower-level sense allowing
 $a \neq 0$ in \eqref{eq:affine} or the higher-level sense assuming $a = 0$
 in \eqref{eq:affine}, because $a = 0$ in most applications.
-We follow \citet{aster1} in calling these models affine.
+We follow \citet{aster1} and \citet{barndorff-nielsen}
+in calling these models affine.
 \index{affine function|)}
 
 The log likelihood for the canonical affine submodel is
@@ -2488,7 +2543,7 @@ non-identifiable parameterization
 (Section~\ref{app:sec:multinomial} in Appendix~\ref{app:families}).
 \item Limiting conditional models require non-identifiable parameterization
 if they are to use the same parameterization as the original model
-(Chapter~\ref{chap:completion}).
+(Chapter~\ref{ch:completion}).
 \end{itemize}
 
 Conditions (e) and (f) connect this concept with multivariate degeneracy.
@@ -2497,7 +2552,8 @@ variable $\inner{Y, \delta}$ is almost surely constant, which is the
 same thing as saying the canonical statistic vector $Y$ is concentrated
 on a hyperplane.  So the canonical parameterization of a full exponential
 family is identifiable if and only if $Y$ is not concentrated on a hyperplane.
-A random variable is constant almost surely if and only if its variance
+A random variable that has finite variance is constant almost surely
+if and only if that variance
 is zero.  Hence we can also characterize directions of constancy in
 terms of the variance matrix of the canonical statistic
 \eqref{eq:cumulant-two}.  In a regular full exponential family, let
@@ -2732,7 +2788,7 @@ There does not have to be a mean value parameter vector $\mu$ such that
 $\mu = y$, and in this case the MLE does not exist: there is no $\theta$
 that maximizes \eqref{eq:logl-expfam} because we can always go uphill
 from any $\theta$.  This is the subject
-of Section~\ref{sec:direction-of-recession} and Chapter~\ref{chap:completion}.
+of Section~\ref{sec:direction-of-recession} and Chapter~\ref{ch:completion}.
 
 \section{Aster Mean Value Parameters}
 \label{sec:aster-mean-value-parameters}
@@ -3026,7 +3082,7 @@ The arrows that may not correspond to a change of parameter arrow are
     are not identifiable (and either both are identifiable or neither are).
 \end{itemize}
 
-As explained in Section~\ref{sec:dealing} above identifiability of either
+As explained in Section~\ref{sec:dealing} above, identifiability of either
 canonical parameterization can be recovered by constraining certain parameters
 to be equal to zero.  When we do this we need to be careful to not mess up
 the other parameter transformations.
@@ -3091,9 +3147,11 @@ Thus we parameterize an aster \emph{unconditional canonical affine submodel}
 where, as stated in Section~\ref{sec:canonical-affine-submodel} above,
 $a$ is the offset vector and $M$ is the model matrix.
 Either $a$ or $M$ may depend on covariate data since aster analyses,
-like all regression analyses are done conditional on covariate data.
+like all regression analyses, are done conditional on covariate data.
 Usually $a$ does not depend on covariate data and $M$ does depend
-on covariate data.
+on covariate data, and usually the $i$-th row of $M$ depends only on
+data for case $i$, but this actually places no restriction on $M$ because
+what is considered ``data for case $i$'' is arbitrary.
 This is the only place where covariate data enters
 an unconditional aster model (for short we refer to such models
 as \emph{unconditional aster models} rather than
@@ -3431,19 +3489,19 @@ not a direction of constancy implies nonexistence of an MLE.
 But we need Theorem~{4} in \citet{geyer-gdor} for the reverse conclusion
 that nonexistence of the MLE cannot occur for any other reason.
 
-All of the same arguments apply to canonical affine submodels,
+All of the same arguments apply to unconditional canonical affine submodels,
 only the notation changes.  Replace $y$ by $M^T y$ and replace $\theta$ by
 $\beta$.  Thus a direction $\delta$ in the vector space where the submodel
 canonical parameter $\beta$ takes values is a direction of recession if and
-only if $\inner{y - Y, M \beta} \ge 0$ almost surely (for any one distribution
+only if $\inner{y - Y, M \delta} \ge 0$ almost surely (for any one distribution
 in the submodel and hence for all distributions).  And MLE for $\beta$ exist
-if and only if $\inner{y - Y, M \beta} \ge 0$ almost surely
-implies $\inner{y - Y, M \beta} = 0$ almost surely.
+if and only if $\inner{y - Y, M \delta} \ge 0$ almost surely
+implies $\inner{y - Y, M \delta} = 0$ almost surely.
 Moreover, $\beta$ is an MLE if and only if
 \eqref{eq:observed-equals-expected-expfam-submodel} holds.
 
 A lot more can be said and will be said on this subject
-(Chapter~\ref{chap:completion}).
+(Chapter~\ref{ch:completion}).
 
 \subsection{Unconditional Aster Models}
 
@@ -3470,8 +3528,8 @@ Rewrite \eqref{eq:logl-aster-theta} as
 \end{equation}
 and pretend that all of the $n_{q(G)}$ are constants.  This makes no
 sense statistically, probabilistically because those $n_{q(G)}$ are actually
-$y_{q(G)}$ and some of them are the same variables some components of the
-$y_G$ that also appear in this expression.  But if we are just treating
+$y_{q(G)}$ and some of them are the same variables that appear as components
+of the $y_G$ that also appear in this expression.  But if we are just treating
 this log likelihood as a numerical, algebraic function to maximize to find
 MLE, then this doesn't matter.
 
@@ -3560,7 +3618,7 @@ From this, for $i$ and $j$ in the same dependence group $G$
 \end{split}
 \end{equation}
 where $\mu$ and $\xi$ are the unconditional and conditional mean value
-parameter vectors, respectively, corresponding to $\varphi$ and we introduce
+parameter vectors, respectively, corresponding to $\varphi$, and we introduce
 the notation
 $$
    \gamma_{i j}
