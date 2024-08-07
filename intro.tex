@@ -167,6 +167,12 @@ We also consider any subscript notation that clearly denotes a set
 as indicating a subvector, for example, $y_{\{1, 3, 5\}}$ or $y_{\{j\}}$ or
 $y_{\set{ j \in J : j \prec i }}$.
 
+The conventional notation for restriction of a function in mathematics
+is $y | A$ or $y_{| A}$.  If we used this, it would be more definite
+whether a subvector is intended.  Perhaps our usage, which agrees
+with \citeauthor{lauritzen}, is ill-advised.  But we will continue
+with it.
+
 It will not be important in what follows, but a special subvector
 $y_\emptyset$ has the empty index set.
 It is a function $\emptyset \to \real$.
@@ -204,6 +210,10 @@ This includes $Y_\emptyset$.  But since $Y_\emptyset$ has only one
 possible value, the empty function $y_\emptyset$, this must be a constant
 random vector (one that takes the same value with probability one).
 
+Of course since $Y_\emptyset$ and $y_\emptyset$ are zero vectors of the
+vector space $\real^\emptyset$ in which they take values, we can write
+$0$ instead of $Y_\emptyset$ or $y_\emptyset$.
+
 \section{Regression Notation}
 
 Strictly speaking, in regression theory, every probability and expectation
@@ -226,7 +236,8 @@ vector depend on the values of other components, so we frequently write
    \\
    \pr(y_A \mid y_j)
 \end{gather*}
-and the like.  And we do not want this dependence confused with dependence
+and the like (Section~\ref{sec:factorization} below).
+And we do not want this dependence confused with dependence
 on covariate data.
 
 When necessary for clarity, as in the discussion of fitness landscapes,
@@ -252,12 +263,12 @@ the joint distribution of $y$ factorizes as
 \end{equation}
 We emphasize that $q : \mathcal{G} \to N$ maps elements of $\mathcal{G}$,
 which are sets of indices, to elements of $N$, which are single indices,
-so each $y_G$ in \eqref{eq:factorize} is a subvector of $y$,
+so each $y_G$ in \eqref{eq:factorize} is a subvector of the response vector $y$,
 and each $y_{q(G)}$ in \eqref{eq:factorize} is a component of the vector
 of all the variables.
 
 In this factorization, each component $y_j$ of the response vector $y$
-appears exactly once ``in front of the bar'' in a conditional on
+appears exactly once ``in front of the bar'' in a conditional distribution on
 the right-hand side (because $\mathcal{G}$ is a partition of $J$ so
 each $j \in J$ is in exactly one $G \in \mathcal{G}$).
 So every component of $y$ is treated as random (the joint distribution
@@ -594,7 +605,7 @@ individuals and perhaps their real biological descendants.
 %%%%%%%%%% NEED FORWARD REFERENCE to example graphs %%%%%%%%%%
 %%%%%%%%%% maybe ?????
 
-If one does not like our terminology of ``individual'' in scare quotes,
+If one does not like our terminology of ``\,`individual' in scare quotes,''
 our advice is to just explain what data the graph is for.  It may actually
 be for a biological individual, for a biological individual
 and its offspring, or $n$ biological individuals and perhaps their offspring.
@@ -668,7 +679,7 @@ not help, so we don't bother.)  This means
 \item $p^0(j) = j$ makes sense for all $j \in N$,
 \item $p^1(j) = p(j)$ makes sense for all $j \in J$, and
 \item $p^k(j) = p\bigl(p^{k - 1}(j)\bigr)$ makes sense whenever
-    $p^{k - 1}(j) \in J$ but not otherwise, that is, when
+    $p^{k - 1}(j) \in J$ but not otherwise; that is, it makes no sense when
     $p^{k - 1}(j)$ is an initial node.
 \end{itemize}
 So $p^k(j)$ always makes sense for $k = 0$, and if it makes sense for
@@ -679,7 +690,8 @@ for all $j$ there exists a $k$ such that $f^k(j)$ is an initial node
 
 As \eqref{eq:predecessor-relation} says,
 we are thinking of the predecessor relation as a relation on the set $J$.
-So in that context $p^k(j)$ only makes sense when $j \in J$ and $p^k(j) \in J$.
+So in that context $p^k(j)$ only makes sense when $p^m(j) \in J$
+for $m = 0, 1, \ldots, k - 1$.
 
 The transitive closure of the predecessor relation
 is the smallest transitive relation $R$ containing it.
@@ -3251,7 +3263,8 @@ non-uniqueness (non-identifiability) by constraining some components of
 $\beta$ to be equal to zero.
 
 The other unlabeled arrows on the ``right square'' in the diagram are the
-inverses of linear transformations, but these generally do not have solutions.
+inverses of linear transformations, but these generally do not have
+unique solutions.
 
 The mapping $\varphi = a + M \beta$ need be neither one-to-one nor onto.
 In applications, it is never onto.  That is the whole point of submodels,
