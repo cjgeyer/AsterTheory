@@ -295,7 +295,7 @@ We do not get anything more by taking further straight-line limits
 in $\mathcal{P}_\delta$ for the various $\delta$.
 
 But in general \citep[Chapters~2 and~4]{geyer-thesis} we may need to take
-further straight-line limits or general (not straight line) limits
+further straight-line limits or general (not straight-line) limits
 to arrive at the completion.
 
 Anyway, one can see why \citet{brown} gave this idea the name aggregate
@@ -373,7 +373,8 @@ the dots, and that line does not have to be a smooth curve.
 
 Theorems~4.1 through~{4.5} in \citet{geyer-thesis} show that taking general
 limits gives no more limits that correspond to probability distributions
-than taking iterated straight line limits.  General limits can produce
+than taking iterated straight-line limits \citep[Theorem~2.7]{geyer-thesis}.
+General limits can produce
 limits that are subprobability distributions
 \citep[Examples~4.2 through~4.4]{geyer-thesis}, but these can never be
 maximum likelihood estimates for a full family, because iterated straight
@@ -385,6 +386,16 @@ as we limit our attention to full families.
 %%%%% Do not need to worry about conditional aster models, which are also
 %%%%%     curved exponential family, because of associated independence
 %%%%%     models, which are full exponential family
+
+When we start with a full exponential family, straight-line limits can
+lead to non-full LCM, but in this case the LCM is always what
+\citet[Section~2.2]{geyer-thesis} calls a \emph{closed convex} family:
+the canonical parameter space of the family is a closed convex subset of
+the full canonical parameter space $\Theta$ given by \eqref{eq:full-expfam},
+that is, the intersection of $\Theta$ and a closed convex subset of the
+vector space where $\Theta$ lives.  This phenomenon does not occur with
+any families currently implemented for aster models.  We mention it only
+for completeness.
 
 \section{Unconditional Aster Models}
 
@@ -851,7 +862,7 @@ The assertions of the first paragraph are all in Theorems 1 and 3 of
 Sections~4.1 and~{4.2} in \citet{geyer-thesis} characterize all possible
 limit distributions in an exponential family of distributions.
 Theorem~{2.7} in \citet{geyer-thesis} says that all limit distributions
-can be obtained by taking iterated straight line limits.
+can be obtained by taking iterated straight-line limits.
 The limit of a product being the product of the limits, when we take a
 limit we get a limit in each term of the fundamental factorization of
 aster models \eqref{eq:factorize}.

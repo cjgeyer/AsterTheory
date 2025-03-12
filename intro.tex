@@ -37,22 +37,25 @@ various groups \citep{aster1,aster2}, estimation of fitness landscapes
 \citealp*{aster-hornworm}),
 Leslie matrix analysis
 \citep{caswell}, life table analysis in demography \citep{goodman},
-and estimation of population growth rates
-\citep{fisher,lenski-service,aster2,aster-hornworm}.
+estimation of population growth rates
+\citep{fisher,lenski-service,aster2,aster-hornworm},
+and estimation of additive genetic variance for fitness
+\citep{kulbaba-et-al,zenodo}.
 Aster models also generalize zero-inflated Poisson regression \citep{lambert},
 negative binomial regression (overdispersed Poisson regression),
 and zero-inflated negative binomial regression.
 
 Aster models are a special case of graphical models \citep{lauritzen}.
 In particular, they are statistical models for which the joint distribution
-of the response vector factorizes as a product of marginal and
+of the response vector given covariates factorizes as a product of marginal and
 conditional distributions (equation~\eqref{eq:factorize} below).
 This makes aster models a special case of chain graph models
 \citep[Sections~2.1.1 and~3.2.3]{lauritzen}.
 
 Aster models also have the predecessor-is-sample-size property
 (Section~\ref{sec:piss} below)
-that makes the joint distribution of the response vector an exponential
+that makes the joint distribution of the response vector given covariates
+an exponential
 family.  This property can be seen to generalize unnamed properties
 of survival analysis, life-table analysis, Leslie matrix analysis,
 and population growth rate analysis (Section~\ref{sec:mu-and-xi} below).
@@ -72,9 +75,9 @@ so any user can get started with aster models in almost no time.
 
 R package \code{aster} is the most complete.
 It does everything except dependence groups
-%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
-and limiting conditional models.
-%%%%%%%%%% NEED FORWARD REFERENCE %%%%%%%%%%
+(Section~\ref{sec:factorization} below)
+and limiting conditional models
+(Chapter~\ref{ch:completion} below).
 
 R package \code{aster2} is the very incomplete.
 It does do dependence groups and limiting conditional models, but everything
@@ -101,7 +104,8 @@ Aster models combine three ideas,
     exponential families of distributions,
 \end{itemize}
 into one big idea.  Together they make the joint distribution of the
-response vector also an exponential family.  And this makes aster models
+response vector (given covariates) also an exponential family.
+And this makes aster models
 as well-behaved as generalized linear models or log-linear models for
 categorical data analysis, even though they are far more more complicated.
 
@@ -161,7 +165,7 @@ Our notation does have the drawback that we have only the convention
 that lower case letters denote elements of sets and upper case letters
 denote sets to indicate that $y_j$ is a component of a vector or subvector
 (the value of a function at the index $j$) and $y_A$ is a subvector
-(the restriction of a function to the set $A$, so still a function,
+(the restriction of a function $y$ to the set $A$, so still a function,
 not the value of a function).
 We also consider any subscript notation that clearly denotes a set
 as indicating a subvector, for example, $y_{\{1, 3, 5\}}$ or $y_{\{j\}}$ or
@@ -182,7 +186,7 @@ which is called the empty function.  It has an empty graph
 (no argument-value pairs) because there are no possible argument values.
 That is, if $f : \emptyset \to A$ is an empty function, then it is
 valid to write $f(x)$ for all $x$ in the domain of $f$, which is the
-empty set, so there are no such $x$.  But there is the function.
+empty set, so there are no such $x$.  But there is the function $f$.
 And there is exactly one such function (for each set $A$) because there
 is only one empty set and only one subset of
 $\emptyset \times A = \emptyset$ that is the graph of $f$.
@@ -215,6 +219,7 @@ vector space $\real^\emptyset$ in which they take values, we can write
 $0$ instead of $Y_\emptyset$ or $y_\emptyset$.
 
 \section{Regression Notation}
+\label{sec:regression-notation}
 
 Strictly speaking, in regression theory, every probability and expectation
 is conditional on covariate data, at least on the part of the covariate data
@@ -234,7 +239,7 @@ vector depend on the values of other components, so we frequently write
 \begin{gather*}
    E(Y_A \mid y_j)
    \\
-   \pr(y_A \mid y_j)
+   \pr(y_A \in B \mid y_j)
 \end{gather*}
 and the like (Section~\ref{sec:factorization} below).
 And we do not want this dependence confused with dependence
@@ -251,7 +256,7 @@ probabilities and expectations.
 
 Let $J$ be the index set of the response vector $y$ of an aster model.
 We also need more variables that are not in the response vector.
-As we shall see they are treated as constants.
+As we shall see, they are treated as constants.
 Let $N$ be the index set of all the variables, so $J \subset N$.
 Then there is a partition $\mathcal{G}$ of $J$
 and a function $q : \mathcal{G} \to N$, such that
@@ -318,16 +323,17 @@ The total order asserted to exist by the theorem need not be unique and
 usually is not unique.
 We can find such a total order using the algorithm called topological sort
 \index{topological sort}
-\citep[Section~6.6]{aho-et-al}.
+\citep*[Section~6.6]{aho-et-al}.
 
-This algorithm, given a partial order on a set, finds a total order that
-extends the partial order, or proves that none exists (and gives an error
+This algorithm, given a general relation (which can also be thought of as
+a directed graph) on a set, finds a total order that
+extends the relation, or proves that none exists (and gives an error
 message).
 R function \code{tsort} in R package \code{pooh}
 \citep{pooh-package} implements this algorithm.
 \index{R package!pooh@\code{pooh}}
 
-The set we use here is $\mathcal{G}$ and the partial order on it is
+The set we use here is $\mathcal{G}$ and the relation on it is
 a list of pairs $(G, H)$ of elements of $\mathcal{G}$ such that
 $q(G) \in H$.  These are supplied to R function \code{tsort} as arguments
 \code{from} and \code{to}, which are vectors whose components are elements
@@ -344,7 +350,7 @@ R function \code{tsort}.
 
 When invoked with these arguments, R function \code{tsort} returns
 a (not necessarily unique) total order on $\mathcal{G}$ compatible with
-the given partial order, that is, it agrees with
+the given relation, that is, it agrees with
 Theorem~\ref{th:factorize}.  If the user has made a mistake and incorrectly
 specified the $q$ function so there is no total order that satisfies
 Theorem~\ref{th:factorize}, then \code{tsort} will give an error.
@@ -373,9 +379,9 @@ notation that allows for them.  So we will never have an analog of equation
 \section{Graphs}
 
 Each factorization goes with a graph \citep[Section~3.2.3]{lauritzen}.
+The nodes of the graph are either the elements of $N$ or the components
 \index{aster graph}
 \index{graph|see{aster graph}}
-The nodes of the graph are either the elements of $N$ or the components
 of $y$ corresponding to these elements ($y_j$ for $j \in N$).
 There is a directed edge, also called an \emph{arrow},
 \index{node}
@@ -383,7 +389,7 @@ There is a directed edge, also called an \emph{arrow},
 \index{arrow}
 \index{line}
 $q(G) \longrightarrow j$ (or if one prefers $y_{q(G)} \longrightarrow y_j$)
-for every $G \in \mathcal{G}$ and every $j \in G$.
+for every $j \in G \in \mathcal{G}$.
 There is an undirected edge, also called a \emph{line},
 $j \myline k$ (or if one prefers $y_j \myline y_k$)
 for every $G \in \mathcal{G}$ and every $j, k \in G$ such that $j \neq k$.
@@ -553,29 +559,14 @@ Certain subgraphs of the full aster graph, we then call graphs
 for ``individuals'' (in scare quotes for reasons to be explained presently).
 These are easier to recognize than describe.
 
-Current aster software (Section~\ref{sec:software} above) forces
-$q(G) \neq q(H)$ whenever $G \neq H$ and $q(G)$ and $q(H)$ are initial nodes.
-In this case, the graph for an ``individual'' (in scare quotes)
-consists of the subgraph consisting of one initial node and all of its
-successors or successors of successors or successors of successors
-of successors and so forth with arbitrarily many repetitions
-of ``successors of'' and all of the arrows and lines in the full graph
-connecting these nodes.
-\index{aster graph!for ``individual''}
-(This is where the term ``descendant'' in its graph-theoretic sense would
-come in handy if we allowed ourselves to use it.  The graph for an
-``individual'' consists of one initial node, all of its descendant nodes,
-and all of the lines and arrows going between these nodes.  But once we
-have the idea of the graph for an ``individual'' we no longer need the
-term ``descendant.'')
+Whether one considers two constant random variables having the same (constant)
+value the same or different is a matter of taste.  Therefore, whether one
+considers initial nodes of the full aster graph having the same (constant)
+value the same or different is also a matter of taste.
+Thus we need a definition of graphs for ``individuals'' (in scare quotes)
+that allows for either.
 
-But aster theory as described so far does not force this convention.
-If $y_j = 1$, for all initial nodes $j$, which is the case with most
-(but not all) aster applications, then it would do no harm if all initial
-nodes were fused into one initial node.  That would invalidate nothing but
-the way we just described graphs for ``individuals'' (in scare quotes).
-
-Thus we have to be a bit more careful.  If $G$ is a dependence group whose
+If $G$ is a dependence group whose
 predecessor $q(G)$ is initial, then the graph for the ``individual''
 (in scare quotes) containing $G$ consists of $q(G)$, the nodes in $G$
 and their successors or successors of successors or successors of successors
@@ -583,9 +574,21 @@ of successors and so forth with arbitrarily many repetitions
 of ``successors of'' and all of the arrows and lines in the full graph
 connecting these nodes.
 \index{aster graph!for ``individual''}
-(And it would make this definition a little shorter
-if we allowed ourselves to use the word ``descendant'' in its graph-theoretic
-sense.)
+(This is where the term ``descendant'' in its graph-theoretic sense would
+come in handy if we allowed ourselves to use it.  The graph for the
+``individual'' containing $G \in \mathcal{G}$ such that $q(G)$ is initial
+consists of $q(G)$, $G$, all descendant nodes of $G$,
+and all of the lines and arrows going between these nodes.  But once we
+have the idea of the graph for an ``individual'' we no longer need the
+term ``descendant.'')
+
+If we consider, as all published examples do, every aster graph for an
+``individual'' in square quotes to have a different initial node (that is,
+if $q(G)$ is initial, then it is distinct from the initial node for any
+other aster graph for an ``individual'' in scare quotes), then we can
+just say the aster graph for an ``individual'' in scare quotes consists
+of all of the successors, successors of successors, successors of successors
+of successors, and so forth of a single initial node.
 
 There are two reasons why the scare quotes.
 \begin{itemize}
@@ -599,11 +602,8 @@ biological descendants, not the graphical models idea of descendants).
 \item If the value of the constant $y_j$ at the initial node of the
 graph for an ``individual'' is greater than one, then the data for this
 ``individual'' is actually cumulative data for $y_j$ real biological
-individuals and perhaps their real biological descendants.
+individuals and perhaps some of their real biological descendants.
 \end{itemize}
-
-%%%%%%%%%% NEED FORWARD REFERENCE to example graphs %%%%%%%%%%
-%%%%%%%%%% maybe ?????
 
 If one does not like our terminology of ``\,`individual' in scare quotes,''
 our advice is to just explain what data the graph is for.  It may actually
@@ -651,7 +651,7 @@ of as a relation, that is, thinking set-theoretically
 \begin{equation} \label{eq:predecessor-relation}
    \set{ (j, p(j)) : j \in J }
 \end{equation}
-of pairs that satisfy the relation.
+of pairs that satisfy the relation (argument-value pairs of the function $p$).
 
 We need a notation from dynamical systems theory for repeated application
 of a function.  If $f$ is any function whose domain and codomain are the same,
@@ -686,7 +686,8 @@ So $p^k(j)$ always makes sense for $k = 0$, and if it makes sense for
 some $k > 0$, then it also makes sense for all $m$ such that $0 \le m \le k$.
 but it will never make sense for all nonnegative integers $k$, because
 for all $j$ there exists a $k$ such that $f^k(j)$ is an initial node
-(because all of our graphs have a finite number of nodes).
+(because all of our graphs have a finite number of nodes
+and because of the total ordering of Theorem~\ref{th:factorize}).
 
 As \eqref{eq:predecessor-relation} says,
 we are thinking of the predecessor relation as a relation on the set $J$.
@@ -1908,13 +1909,19 @@ and a full family is \emph{regular} if its canonical parameter space is an open
 \index{exponential family!regular}
 subset of the vector space where $\theta$ takes values.
 
+Since cumulant functions are convex sets (Lemma~\ref{lem:convex} below),
+canonical parameter spaces of regular full exponential families
+\eqref{eq:full-expfam} are convex sets (open convex sets because of the
+regularity property).
+
 Almost all exponential families used in real applications are full and regular.
 So-called \emph{curved exponential families} (smooth non-affine submodels of
 \index{exponential family!curved}
 full exponential families) are not full.
 Constrained exponential families \citep{geyer-constrained} are not full.
 A few exponential families used in spatial statistics are full but not regular
-\citep{geyer-moller}.
+\citep{geyer-moller}.  All families so far implemented in aster software
+are full and regular (Appendix~\ref{app:families} below).
 
 Many people use ``natural'' everywhere this book uses ``canonical.''
 In this we are following \citet{barndorff-nielsen}.
@@ -2640,7 +2647,7 @@ Since $\theta - \theta^*$ is not a direction of constancy,
 \end{equation}
 is strictly positive for all $s$ in some open interval of the real line
 containing 0 and 1 (because $\theta$ and $\theta^*$ are interior points
-of the full canonical parameter space).
+of the full canonical parameter space, which is an open convex set).
 We note that \eqref{eq:identifiable-foo} is the
 derivative of the function $h$ defined by
 $$
@@ -2682,9 +2689,10 @@ mean value
 \begin{equation} \label{eq:logl-expfam-expected}
    \tilde{l}(\theta) = \inner{\mu, \theta} - c(\theta),
 \end{equation}
-where $\mu = E_\theta(Y)$ for some $\theta$.
+where $\mu = E_\theta(Y)$ for some $\theta$ in the interior of the full
+canonical parameter space \eqref{eq:full-expfam}.
 
-\begin{lemma}
+\begin{lemma} \label{lem:convex}
 The cumulant function of a full exponential family is a convex function.
 It is strictly convex if and only if the exponential family has no
 nonzero directions of constancy.
@@ -2751,8 +2759,9 @@ then $\theta = \theta^*$.
 \begin{theorem} \label{th:om}
 For a regular full exponential family with identifiable canonical
 parameterization,
-any algorithm that always goes uphill if it can on $\tilde{l}$
-defined by \eqref{eq:logl-expfam-expected}
+any algorithm that always goes uphill on $\tilde{l}$
+defined by \eqref{eq:logl-expfam-expected} until the derivative of $\tilde{l}$
+converges to zero
 converges to the unique maximizer of $\tilde{l}$ which is the unique
 canonical parameter vector $\theta$ corresponding to mean value
 parameter vector $\mu$.
@@ -2767,8 +2776,9 @@ The rest of the theorem is Corollary~{27.2.2} in \citep{rockafellar}.
 \begin{corollary} \label{cor:om-mani-padme-hum}
 For a regular full exponential family with identifiable canonical
 parameterization,
-any algorithm that always goes uphill if it can on the log likelihood
-defined by \eqref{eq:logl-expfam} converges to the unique MLE if the observed
+any algorithm that always goes uphill on the log likelihood
+defined by \eqref{eq:logl-expfam} until the derivative of $l$ converges
+to zero converges to the unique MLE of $\theta$ if the observed
 value of the canonical statistic vector $y$ is a possible value of the
 mean value parameter vector.
 \end{corollary}

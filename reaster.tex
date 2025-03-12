@@ -1,0 +1,571 @@
+
+\chapter{Aster Mixed Models} \label{ch:reaster}
+
+\section{Introduction}
+
+In this chapter we cover the theory of aster mixed models (AMM),
+a special case of exponential family mixed models (EFMM),
+as described by \citet{reaster-tr,reaster} and as implemented by
+R function \code{reaster} in R package \code{aster} \citep{aster-package}.
+
+Except we correct one mistake in \citet{reaster} and also one wrong-headedness.
+We also add some theory.
+
+\subsection{Log Likelihood}
+
+Let $l$ be the log likelihood for the canonical parameter vector of a
+regular full exponential family whose canonical parameter space is a
+full vector space.  A saturated aster model having the unconditional
+canonical parameterization (Sections~\ref{sec:aster-transform},
+\ref{sec:aster-mean-value-parameters}, and~\ref{sec:plethora} above)
+is an example.  Following \citet{breslow-clayton}
+and \citet*{stiratelli-laird-ware} and the thousands of papers citing them,
+\citet{reaster} define an exponential family mixed model (EFMM) to be
+a canonical affine submodel (Section~\ref{sec:canonical-affine-submodel}
+above) in which some of the fixed effects are converted to random effects.
+
+In more detail, if $\varphi$ is the canonical parameter vector of the
+saturated aster model, we write
+\begin{equation} \label{eq:reaster-model-equation}
+   \varphi = a + M \alpha + Z b
+\end{equation}
+where
+\begin{itemize}
+\item $a$ is a known vector (the \emph{offset vector}),
+\item $M$ is a known matrix (the \emph{model matrix for fixed effects}),
+\item $\alpha$ is a vector of unknown parameters (the vector of
+    \emph{fixed effects}),
+\item $Z$ is a known matrix (the \emph{model matrix for random effects}), and
+\item $b$ is a mean-zero multivariate normal random vector (the vector of
+    \emph{random effects}).
+\end{itemize}
+The variance matrix of $b$ (also called variance-covariance matrix,
+Section \ref{sec:mean-variance-cumulant} above), which we denote $D$,
+determines the distribution of $b$.  In turn, $D$ is a function of
+other unknown parameters.
+
+As always (Section~\ref{sec:regression-notation} above) ``known'' means
+not a function of the response vector.  The vector $a$ and the matrices
+$M$ and $Z$ may depend on covariates or on the experimental design.
+Usually $a$ does not, and usually $M$ and $Z$ do.  They are ``known'' in
+the sense that our whole analysis is done conditional on the values of any
+covariates that are random, so they are essentially treated as fixed at their
+observed values (because that is how conditional probability works).
+
+\citet{reaster} and R function \code{reaster} in R package \code{aster}
+assume that $D$ is diagonal and the diagonal elements of $D$ are the unknown
+parameters, which are traditionally called \emph{variance components}.
+They denote the vector of variance components $\nu$.
+
+In almost all applications there are groups of random effects whose variance
+is the same by design, hence their variance is the same variance component.
+We keep track of this by defining
+\begin{equation} \label{eq:eek}
+   E_k = \frac{\partial D}{\partial \nu_k}
+\end{equation}
+so each $E_k$ is a diagonal matrix whose diagonal elements are either zero
+or one, the sum of the $E_k$ is the identity matrix, and the product of the
+$E_k$ is the zero matrix.
+We can now write
+$$
+   D = \sum\nolimits_k \nu_k E_k
+$$
+to show the explict dependence of $D$ on $\nu$.
+
+We no longer think we should make this restriction on the structure of $D$
+part of the definition of EFMM.  In other contexts, users sometimes use
+correlated random effects.  If we assume AR(1) (auto-regressive order one)
+structure, then $D$ can no longer be written as above.  If our random effects
+come from quantitative genetics, then we can write $D$ in the form above if
+the pedigree of our experimental design has no inbreeding.  But otherwise we
+cannot.
+
+Nevertheless, we have not yet implemented more complicated
+specification of $D$ in R package \code{aster}.
+And we will assume $D$ has the structure described above in the rest of this
+chapter.
+
+Minus the the so-called ``complete data log likelihood,''
+what the log likelihood would
+be if the random effects were observed data rather than unobservable latent
+variables, is
+\begin{equation} \label{eq:mlogl-complete}
+   - l(a + M \alpha + Z b) + \tfrac{1}{2} b^T D^{-1} b
+   + \tfrac{1}{2} \log \det(D)
+\end{equation}
+Recall that $D$ is a function of the unknown parameter vector $\nu$
+even though the notation does not explicitly indicate this.
+Note that \eqref{eq:mlogl-complete} only makes sense when no variance
+components are zero (otherwise $D^{-1}$ does not exist, much more on this
+later, starting with Section~\ref{sec:lsc} below).
+
+The likelihood for the random effects model is the conditional expectation
+of the complete data likelihood (the exponential of \eqref{eq:mlogl-complete})
+with respect to the observed data (the response vector $y$, which is also
+not explicitly indicated in the notation but is in the log likelihood $l$,
+see \eqref{eq:logl-aster-phi} above).  That is, we exponentiate
+\eqref{eq:mlogl-complete} and then integrate out $b$ with respect to its
+assumed multivariate normal distribution, and then take the logarithm to get
+the log likelihood for the random effects.  This process rarely, if ever,
+can be done exactly.
+
+\subsection{Laplace Approximation}
+
+Thus, following \citet{breslow-clayton} and \citet{reaster}
+we use the Laplace approximation
+of the log likelihood for the random effects model,
+\begin{equation} \label{eq:mlogl-pickle}
+\begin{split}
+   q(\alpha, \nu)
+   & =
+   - l(a + M \alpha + Z b^*) + \tfrac{1}{2} (b^*)^T D^{-1} b^*
+   \\
+   & \qquad
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W(a + M \alpha + Z b^*) Z D + \text{Id}
+   \bigr]
+\end{split}
+\end{equation}
+where
+\begin{itemize}
+\item $W$ is the Fisher information matrix for the saturated exponential
+    family model, $W = - l''(\fatdot) = \nabla^2 c''(\fatdot)$
+\item $b^*$ is the minimizer of \eqref{eq:mlogl-complete} with respect to $b$,
+    holding $\alpha$ and $\nu$ fixed, and
+\item $\text{Id}$ is the identity matrix of the appropriate dimension.
+\end{itemize}
+So $b^*$ is a function of $\alpha$ and $\nu$ although the notation in
+\eqref{eq:mlogl-pickle} does not explicitly indicate this.
+
+Summarizing the implicit dependencies:
+\begin{itemize}
+\item $l$ is a function of the response vector $y$ as well as its indicated
+    arguments,
+\item $D$ is a function of $\nu$, and
+\item $b^*$ is a function of $\alpha$ and $\nu$.
+\end{itemize}
+If we need to make these dependencies explicit we could write $l_y$ or
+$D(\nu)$ or $b^*(\alpha, \nu)$.
+
+\begin{theorem} \label{th:pickle}
+If \eqref{eq:mlogl-complete} considered a function of $b$ for
+fixed $\alpha$ and $\nu$ is bounded below, then has a unique minimizer $b^*$.
+\end{theorem}
+\begin{proof}
+The first term in \eqref{eq:mlogl-complete} considered as a function of $b$
+for fixed $\alpha$ is a convex function and $b \mapsto b^T D^{-1} b$ is a
+strictly convex function with bounded level sets,
+hence the sum is a strictly convex function with bounded level sets
+(under the assumption that it is bounded below).
+Thus the minimizer $b^*$ exists and is unique.
+\end{proof}
+
+Then the $\alpha$ and $\nu$ that minimize \eqref{eq:mlogl-pickle} are
+our estimates of these parameters.  They are approximate MLE (minimizers
+of the Laplace approximation of the log likelihood).  Call them $\hat{\alpha}$
+and $\hat{\nu}$.
+
+The condition in Theorem~\ref{th:pickle} that \eqref{eq:mlogl-complete} be
+bounded below is not restrictive.
+Any aster log likelihood that does not involve
+normal location-scale dependence groups is bounded below, and even those
+having such dependence groups will be bounded below if the model equation
+\eqref{eq:reaster-model-equation} does not send any components of $\varphi$
+to infinity that correspond to variance nodes of a normal-location-scale
+dependence group (Theorem~\ref{th:dor-normal} above).  And, of course,
+$b^T D^{-1} b$ is bounded below by zero.
+
+\subsection{Estimates of Random Effects}
+
+We then have $b^*(\hat{\alpha}, \hat{\nu})$ as ``estimates'' (in scare quotes)
+of the random effects.  We say ``in scare quotes'' because, of course, the
+random effects are not parameters to estimate.  They are (supposed to be)
+random variables, not unknown constants.
+
+Thus we should ``estimate'' something about their conditional distribution
+given the observed value of the response vector and the parameter estimates
+$\hat{\alpha}$ and $\hat{\nu}$.
+
+Since \eqref{eq:mlogl-complete} is minus a log unnormalized
+conditional probability density function of $b$ given $y$, it follows
+that $b^*(\alpha, \nu)$ is the mode of that conditional distribution
+for parameter values $\alpha$ and $\nu$.
+Because of the symmetry of the normal distribution, these are also medians
+of this conditional distribution.
+
+When we map these estimates through a nonlinear transformation, such as the
+map from canonical to mean value parameters,
+they are no longer modes or medians, so it is unclear how to describe these
+``estimates'' in scare quotes.
+
+\subsection{A Key Concept}
+
+Following \citet{reaster},
+for any positive semidefinite matrix $W$, define
+\begin{equation} \label{eq:pee}
+   p_W(\alpha, b, \nu) =
+   - l(a + M \alpha + Z b) + \tfrac{1}{2} b^T D^{-1} b
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id}
+   \bigr]
+\end{equation}
+Considered as functions of $b$ for fixed $\alpha$ and $\nu$
+\eqref{eq:mlogl-complete} and \eqref{eq:pee} differ only by a constant,
+hence have the same minimizer.
+
+We thus consider the problem of jointly
+minimizing $p_W$ as a function of $(\alpha, b, \nu)$.
+When $W$ is close to
+\begin{equation} \label{eq:w-hat}
+   \widehat{W} =
+   W\bigl(a + M \hat{\alpha} + Z b^*(\hat{\alpha}, \hat{\nu})\bigr)
+\end{equation}
+The function
+$$
+   \inf p_W(\alpha, \fatdot, \nu)
+$$
+should be close to the Laplace approximation \eqref{eq:mlogl-pickle}.
+(This is the conclusion of Theorem~\ref{th:pee-epi} below.)
+
+So the joint minimizer of $p_W$ should be close to the minimizers
+of the Laplace approximation \eqref{eq:mlogl-pickle},
+when $W$ is close to $\hat{W}$.
+(This is implied by Theorems~\ref{th:attouch} and~\ref{th:pee-epi} below.)
+
+\subsection{Basic Optimization Theory}
+\label{sec:basic}
+
+In optimization theory, we have the following basic ideas
+\citep[Sections~1.A, 1.B, and~1.C]{rockafellar-wets}.
+\begin{itemize}
+\item We explicitly deal with minimization rather than maximization.  If
+    you have a maximization problem, just turn everything upside down.
+    To maximize $f$, minimize $- f$.
+\item For constrained optimization, we incorporate the constraints into
+    the objective function (the function to minimize).
+    To minimize $f$ subject to the constraint
+    that the minimizer lie in $C$, redefine $f$ to have the value $+\infty$
+    off of $C$.  Thus (unless $C$ is empty) the minimizer (if it exists)
+    must lie in $C$.
+\item We consider only lower semicontinuous (LSC) objective functions.
+\end{itemize}
+(LSC is defined at the beginning of Section~\ref{sec:lsc} below.)
+
+The point of the first item is conservation of blather.
+\citet{rockafellar-wets} is already a long book, more than 700 pages.
+If it gratuitously introduced notation for terminology and discussion
+of both maximization and minimization, it would be twice as long with
+zero additional mathematical content.  After all, the change of point of
+view from maximizing $f$ to minimizing $- f$ is truly trivial.
+
+This is why, in this chapter, we are minimizing minus the log likelihood
+(or its Laplace approximation) rather than maximizing the log likelihood.
+We want to use a lot of optimization theory.
+
+The point of the second item is hard to explain.  Like many places
+in mathematics, simple changes can simplify greatly.  Incorporating
+constraints into the objective function with the $+\infty$ trick
+greatly simplifies (or even makes
+possible) most of the theory in \citet{rockafellar-wets}.
+
+Note the interplay of the first two items.  If you are maximizing, then
+the objective function is $-\infty$ off the constraint set.
+
+Since we are only minimizing (the first item), we no longer have any need
+for continuity.  Continuity gives us existence of minimizers.  Any continuous
+function achieves its maximum and minimum on any compact set.  But we don't
+care about maxima.  So we replace continuity by LSC.  Any LSC function
+achieves its minimum on any compact set.  That is all we need.
+
+Note the interplay of the last two items.  No function that jumps from finite
+to infinite at the boundary of the constraint set can be continuous.
+But it can be LSC.
+
+Having allowed $+\infty$ as a value of the objective function, we also allow
+$-\infty$ as a value for technical reasons.  This means we are working with
+the \emph{extended real number system} with its usual arithmetic, order, and
+topology \citep[Section~1.E]{rockafellar-wets}.  The only tricky bit is that
+there are no natural definitions of zero times infinity or infinity minus
+infinity.  \citet{rockafellar-wets} define $0 \cdot \infty = 0$, a convention
+familiar from probability theory, and define $\infty - \infty = \infty$ in
+the context of minimization (they note that you would
+want $\infty - \infty = - \infty$ in the context of maximization, which,
+of course, the turn-everything-upside-down principle gives).
+
+Topologically, the extended real number system, denoted $\exreal$ is a compact
+set.  So every sequence has a convergent subsequence.  What it means for
+objective function values to converge to infinity is just what it means in
+calculus.
+
+\subsection{Lower Semicontinuous Regularization}
+\label{sec:lsc}
+
+An extended-real-valued function $f$ is LSC at the point $x$ if
+$$
+   f(x) \le \liminf f(x_n), \qquad \text{whenever $x_n \to x$}
+$$
+and $f$ is LSC if it is LSC at each point.
+
+To make a function LSC, we use the process of LSC regularization.
+For any extended-real-valued function $f$, there is a least LSC function
+majorized by $f$, denoted $\closure f$ \citep[Section~1.D]{rockafellar-wets}.
+
+We want to apply LSC regularization to \eqref{eq:pee}.  First we define
+\eqref{eq:pee} to have the value $+\infty$ when any component of $\nu$ is
+negative.  This agrees with item 2 on our list (no variance can be negative).
+
+Now we apply LSC regularization.  First we note that $b^T D^{-1} b$ is the
+sum of terms of the form $h(b_i, \nu_k) = b_i^2 / \nu_k$,
+where $\nu_k = \var(b_i)$.  Thus we start with the LSC regularization of $h$.
+
+Again we define $h(b, \nu) = +\infty$ when $\nu < 0$ to enforce
+the constraints.  Clearly $h(b, \nu) \ge 0$ for all $b$ and $\nu \neq 0$, and
+$$
+   \lim_{\substack{b = 0 \\ \nu \searrow 0}} h(b, \nu) = 0
+$$
+So we define $h(0, 0) = 0$.  Conversely, if $b_n$ is a sequence bounded
+away from zero
+$$
+   \lim_{\nu_n \to 0} h(b_n, \nu_n) = + \infty
+$$
+Thus the LSC regularization has the form
+$$
+   h(b, \nu) =
+   \begin{cases}
+   b^2 / \nu, & \nu > 0
+   \\
+   0, & \nu = b = 0
+   \\
+   +\infty & \text{otherwise}
+   \end{cases}
+$$
+\begin{equation} \label{eq:pee-lsc}
+\begin{split}
+   p_W(\alpha, b, \nu)
+   & =
+   - l(a + M \alpha + Z b)
+   + \tfrac{1}{2} \sum_{(j, k) \in \mathcal{J}} h(b_j, \nu_k)
+   \\
+   & \qquad
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id}
+   \bigr]
+\end{split}
+\end{equation}
+where $\mathcal{J}$ is the set of all $(j, k)$ such that $j$ is a possible
+index for $b$, $k$ is a possible index for $\nu$ and the variance of $b_j$
+is $\nu_k$ by design.
+
+This still leaves us with a problem with the third term in \eqref{eq:pee}
+or \eqref{eq:pee-lsc}.
+\begin{lemma}
+The third term in \eqref{eq:pee-lsc} is nonnegative when all components of
+$\nu$ are nonnegative.
+\end{lemma}
+\begin{proof}
+When all components of $\nu$ are nonnegative we can define $D^{1/2}$ to be
+the diagonal matrix whose diagonal elements are the (positive) square roots
+of the corresponding diagonal elements of $D$.
+When all components of $\nu$ are strictly positive we can define $D^{-1/2}$
+to be the diagonal matrix whose $k, k$ component is $1 / \sqrt{\nu_k}$.
+Clearly, $D^{1/2}$ and $D^{-1/2}$ are inverse matrices.
+
+First assume all components of $\nu$ are positive.
+Then, because the determinant
+of a product is the product of determinants,
+\begin{align*}
+   \det \left( Z^T W Z D + \text{Id} \right)
+   & =
+   \det \left( \bigl[ Z^T W Z D^{1/2} + D^{-1/2} \bigr] D^{1/2} \right)
+   \\
+   & =
+   \det \left( Z^T W Z D^{1/2} + D^{-1/2} \right) \det \left( D^{1/2} \right)
+   \\
+   & =
+   \det \left( D^{1/2} Z^T W Z D^{1/2} + \text{Id} \right)
+\end{align*}
+Reading from end to end, we have
+\begin{equation*}
+   \det \left( Z^T W Z D + \text{Id} \right)
+   =
+   \det \left( D^{1/2} Z^T W Z D^{1/2} + \text{Id} \right)
+\end{equation*}
+which no longer contains $D^{-1/2}$.  Hence, by continuity, this equation
+also holds when all components of $\nu$ are nonnegative.
+
+$W$ is assumed to be symmetric and positive semidefinite by definition,
+hence so are $D^{1/2} Z^T W Z D^{1/2}$
+and $D^{1/2} Z^T W Z D^{1/2} + \text{Id}$.
+The determinant of a symmetric matrix is the product of its eigenvalues.
+The eigenvalues of a symmetric positive semidefinite matrix are nonnegative.
+The eigenvalues of $D^{1/2} Z^T W Z D^{1/2} + \text{Id}$ are one plus the
+corresponding eigenvalues of $D^{1/2} Z^T W Z D^{1/2}$.  Hence the determinant
+of $D^{1/2} Z^T W Z D^{1/2} + \text{Id}$ is greater than or equal to one.
+Hence the log determinant is greater than or equal to zero.
+\end{proof}
+
+It follows from the lemma that the third term in \eqref{eq:pee-lsc} is
+finite on an open neighborhood of the set of $(b, \nu)$ such that all
+components of $\nu$ are nonnegative and infinitely differentiable on
+that neighborhood.  But at some $(b, \nu)$ with some components of $\nu$
+sufficiently negative, we may have the determinant negative so the log
+determinant is undefined.  We have to separately define the value of
+\eqref{eq:pee-lsc} to be $+\infty$ in this case.
+(Of course, the principle of incorporating the constraints into the
+objective function, requires the value to be $+\infty$ whenever any
+component of $\nu$ is negative, so this paragraph is just about being
+careful about that.)
+
+\subsection{Epiconvergence}
+
+Epiconvergence is a form of convergence of sequences of functions useful
+in optimization \citep[Chapter~7]{rockafellar-wets}.  It has been little
+used in statistics, notable uses being \citet{geyer-1994-jrssb} and
+\citet{constrained-m-estimation}.
+
+Epiconvergence has multiple characterizations.  The one we shall use is
+\citet[Proposition~7.2]{rockafellar-wets} a sequence of extended-real-valued
+functions $f_n$ \emph{epiconverges} to an extended-real-valued function $f$
+at the point $x$ if
+\begin{subequations}
+\begin{alignat}{2}
+   f(x) & \le \liminf\nolimits_n  f_n(x_n), & \qquad &
+   \text{for every sequence $x_n \to x$}
+   \label{eq:epiconvergence-every}
+   \\
+   f(x) & \ge \limsup\nolimits_n  f_n(x_n), & \qquad &
+   \text{for some sequence $x_n \to x$}
+   \label{eq:epiconvergence-some}
+\end{alignat}
+\end{subequations}
+and $f_n$ \emph{epiconverges} to $f$ if it epiconverges at every $x$.
+This is denoted $f_n \eto f$.
+
+If we changed \eqref{eq:epiconvergence-some} so it said ``every'' instead
+of ``some'' this would define uniform convergence on compact sets
+(also called continuous convergence) \citep[Section~7.C]{rockafellar-wets}.
+
+As it is \eqref{eq:epiconvergence-some} is weaker than what pointwise
+convergence says: that \eqref{eq:epiconvergence-some} holds when $x_n = x$
+for all $n$.
+
+Thus epiconvergence provides the same guarantee from below as uniform
+convergence on compact sets, but a weaker guarantee from above than
+pointwise convergence.  As with replacing continous with LSC, this is
+just what is needed for minimization.
+\begin{theorem} \label{th:attouch}
+Suppose $f_n \eto f$ and $x_n \to x$ and $f_n(x_n) - \inf f_n \to 0$.
+Then
+\begin{itemize}
+\item[\normalfont (a)] $f(x) = \inf f$.
+\item[\normalfont (b)] $f_n(x_n) \to f(x)$.
+\end{itemize}
+\end{theorem}
+This is Proposition~{3.1} in \citet{constrained-m-estimation} which
+mostly comes from Theorem~{1.10} in \citet{attouch}.
+
+It may seem strange that our theorem assumes $x_n \to x$ when we want
+that to be a conclusion rather than an assumption.  How one uses the
+theorem is that if we assume $x_n$ is a bounded sequence, then it has
+convergent subsequences to which the theorem can be applied.  Then
+we use the subsequence principle (if every convergent subsequence converges
+to the same limit, then the whole sequence converges to that limit) to
+conclude $x_n \to x$.  The problem is obtaining boundedness (no escape
+to infinity) and uniqueness ($f$ has a unique minimizer).  Neither is
+easy.  We will not be able to prove either: that our algorithm (still
+to be described) has a bounded sequence of iterates or that our objective
+function \eqref{eq:mlogl-pickle} has a unique minimizer.
+So Theorem~\ref{th:attouch} is often the best we can do.
+
+\begin{theorem} \label{th:pee-epi}
+Suppose $W_n \to W$, then $p_{W_n} \eto p_{W}$.
+\end{theorem}
+In the theorem statement $W_n \to W$ means
+componentwise convergence of matrices.
+\begin{proof}
+We consider separately the three terms of \eqref{eq:pee-lsc}.
+\begin{align*}
+   p_1(\alpha, b, \nu)
+   & =
+   - l(a + M \alpha + Z b)
+   \\
+   p_2(\alpha, b, \nu)
+   & =
+   \tfrac{1}{2} \sum_{(j, k) \in \mathcal{J}} h(b_j, \nu_k)
+   \\
+   p_{3, W}(\alpha, b, \nu)
+   & =
+   \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id} \bigr]
+\end{align*}
+Note that $p_1$ does not actually depend on $\nu$ or $W$ so we are
+considering constant sequences for it as $W_n \to W$.  Since $p_1$
+is a continuous function of its arguments, we have continuous convergence
+for these constant sequences.
+
+Also note that $p_2$ does not actually depend on $\alpha$ or $W$ so we are
+considering constant sequences for it as $W_n \to W$.  Since each term of
+its definition is LSC, the sum multiplied by a positive scalar is LSC
+\citet[Theorem~1.39]{rockafellar-wets}, that is, $p_2$ is LSC.
+Since a constant sequence of functions $f$ epiconverges to $\closure f$,
+we have epiconvergence of these constant sequences.
+
+Now $p_{3, W}$ does not actually depend on $\alpha$ or $b$.  And its
+defining formula is a continuous function of $\nu$ and $W$ so
+$$
+   p_{3, W_n}(\nu_n) \to p_{3, W}(\nu), \qquad \text{as $W_n \to W$
+   and $\nu_n \to \nu$}
+$$
+This is continuous convergence $p_{3, W_n} \to p_{3. W}$.
+
+Now we apply (twice) that the sum of an epiconverging sequence
+and a continuously converging sequence epiconverges
+\citep[Theorem~7.46 (b)]{rockafellar-wets}.
+\end{proof}
+
+\subsection{Algorithm}
+
+This gives us an algorithm.
+\begin{enumerate}
+\item Initialize $W$ to be a positive definite symmetric matrix.
+\item Find $(\alpha, b, \nu)$ that minimize $p$ given by \eqref{eq:pee-lsc}.
+\item Set $W$ to $- l''(a + M \alpha + Z b)$.
+\item If the sequence of iterates $(\alpha, b, \nu, W)$ appears
+    to have converged, stop.  Otherwise, go to step 2.
+\end{enumerate}
+
+This is cheating a bit in several ways.
+\begin{itemize}
+\item Theorem~\ref{th:attouch} is about global minimizers, but all the
+    optimization algorithms we have access to only find local minimizers
+    (p given by \eqref{eq:pee-lsc} is not convex).
+\item We have not stated what our convergence criteria are.
+\end{itemize}
+
+Nevertheless, Theorems~\ref{th:attouch} and~\ref{th:pee-epi} do say
+that if we are finding global minimizers in Step 2 and if the iterates
+converge, then they converge to the global minimizer of
+\eqref{eq:mlogl-pickle}.
+
+Note that, despite what might appear at first sight.  This is an algorithm
+for minimizing the Laplace approximation $q$ given by \eqref{eq:mlogl-pickle}
+not for minimizing $p_W$.
+
+\section{Derivatives}
+
+\REVISED
+
+\section{What Happens When Variance Components are Zero?}
+
+\subsection{Square Root Parameterization}
+
+\citet{reaster} suggest a re-parameterization that makes the problem with
+zero variance components go away.
+The original variables are $(\alpha, b, \nu)$, and
+the new variables are $(\alpha, c, \sigma)$, where
+\begin{alignat*}{2}
+   \nu_k & = \sigma^2_k, & \qquad & \text{for all $k$}
+   \\
+   b_j & = \sigma_k c_j, & & \text{whenever $\var(b_j) = \nu_k$}
+\end{alignat*}
+The inverse transformation is not one-to-one.  We allow $\sigma_k$ to be
+either square root of $\nu_k$, that is, $\sigma_k = \pm \sqrt{\nu_k}$.
+We do this in order that our objective function be continuous and
+differentiable at zero.
+
