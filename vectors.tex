@@ -1,0 +1,78 @@
+
+\chapter{Vector Spaces and Differentiation}
+
+The method of gradient descent dates back at least to Cauchy, so is
+nearly 200 years old.  It has lately become very popular in machine learning.
+
+In advanced math, all mathematics from theoretical linear algebra up,
+including real and functional analysis, abstract algebra, differential
+geometry, and any courses more advanced than them, derivatives are
+linear functions rather than scalars or vectors
+\citet[Chapters~XIII and~XXII]{lang}.  In particular, if $f$ is a real-valued
+function on a vector space $V$, then the derivative $f'(x)$ at the point $x$
+is a linear function $V \to \real$ and hence is an element of the dual vector
+space $V^{\textstyle *}$ to $V$.  The derivative, if it exists is in this
+special case, the linear function satisfying
+$$
+   f(x + h) = f(x) + f'(x)(h) + \norm{h} o(h)
+$$
+which is the Taylor series up to terms linear in $h$.
+This appears to make the definition of derivative dependent on the norm.
+If $V$ is a finite-dimensional vector space (the subject of real analysis),
+then it does not actually depend on the norm because all norms are equivalent
+\citep[Corollary~3.14 of Chapter~II]{lang}.
+If $V$ is an infinite-dimensional topological vector space
+(the subject of functional analysis), then the definition of derivative
+actually does depend on the norm.
+
+The point of all of this is that the gradient vector lies in
+$V^{\textstyle *}$ which is not the same vector space as the domain of
+the function $f$ that we are differentiating and trying to minimize.
+So it does not give a direction in $V$ to go.
+In higher mathematics, the method of gradient descent does not make any
+sense.  It is literally meaningless.
+
+We have already mentioned or at least alluded to this view of vector spaces
+and duals several times.  In our basic definition of exponential families
+(Section~1.15) above we said that the angle brackets notation
+$\inner{\fatdot, \fatdot}$ is a bilinear form that places the
+(finite-dimensional) vector space where the canonical statistic vector
+takes values and the
+(finite-dimensional) vector space where the canonical parameter vector
+takes values in duality.  That is $V$ and $V^{\textstyle *}$ for some
+finite-dimensional vector space $V$.
+
+In the fundamental equation giving means and variances of the canonical
+statistic vector of an exponential family as derivatives of the cumulant
+function \eqref{eq:cumulant-one} and \eqref{eq:cumulant-two} and the use
+of these in defining the mean value parameterization and Fisher information
+(Section~\ref{sec:mean-value-parameterization} above) if we were going to
+be really fussy about using abstract mathematics correctly, we would have
+$V$ is the vector space where the canonical statistic takes values,
+$V^{\textstyle *}$ is the vector space where the canonical parameter
+takes values,
+the mean value parameter $\mu = c'(\varphi)$ is a linear function on
+$V^{\textstyle *}$ hence an element of $V^{\textstyle {*}{*}}$.
+But for finite-dimensional $V$, there is the so-called
+\emph{natural isomorphism} $V \to V^{\textstyle {*}{*}}$ that takes the
+point $y$ to the linear functional $\inner{y, \fatdot}$.
+This allows us to consider $\mu$ to lie in the same vector space $V$
+where $y$ takes values.  It also allows us to consider the map
+$c' : \varphi \mapsto \mu$ as a nonlinear function $V^{\textstyle *} \to V$.
+Hence the derivative of this function $c''$ must be a linear function
+$V^{\textstyle *} \to V$.  So Fisher information is this linear function.
+
+That might have been a TL;DR (too long, didn't read).  The only point we
+want to stress here is that $\mu$ and $\varphi$ live in dual vector spaces.
+They are not in any way comparable.  It is wrongheaded (not in accordance
+with abstract math) to think of them as comparable.  This is because
+while $V$ and $V^{\textstyle *}$ have the same dimension
+\citep[if finite-dimensional][Theorem~2 of Section~15]{halmos-vector-spaces}
+there is no unique way to match them up.  It is a mistake to think of them
+as the same vector space, as equal to $\real^d$ for some $d$.
+If you want to consider them as elements of $\real^d$, then any isomorphisms
+(invertible linear transformations) $V \to \real^d$
+and $V^{\textstyle *} \to \real^d$ will do.  This is related to the
+nonuniqueness of canonical statistics and canonical parameters mentioned
+in Section~\ref{sec:define-expfam} above.
+

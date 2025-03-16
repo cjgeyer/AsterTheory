@@ -8,7 +8,7 @@ a special case of exponential family mixed models (EFMM),
 as described by \citet{reaster-tr,reaster} and as implemented by
 R function \code{reaster} in R package \code{aster} \citep{aster-package}.
 
-Except we correct one mistake in \citet{reaster} and also one wrong-headedness.
+Except we correct one mistake in \citet{reaster}.
 We also add some theory.
 
 \subsection{Log Likelihood}
@@ -200,7 +200,7 @@ they are no longer modes or medians, so it is unclear how to describe these
 \subsection{A Key Concept}
 
 Following \citet{reaster},
-for any positive semidefinite matrix $W$, define
+for any positive semidefinite symmetric matrix $W$, define
 \begin{equation} \label{eq:pee}
    p_W(\alpha, b, \nu) =
    - l(a + M \alpha + Z b) + \tfrac{1}{2} b^T D^{-1} b
@@ -326,8 +326,8 @@ away from zero
 $$
    \lim_{\nu_n \to 0} h(b_n, \nu_n) = + \infty
 $$
-Thus the LSC regularization has the form
-$$
+Thus the LSC regularization of $h$ has the form
+\begin{equation} \label{eq:h}
    h(b, \nu) =
    \begin{cases}
    b^2 / \nu, & \nu > 0
@@ -336,22 +336,30 @@ $$
    \\
    +\infty & \text{otherwise}
    \end{cases}
-$$
+\end{equation}
+and the LSC regularization of $p_W$ has the form
 \begin{equation} \label{eq:pee-lsc}
 \begin{split}
    p_W(\alpha, b, \nu)
    & =
    - l(a + M \alpha + Z b)
-   + \tfrac{1}{2} \sum_{(j, k) \in \mathcal{J}} h(b_j, \nu_k)
+   + \tfrac{1}{2}
+   \sum_{k \in I^{(\nu)}}
+   \sum_{\substack{j \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
+   h(b_j, \nu_k)
    \\
    & \qquad
    + \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id}
    \bigr]
 \end{split}
 \end{equation}
-where $\mathcal{J}$ is the set of all $(j, k)$ such that $j$ is a possible
-index for $b$, $k$ is a possible index for $\nu$ and the variance of $b_j$
-is $\nu_k$ by design.
+where $I^{(\alpha)}$, $I^{(b)}$, and $I^{(\nu)}$ are the
+index sets of the vectors $\alpha$, $b$, and $\nu$, respectively,
+and where
+$\equiv$ means equal by design rather than by accident (we can have
+two components of $\nu$ equal by accident because they are nonnegative-valued
+variables, but $\equiv$ means equal by the design of the experiment,
+forced to be always equal even as they are varied).
 
 This still leaves us with a problem with the third term in \eqref{eq:pee}
 or \eqref{eq:pee-lsc}.
@@ -488,7 +496,9 @@ We consider separately the three terms of \eqref{eq:pee-lsc}.
    \\
    p_2(\alpha, b, \nu)
    & =
-   \tfrac{1}{2} \sum_{(j, k) \in \mathcal{J}} h(b_j, \nu_k)
+   \sum_{k \in I^{(\nu)}}
+   \sum_{\substack{j \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
+   h(b_j, \nu_k)
    \\
    p_{3, W}(\alpha, b, \nu)
    & =
@@ -524,7 +534,7 @@ and a continuously converging sequence epiconverges
 This gives us an algorithm.
 \begin{enumerate}
 \item Initialize $W$ to be a positive definite symmetric matrix.
-\item Find $(\alpha, b, \nu)$ that minimize $p$ given by \eqref{eq:pee-lsc}.
+\item Find $(\alpha, b, \nu)$ that minimize $p_W$ given by \eqref{eq:pee-lsc}.
 \item Set $W$ to $- l''(a + M \alpha + Z b)$.
 \item If the sequence of iterates $(\alpha, b, \nu, W)$ appears
     to have converged, stop.  Otherwise, go to step 2.
@@ -549,11 +559,576 @@ not for minimizing $p_W$.
 
 \section{Derivatives}
 
-\REVISED
+We all know that derivatives (first and second) have something to do with
+optimization.  Especially in statistics, where second derivatives define
+Fisher information used to derive standard errors of MLE.
 
-\section{What Happens When Variance Components are Zero?}
+In optimization theory we also have subderivatives and directional derivatives
+used at points where derivatives do not exist.  In our problem this is
+at points where some component of $\nu$ is zero and the corresponding
+components of $b$ are zero.
 
-\subsection{Square Root Parameterization}
+\subsection{Classical First Derivatives}
+
+\citet{reaster-tr,reaster} give derivatives of the objective function $q$
+given by \eqref{eq:mlogl-pickle}.  We follow them closely here.  Since
+$q$ is only defined implicitly (it involves $b^*$ for which we have only
+an implicit definition), we need to use the implicit function theorem.
+
+Thus we start with derivatives of $p_W$ given by \eqref{eq:pee} and
+derive derivatives of $q$ given by \eqref{eq:mlogl-pickle} from them.
+All of these derivatives are found in Section~1.7 of \citet{reaster-tr}.
+
+First derivatives of $p_W$ are
+\begin{align}
+   p_{W, \alpha}(\alpha, b, \nu)
+   & =
+   - M^T \bigl[ y - \mu(a + M \alpha + Z b) \bigr]
+   \label{eq:p-alpha}
+   \\
+   p_{W, b}(\alpha, b, \nu)
+   & =
+   =
+   - Z^T \bigl[ y - \mu(a + M \alpha + Z b) \bigr] + D^{- 1} b
+   \label{eq:p-bee}
+   \\
+   p_{W, \nu_k}(\alpha, b, \nu)
+   & =
+   - \tfrac{1}{2} b^T D^{- 1} E_k D^{- 1} b
+   + \tfrac{1}{2} \tr \Bigl(
+   \bigl[ Z^T W Z D + \text{Id} \bigr]^{- 1}
+   Z^T W Z E_k
+   \Bigr)
+   \label{eq:p-nu-k}
+\end{align}
+where
+\begin{itemize}
+\item derivatives are noted by subscripts, if $f$ is a scalar-valued function
+    of vector variables, then $f_\theta$ is the vector of partial derivatives
+    with respect to the components of $\theta$
+    and $f_\theta(\alpha, \beta, \theta)$ is the
+    value of this derivative at the point $(\alpha, \beta, \theta)$,
+\item $y$ is the response vector (the observed data), and
+\item $\mu(\fatdot)$ is the expectation of $y$ given the parameters and
+    random effects (so it is a function of $\alpha$ and $b$).
+    From exponential family theory $l_\alpha(\alpha, b, \nu) =
+    y - \mu(a + M \alpha + Z b)$.
+\end{itemize}
+
+The estimating equation for $b^*$ can be written
+\begin{equation} \label{eq:estimating-bee-star}
+   p_{W, b}\bigl(\alpha, b^*, \nu\bigr) = 0
+\end{equation}
+\citep[Section~1.7]{reaster-tr}.  Despite the notation, this does not
+actually depend on $W$ because the part of $p_W$ containing $W$ does not
+contain $b$.
+
+Then \citet[Section~1.7]{reaster-tr} derive the first derivatives of $q$
+from \eqref{eq:estimating-bee-star} and the multivariate chain rule
+\begin{align}
+   q_\alpha(\alpha, \nu)
+   & =
+   p_{W, \alpha}(\alpha, b^*, \nu)
+   \label{eq:q-alpha}
+   \\
+   q_{\nu_k}(\alpha, \nu)
+   & =
+   p_{W, \nu_k}(\alpha, b^*, \nu)
+   \label{eq:q-nu-k}
+\end{align}
+
+We will also need derivatives of $b^*$ derived via the implicit function
+theorem \citep[Section~1.8]{reaster}
+\begin{align}
+   b^*_\alpha(\alpha, \nu)
+   & =
+   -
+   p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \alpha}(\alpha, b^*, \nu)
+   \label{eq:bee-star-alpha}
+   \\
+   b^*_{\nu}(\alpha, \nu)
+   & =
+   -
+   p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \nu}(\alpha, b^*, \nu)
+   \label{eq:bee-star-nu}
+\end{align}
+These formulas require that the matrix $p_{W, b b}(\alpha, b^*, \nu)$,
+which, recall, does not depend on $W$ despite the notation,
+is invertible.  We will eventually find out that it is
+(Theorem~\ref{th:positive-definite} below).
+These formulas also require second derivatives of $p_W$ which are found
+in the following section.
+
+\subsection{Classical Second Derivatives}
+
+These are given in \citet[Section~1.8]{reaster-tr}.
+We start with derivatives of $p_W$.
+\begin{align*}
+   p_{W,\alpha \alpha}(\alpha, b, \nu)
+   & =
+   M^T W(a + M \alpha + Z b) M
+   \\
+   p_{W, \alpha b}(\alpha, b, \nu)
+   & =
+   M^T W(a + M \alpha + Z b) Z
+   \\
+   p_{W, b b}(\alpha, b, \nu)
+   & =
+   Z^T W(a + M \alpha + Z b) Z + D^{- 1}
+   \\
+   p_{W, \alpha \nu_k}(\alpha, b, \nu)
+   & =
+   0
+   \\
+   p_{W, b \nu_k}(\alpha, b, \nu)
+   & =
+   - D^{- 1} E_k D^{- 1} b
+   \\
+   p_{W, \nu_j \nu_k}(\alpha, b, \nu)
+   & =
+   b^T D^{- 1} E_j D^{- 1} E_k D^{- 1} b
+   \\
+   & \qquad
+   -
+   \tfrac{1}{2} \tr \Bigl(
+   \bigl[ Z^T W Z D + I \bigr]^{- 1}
+   Z^T W Z E_j
+   \\
+   & \qquad \qquad
+   \bigl[ Z^T W Z D + I \bigr]^{- 1}
+   Z^T W Z E_k
+   \Bigr)
+\end{align*}
+where all of these are now matrices: the $i, j$ component
+of $f_{\alpha, \beta}$ evaluated at the point $x$ is
+$\partial^2 f(x) / \partial \alpha_i \partial \beta_j$.
+
+And the derivatives of $q$.
+\begin{align*}
+   q_{\alpha \alpha}(\alpha, \nu)
+   & =
+   p_{W, \alpha \alpha}(\alpha, b^*, \nu)
+   -
+   p_{W, \alpha b}(\alpha, b^*, \nu)
+   p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \alpha}(\alpha, b^*, \nu)
+   \\
+   q_{\alpha \nu}(\alpha, \nu)
+   & =
+   p_{W, \alpha \nu}(\alpha, b^*, \nu)
+   -
+   p_{W, \alpha b}(\alpha, b^*, \nu)
+   p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \nu}(\alpha, b^*, \nu)
+   \\
+   q_{\nu \nu}(\alpha, \nu)
+   & =
+   p_{W, \nu \nu}(\alpha, b^*, \nu)
+   -
+   p_{W, \nu b}(\alpha, b^*, \nu)
+   p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \nu}(\alpha, b^*, \nu)
+\end{align*}
+
+If we combine all the parameters
+in one vector $\psi = (\alpha, \nu)$ and write $p_W(\psi, b)$ instead
+of $p_W(\alpha, b, \nu)$ we have
+\begin{equation} \label{eq:psi-psi}
+   q_{\psi \psi}(\psi)
+   =
+   p_{W, \psi \psi}(\psi, b^*)
+   -
+   p_{W, \psi b}\bigl(\psi, b^*\bigr)
+   p_{W, b b}\bigl(\psi, b^*\bigr)^{- 1}
+   p_{W, b \psi}\bigl(\psi, b^*\bigr)
+\end{equation}
+
+\citet[Section~1.8]{reaster-tr} prove the following.
+\begin{theorem} \label{th:positive-definite}
+If $p_W$ has a positive definite Hessian matrix, so does $q$.
+\end{theorem}
+
+\subsection{Subderivatives}
+
+Given an extended-real-valued function $f$ of one vector variable,
+at a point $x$ such that $f(x)$ is finite,
+the \emph{subderivative} of $f$ at $x$ is
+the function $d f(x) : \real^d \to \exreal$ defined by
+\begin{equation} \label{eq:subderivative}
+   d f(x)(w) = \liminf_{\substack{\tau \searrow 0 \\ v \to w}}
+   \frac{f(x + \tau v) - f(x)}{\tau}
+\end{equation}
+\citep[Definition~8.1]{rockafellar-wets}.
+
+This plays the same role in nonsmooth optimization theory
+that derivatives play in the theory of optimization of smooth functions that
+is part of multivariable calculus.  \emph{Fermat's rule} says a necessary
+condition for a real-valued function of a vector variable to have
+a local minimum at a point where it is differentiable is that
+the derivative is zero.  What \citet[Theorem~10.1]{rockafellar-wets} call
+\emph{Fermat's rule, generalized} says a necessary condition for
+an extended-real-valued function $f$ of a vector variable to have
+a local minimum at a point $x$ where $f(x)$ is finite is that $d f(x)$ is
+a nonnegative-valued function, that is, $d f(x)(w) \ge 0$ for all $w$.
+
+For smooth (continuously differentiable) functions,
+subderivatives tell us nothing new because
+\begin{equation} \label{eq:smooth}
+   d f(x)(w) = w^T f'(x)
+\end{equation}
+where $f'(x)$ is the gradient of $f$ at $x$
+\citep[Exercise~8.20]{rockafellar-wets}.
+When \eqref{eq:smooth} holds, $d f(x)(- w) = - d f(x)(w)$ so the only way
+$d f(x)$ can be nonnegative-valued is if it is the constant function everywhere
+equal to zero.  Thus when applied to smooth functions the Fermat rule,
+generalized, is the the same as the plain old Fermat rule.
+
+So we only need subderivatives
+on the boundary of the constraint set (in our application,
+where some components of $\nu$ are
+zero).  On the interior of the constraint set, we can just use what we know
+from multivariable calculus (and already covered in the preceding section).
+
+The definition of subderivative \eqref{eq:subderivative} is hard to apply.
+Subderivatives do not obey all the rules for derivatives taught
+in multivariable calculus.  Chapter~10 of \citet{rockafellar-wets}
+is about what the rules for subdifferential calculus are.
+
+Fortunately for us, there is a class of functions called
+\emph{subdifferentially regular} \citep[Definition~7.25]{rockafellar-wets}
+for which the calculus rules are particularly simple.
+Smooth functions are subdifferentially regular
+\citep[Exercise~8.20]{rockafellar-wets}, and
+extended-real-valued LSC convex functions are subdifferentially regular
+\citep[Proposition~8.21]{rockafellar-wets}.
+Moreover the sum of subdifferentially regular functions is differentially
+regular, and the subderivative of the sum is the sum of the subderivatives
+\citep[Corollary~10.9]{rockafellar-wets}.
+
+\citet[Section~1.10.2]{reaster-tr} show that $h$ given by \eqref{eq:h}
+is LSC convex and that its subderivative at the only point on the boundary
+of its effective domain, $(0, 0)$, is given by
+\begin{equation} \label{eq:d-h}
+   d h(0, 0)(u, v) = h(u, v), \qquad \text{for all $u$ and $v$},
+\end{equation}
+read the subderivative of $h$ at the point $(0, 0)$ in the direction
+$(u, v)$.
+
+Let $\bar{p}_W$ denote the smooth terms of \eqref{eq:pee-lsc}, that is,
+\begin{equation} \label{eq:pee-bar}
+   \bar{p}_W(\alpha, b, \nu)
+   =
+   - l(a + M \alpha + Z b)
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id} \bigr]
+\end{equation}
+The subderivative of \eqref{eq:pee-lsc} can now be written
+\begin{equation} \label{eq:pee-lsc-subderivative}
+\begin{split}
+   d p_W(\alpha, b, \nu)(t, u, v)
+   & =
+   d \bar{p}_W(\alpha, b, \nu)(t, u, v)
+   \\
+   & \quad
+   + \tfrac{1}{2}
+   \sum_{k \in I^{(\nu)}}
+   \sum_{\substack{j \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
+   d h(b_j, \nu_k)(u_j, v_k)
+\end{split}
+\end{equation}
+This is the subderivative of the function $p_W$ at the point $(\alpha, b, \nu)$
+in the direction $(t, u, v)$.
+
+\subsection{Directional Derivatives}
+
+\citet{reaster-tr} note that in all cases of interest to them
+subderivatives are equal to directional derivatives,
+that is \eqref{eq:subderivative} can actually be calculated by the simpler
+formula
+\begin{equation} \label{eq:directional-derivative}
+   d f(x)(w) = \lim_{\tau \searrow 0}
+   \frac{f(x + \tau w) - f(x)}{\tau}
+\end{equation}
+where the limit is guaranteed to exist (because it is equal to the $\liminf$
+in \eqref{eq:subderivative}).
+This is true of smooth functions and of LSC convex functions whose directional
+derivatives (which always exist by convexity) define an LSC function,
+that is, the right-hand side of \eqref{eq:directional-derivative} is
+an LSC function of $w$ for fixed $x$.  And \citet[Section~1.10.3]{reaster-tr}
+show that this is the case for $h$ defined by \eqref{eq:h}.
+
+For this reason \citet{reaster} could and did talk about $d f(x)(w)$ using
+the language of directional derivatives, which is simpler to explain, and
+did not mention subderivatives.  But without subderivative theory
+\citep[Chapters~8 and~10]{rockafellar-wets} we would not know that the
+directional derivatives exist or have anything to do with minimization.
+
+\subsection{Second Derivatives}
+
+\citet{reaster-tr,reaster} did not discuss second derivative information
+where the function is not differentiable (on the boundary), but
+\citet[Chapter~13]{rockafellar-wets} do.
+
+As in the case of subderivatives, we are primarily interested in the nonsmooth
+function $h$ defined by \eqref{eq:h} at its only boundary point $(0, 0)$.
+
+Given an extended-real-valued function $f$ of one vector variable,
+at a point $x$ such that $f(x)$ is finite,
+the \emph{second subderivative} of $f$ at $x$ is
+the function $d^2 f(x) : \real^d \to \exreal$ defined by
+\begin{equation} \label{eq:second-subderivative}
+   d^2 f(x)(w) = \liminf_{\substack{\tau \searrow 0 \\ v \to w}}
+   \frac{f(x + \tau v) - f(x) - \tau d f(x)(v)}{\frac{1}{2} \tau^2}
+\end{equation}
+\citep[Definition~13.3]{rockafellar-wets}.
+
+\begin{theorem} \label{th:second-subderivative}
+The second subderivative of $h$ defined by \eqref{eq:h} at $(0, 0)$ is
+the constant function everywhere equal to zero.
+\end{theorem}
+\begin{proof}
+Applied to $h$ the definition \eqref{eq:second-subderivative} gives
+\begin{equation*}
+   d^2 h(0, 0)(u, v)
+   = \liminf_{\substack{\tau \searrow 0 \\ u' \to u \\ v' \to v}}
+   \frac{h(\tau u', \tau v') - \tau h(u', v')}{\frac{1}{2} \tau^2}
+\end{equation*}
+and this is zero because $h(\tau u, \tau v) = \tau u^2 / v = \tau h(u, v)$.
+\end{proof}
+
+Having gotten this far, we drop this subject, leaving our discussion
+incomplete.  It seems that whether we have a local minimum where some
+variance component is zero is determined entirely by first subderivative
+information.  So we now turn to that.
+
+\section{Descent Directions from the Boundary}
+
+\citet[Section~4]{reaster} backed up by \citet[Section~1.10.4]{reaster-tr}
+give a criterion for when $\nu_k = 0$ at a solution to the problem of minizing
+$p_W$ given by \eqref{eq:pee-lsc}.  Unfortunately, this criterion,
+equation (20) in \citet{reaster} and equation (33)  in \citet{reaster-tr}
+are missing a factor of {2} in one place.
+So we correct that mistake.
+We also slightly generalize their calculation,
+and carry it a little further to actually give a formula for a descent
+direction if one exists.
+
+We know from Fermat's rule generalized that a necessary condition for
+a local minimum is $d p_W(\alpha, b, \nu)$
+given by \eqref{eq:pee-lsc-subderivative} being a non-negative function.
+Common parlance in optimization algorithms is that a direction $w$ such
+that $f(x)(w) < 0$ is a \emph{descent direction} (for $f$ at $x$).
+Thus another way to state Fermat's rule generalized is that the necessary
+condition for a local minimum is that there are no descent directions.
+
+Conversely, if there is a descent direction, then we know from the
+equivalence of subderivatives and directional derivatives (for the
+functions of interest to us) that moving away from $x$ along a descent
+direction $w$ actually decreases $f$.  So we are not at a local minimum
+and moving in that directions is a useful step in an algorithm.
+
+So in this following we fix a point $(\alpha, b, \nu)$ and try to find
+a descent direction or prove than none exists.  Of course, off the boundary,
+where $p_W$ is smooth, we know a descent direction exists if and only if
+the first derivative vector (gradient) is nonzero, in which case minus
+the gradient is a descent direction.  So we are only interested in points
+$(\alpha, b, \nu)$ where some components of $\nu$ are zero, in which case
+we must also have $b_j = 0$ whenever $\var(b_j) \equiv \nu_k = 0$
+in order that $p_W$ be finite at this point.
+
+Any directional derivative is positively homogeneous, that is
+$d f(x)(s w) = s d f(x)(w)$ for $s > 0$.  Thus the problem of minimizing
+$d f(x)$ is unbounded below.  To get finite solutions, we constrain our
+direction vectors $w$ to lie in a compact set.  So we know the problem
+of minimizing the LSC function $d f(x)$ over this compact set achieves its
+minimum.  We choose the compact set to be an ellipsoid because quadratic
+functions are smooth and easy to handle.  Thus we decide to solve the following
+optimization problem
+\begin{subequations}
+\begin{align}
+   \text{minimize } & d p(\alpha, b, \nu)(t, u, v)
+   \label{eq:problem-objfun}
+   \\
+   \text{subject to } &
+   \sum_{i \in I^{(\alpha)}} \lambda^{(\alpha)}_i t_i^2
+   + \sum_{i \in I^{(b)}} \lambda^{(b)}_i u_i^2
+   + \sum_{i \in I^{(\nu)}} \lambda^{(\nu)}_i v_i^2
+   \le \Lambda
+   \label{eq:problem-consfun}
+\end{align}
+\end{subequations}
+the lambdas being arbitrary strictly positive numbers
+(it does not matter what ellipsoid we use as the constraint set)
+The variables being optimized over are $(t, u, v)$ not $(\alpha, b, \nu)$.
+
+Since the objective function of this optimization problem is convex
+(we know that subderivatives of convex functions are sublinear, hence convex,
+and we know that derivatives of smooth function are linear, hence convex,
+and we know that sums of convex functions are convex
+\citep[Exercise~2.18]{rockafellar-wets}.  Thus we know that any local minimizer
+of our optimization problem (finding a descent direction) is the global
+minimizer, and a local minimizer always exists (by compactness).
+
+Following \citet{reaster-tr,reaster} we use the method of
+also known as the Kuhn-Tucker conditions when inequality constraints
+are involved.  The Lagrangian function for this problem is
+\begin{equation} \label{eq:problem-lagrangian}
+\begin{split}
+   L(t, u, v) & = d p(\alpha, b, \nu)(t, u, v)
+   \\
+   & \qquad
+   + \kappa \left( \sum_{i \in I^{(\alpha)}} \lambda^{(\alpha)}_i t_i^2
+   + \sum_{i \in I^{(b)}} \lambda^{(b)}_i u_i^2
+   + \sum_{i \in I^{(\nu)}} \lambda^{(\nu)}_i v_i^2 \right)
+\end{split}
+\end{equation}
+where $\kappa$ is a Lagrange multiplier that must be nonnegative
+(dual feasibility) and must be zero unless the constraint
+\eqref{eq:problem-consfun} holds with equality at the solution
+(complementary slackness).
+
+Corollary~{28.8.1} in \citet{rockafellar} says that the method
+of Kuhn and Tucker is guaranteed to find a solution of this convex programming
+problem (we can always find a $\kappa$ so that the unconstrained minimum of
+the Lagrangian is the constrained minimum of the stated problem).
+
+By sublinearity of the objective function, its value at $(0, 0, 0)$ is
+zero.  So is the value of the constraint function.  Thus the value of
+the Lagrangian at $(0, 0, 0)$ is zero.  Hence the minimum value is nonpositive.
+If there exists a descent direction, the minimum value will be negative.
+If there does not exist a descent direction, the minimum value will be zero.
+
+So let us get on with solving the problem.  By convexity of the Lagrangian,
+the minimum (if not on the boundary) occurs where the gradient is zero.
+So we differentiate, or, if on the boundary, subdifferentiate.
+
+Differentiating the Lagrangian with respect to $t_i$,
+setting equal to zero, and solving gives
+\begin{subequations}
+\begin{equation} \label{eq:solution-t}
+   t_i =
+   - \frac{1}{2 \kappa \lambda^{(\alpha)}_i}
+   \frac{\partial p(\alpha, b, \nu)}{\partial \alpha_i}
+\end{equation}
+Similarly, for any $i$ and $j$ such that $\var(b_i) \equiv \nu_j > 0$,
+differentiating the Lagrangian with respect to $v_j$,
+setting equal to zero, and solving gives
+\begin{equation} \label{eq:solution-v-nu-positive}
+   v_j =
+   - \frac{1}{2 \kappa \lambda^{(\nu)}_j}
+   \frac{\partial p(\alpha, b, \nu)}{\partial \nu_j}
+\end{equation}
+and differentiating the Lagrangian with respect to $u_i$,
+setting equal to zero, and solving gives
+\begin{equation} \label{eq:solution-u-nu-positive}
+   u_i =
+   - \frac{1}{2 \kappa \lambda^{(b)}_i}
+   \frac{\partial p(\alpha, b, \nu)}{\partial b_i}
+\end{equation}
+
+In contrast, for any $i$ and $j$ such that $\var(b_i) \equiv \nu_j = 0$,
+which implies $b_i = 0$ in order for the $p_W(\alpha, b, \nu)$ to be finite,
+we have
+\begin{align}
+   \frac{\partial L(t, u. v)}{\partial u_i} & =
+   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i}
+   + 2 \kappa \lambda^{(b)}_i u_i
+   + \frac{u_i}{v_j}
+   \label{eq:lagrangian-u-zero}
+   \\
+   \frac{\partial L(t, u. v)}{\partial v_j} & =
+   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   + 2 \kappa \lambda^{(\nu)}_j v_j
+   - \frac{1}{2 v_j^2}
+   \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}} u_i^2
+   \label{eq:lagrangian-v-zero}
+\end{align}
+Now setting \eqref{eq:lagrangian-u-zero} equal to zero and solving
+for $u_i$ gives
+\begin{equation} \label{eq:solution-u-nu-zero}
+   u_i = -
+   \left( \frac{1}{v_j} + 2 \kappa \lambda^{(b)}_i \right)^{-1}
+   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i}
+\end{equation}
+\end{subequations}
+And plugging this back into \eqref{eq:lagrangian-v-zero} gives
+\begin{equation} \label{eq:lagrangian-v-plug}
+\begin{split}
+   \frac{\partial L(t, u. v)}{\partial v_j} & =
+   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   + 2 \kappa \lambda^{(\nu)}_j v_j
+   \\
+   & \qquad
+   - \frac{1}{2} \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
+   \left( \frac{\partial \bar{p}(\alpha, b, \nu) / \partial b_i}
+   {1 + 2 \kappa \lambda^{(b)}_i v_j} \right)^2
+\end{split}
+\end{equation}
+Since the lambdas are assumed strictly positive, $\kappa > 0$ implies
+\eqref{eq:lagrangian-v-plug} is a strictly increasing continuous function
+of $v_j$ that is unbounded above.
+Thus \eqref{eq:lagrangian-v-plug} has
+a zero when $v_j > 0$ only if it is negative when $v_j = 0$, that is,
+\begin{equation} \label{eq:zero-criterion}
+   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   - \frac{1}{2} \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
+   \left( \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i} \right)^2
+   < 0
+\end{equation}
+
+The corresponding equation in \citet[their (20)]{reaster} seems to be in error
+by a factor of 2 (which appears to be just losing somewhere in their
+derivation the $1/2$ in
+\eqref{eq:pee-lsc}).  This error was copied into the code for R function
+\code{summary.reaster}.  So it needs to be fixed there too,
+and has been fixed in a development version not yet on CRAN.
+
+Just to be clear, condition \eqref{eq:zero-criterion} holding indicates
+that there is a descent direction along which $\nu_j$ increases and
+$p_W(\alpha, b, \nu)$ decreases, so $(\alpha, b, \nu)$ is
+not a local minimum of $p_W$.
+Conversely, if the right-hand side of \eqref{eq:zero-criterion} is strictly
+positive, we know there is no descent direction along which $\nu_j$ increases
+$p_W(\alpha, b, \nu)$ decreases,
+so this suggests $(\alpha, b, \nu)$ either is a local minimum,
+or at least some point $(\alpha, b, \nu)$ with $\nu_j = 0$ is a local
+minimum.  But if we change the point $(\alpha, b, \nu)$ at which the
+test \eqref{eq:zero-criterion} is applied, we must recalculate the test.
+
+Now we want to go a little bit beyond what \citet{reaster-tr,reaster} did
+and actually solve the optimization problem
+\eqref{eq:problem-objfun} and \eqref{eq:problem-consfun}.
+
+In this we are helped by the fact that all of the lambdas are arbitrary.
+We can, if we like adjust them to help us find a solution.
+
+What we are supposed to do if the lambdas are given and unchangeable is
+to solve the equations above for $(t, u, v)$ as a function of $\kappa$,
+and then adjust $\kappa$, re-solving for $(t, u, v)$ after each adjustment,
+so that \eqref{eq:problem-consfun} holds with equality.
+But since $\Lambda$ is arbitrary and changeable, we can just choose an
+arbitrary $\kappa > 0$ and set $\Lambda$ equal to the left-hand side of
+\eqref{eq:problem-consfun}.
+
+So our procedure is to choose any strictly positive $\kappa$ and lambdas
+and determine
+\begin{itemize}
+\item $t_i$ by \eqref{eq:solution-t},
+\item in case $\nu_j > 0$, determine $u_i$ and $v_j$
+    such that $\var(b_i) \equiv \nu_j$ by
+    \eqref{eq:solution-u-nu-positive} and \eqref{eq:solution-v-nu-positive},
+    and
+\item in case $\nu_j = 0$ and \eqref{eq:zero-criterion} holds,
+\begin{itemize}
+\item determine $v_j$ by solving \eqref{eq:lagrangian-v-plug} for the
+    unique $v_j$ that makes it equal to zero,
+\item determine $u_i$ by \eqref{eq:solution-u-nu-zero}, and
+\end{itemize}
+\item in case $\nu_j = 0$ and \eqref{eq:zero-criterion} does not hold,
+    set $u_i = v_j = 0$.
+\end{itemize}
+So this gives us our descent direction $(t, u, v)$.
+
+The arbitrariness of the descent direction (because of the arbitrariness
+of $\kappa$ and the lambdas) may give one pause.
+
+\section{Square Root Parameterization}
 
 \citet{reaster} suggest a re-parameterization that makes the problem with
 zero variance components go away.

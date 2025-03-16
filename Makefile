@@ -1,7 +1,7 @@
 
 TEXFILES = macros.tex intro.tex complete.tex \
     factorize.tex markov.tex regular.tex families.tex notation.tex \
-    sampling.tex reaster.tex
+    sampling.tex reaster.tex vectors.tex
 
 BIBFILES = tpa.bib
 
