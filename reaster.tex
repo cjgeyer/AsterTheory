@@ -1,21 +1,24 @@
 
-\chapter{Aster Mixed Models} \label{ch:reaster}
+\chapter{Aster Mixed Models}
+\label{ch:reaster}
 
 \section{Introduction}
 
 In this chapter we cover the theory of aster mixed models (AMM),
 a special case of exponential family mixed models (EFMM),
-as described by \citet{reaster-tr,reaster} and as implemented by
+as described by \citet*{reaster-tr,reaster} and as implemented by
 R function \code{reaster} in R package \code{aster} \citep{aster-package}.
 
-Except we correct one mistake in \citet{reaster}.
+Except we correct one mistake in \citet{reaster-tr,reaster}.
+The correction is in equation \eqref{eq:zero-criterion}
+below and the surrounding discussion.
 We also add some theory.
 
-\subsection{Log Likelihood}
+\subsection{Introducing Random Effects}
 
 Let $l$ be the log likelihood for the canonical parameter vector of a
-regular full exponential family whose canonical parameter space is a
-full vector space.  A saturated aster model having the unconditional
+regular full exponential family.
+A saturated aster model having the unconditional
 canonical parameterization (Sections~\ref{sec:aster-transform},
 \ref{sec:aster-mean-value-parameters}, and~\ref{sec:plethora} above)
 is an example.  Following \citet{breslow-clayton}
@@ -33,9 +36,11 @@ where
 \begin{itemize}
 \item $a$ is a known vector (the \emph{offset vector}),
 \item $M$ is a known matrix (the \emph{model matrix for fixed effects}),
+    \index{fixed effect}
 \item $\alpha$ is a vector of unknown parameters (the vector of
     \emph{fixed effects}),
 \item $Z$ is a known matrix (the \emph{model matrix for random effects}), and
+    \index{random effect}
 \item $b$ is a mean-zero multivariate normal random vector (the vector of
     \emph{random effects}).
 \end{itemize}
@@ -51,6 +56,21 @@ Usually $a$ does not, and usually $M$ and $Z$ do.  They are ``known'' in
 the sense that our whole analysis is done conditional on the values of any
 covariates that are random, so they are essentially treated as fixed at their
 observed values (because that is how conditional probability works).
+
+In order that \eqref{eq:reaster-model-equation} make sense,
+it must be the case that
+$\varphi$ in that equation lie in the full canonical parameter space
+\eqref{eq:full-expfam} for all possible $b$, that is for all $b \in \real^K$
+where $K$ is the index set for $b$.  This need not be the case, because
+exponential family theory only guarantees this full canonical parameter
+space is a convex set (not a full vector space).  Consequently, the help
+page for R function \code{reaster} in R package \code{aster}, which fits
+AMM, warns about including negative binomial or truncated negative binomial
+arrows in AMM (because these families have full canonical parameter
+spaces that are not full vector spaces, Sections~\ref{sec:negative-binomial}
+and~\ref{sec:zero-truncated-negative-binomial} in the appendix).
+
+\subsection{Parameters}
 
 \citet{reaster} and R function \code{reaster} in R package \code{aster}
 assume that $D$ is diagonal and the diagonal elements of $D$ are the unknown
@@ -72,6 +92,16 @@ $$
 $$
 to show the explict dependence of $D$ on $\nu$.
 
+Another way we indicate the relationship between indices $i$ such that $b_i$
+makes sense and $k$ such that $\nu_k$ makes sense, is to write
+$\var(b_i) \equiv \nu_k$ to mean that $E_{k, i i} = 1$, where $E_{k, i i}$
+means the $i$-th diagonal element of $E_k$.  Here
+$\equiv$ means equal by design rather than by accident.  We can have
+two components of $\nu$ equal by accident because they are variables
+that can have any nonnegative values,
+but $\equiv$ means equal by the design of the experiment,
+forced to be always equal even as they are varied.
+
 We no longer think we should make this restriction on the structure of $D$
 part of the definition of EFMM.  In other contexts, users sometimes use
 correlated random effects.  If we assume AR(1) (auto-regressive order one)
@@ -84,6 +114,11 @@ Nevertheless, we have not yet implemented more complicated
 specification of $D$ in R package \code{aster}.
 And we will assume $D$ has the structure described above in the rest of this
 chapter.
+(If we were to generalize variance structure, this would considerably
+complicate the theory, especially testing whether random effects have
+variance zero, Section~\ref{sec:descent-directions} below).
+
+\subsection{Complete Data Log Likelihood}
 
 Minus the the so-called ``complete data log likelihood,''
 what the log likelihood would
@@ -99,6 +134,8 @@ Note that \eqref{eq:mlogl-complete} only makes sense when no variance
 components are zero (otherwise $D^{-1}$ does not exist, much more on this
 later, starting with Section~\ref{sec:lsc} below).
 
+\subsection{Log Likelihood}
+
 The likelihood for the random effects model is the conditional expectation
 of the complete data likelihood (the exponential of \eqref{eq:mlogl-complete})
 with respect to the observed data (the response vector $y$, which is also
@@ -106,10 +143,21 @@ not explicitly indicated in the notation but is in the log likelihood $l$,
 see \eqref{eq:logl-aster-phi} above).  That is, we exponentiate
 \eqref{eq:mlogl-complete} and then integrate out $b$ with respect to its
 assumed multivariate normal distribution, and then take the logarithm to get
-the log likelihood for the random effects.  This process rarely, if ever,
-can be done exactly.
+the log likelihood for the random effects.
+
+This process rarely, if ever, can be done exactly.
+It can be done by Monte Carlo, either Markov chain Monte Carlo
+\citep{thompson-guo,geyer-1994-jrssb} or ordinary Monte Carlo
+\citep*{sung-geyer,bernor-package,glmm,glmm-package}, but even though
+the Monte Carlo approximations can be made as accurate as one wants by
+simply doing more simulation, in practice, most users do too little simulation
+and these may be quite inaccurate.  But the R packages cited above
+\citep{bernor-package,glmm-package} only do
+generalized linear mixed models.  Their ideas could perhaps
+work for AMM, but have not yet been implemented for AMM.
 
 \subsection{Laplace Approximation}
+\label{sec:laplace-approximation}
 
 Thus, following \citet{breslow-clayton} and \citet{reaster}
 we use the Laplace approximation
@@ -128,7 +176,9 @@ of the log likelihood for the random effects model,
 where
 \begin{itemize}
 \item $W$ is the Fisher information matrix for the saturated exponential
-    family model, $W = - l''(\fatdot) = \nabla^2 c''(\fatdot)$
+    family model, $W(\fatdot) = - l''(\fatdot) = c''(\fatdot)$
+    where $l(\fatdot)$
+    is as above and $c(\fatdot)$ is the cumulant function for the family,
 \item $b^*$ is the minimizer of \eqref{eq:mlogl-complete} with respect to $b$,
     holding $\alpha$ and $\nu$ fixed, and
 \item $\text{Id}$ is the identity matrix of the appropriate dimension.
@@ -146,9 +196,13 @@ Summarizing the implicit dependencies:
 If we need to make these dependencies explicit we could write $l_y$ or
 $D(\nu)$ or $b^*(\alpha, \nu)$.
 
+For a derivation of \eqref{eq:mlogl-pickle} see Section~1.4 of
+\citet{reaster-tr}.
+
 \begin{theorem} \label{th:pickle}
 If \eqref{eq:mlogl-complete} considered a function of $b$ for
-fixed $\alpha$ and $\nu$ is bounded below, then has a unique minimizer $b^*$.
+fixed $\alpha$ and $\nu$ is bounded below,
+then it has a unique minimizer $b^*$.
 \end{theorem}
 \begin{proof}
 The first term in \eqref{eq:mlogl-complete} considered as a function of $b$
@@ -167,14 +221,15 @@ and $\hat{\nu}$.
 The condition in Theorem~\ref{th:pickle} that \eqref{eq:mlogl-complete} be
 bounded below is not restrictive.
 Any aster log likelihood that does not involve
-normal location-scale dependence groups is bounded below, and even those
-having such dependence groups will be bounded below if the model equation
+normal location-scale dependence groups is bounded above
+(so minus the log likelihood is bounded below), and even those
+having such dependence groups will be bounded above if the model equation
 \eqref{eq:reaster-model-equation} does not send any components of $\varphi$
 to infinity that correspond to variance nodes of a normal-location-scale
-dependence group (Theorem~\ref{th:dor-normal} above).  And, of course,
-$b^T D^{-1} b$ is bounded below by zero.
+dependence group (Theorem~\ref{th:dor-normal} above).
 
 \subsection{Estimates of Random Effects}
+\label{sec:bee-hat}
 
 We then have $b^*(\hat{\alpha}, \hat{\nu})$ as ``estimates'' (in scare quotes)
 of the random effects.  We say ``in scare quotes'' because, of course, the
@@ -197,7 +252,22 @@ map from canonical to mean value parameters,
 they are no longer modes or medians, so it is unclear how to describe these
 ``estimates'' in scare quotes.
 
-\subsection{A Key Concept}
+\subsection{A Second Approximation}
+\label{sec:second-approximation}
+
+The Laplace approximation \eqref{eq:mlogl-pickle} is still too hard to
+deal with.  The problem is that first and second derivatives of $W(\fatdot)$,
+which are third and forth derivatives of $- l(\fatdot)$, exist but would be
+time consuming and complicated to compute, and would require a complete
+rewrite of R package \code{aster}, which only provides first and second
+derivatives of $l(\fatdot)$.
+
+Hence, again following \citet{breslow-clayton} and \citet{reaster}, we
+make a second approximation (the first approximation is Laplace approximation).
+The way \citet{reaster} talk about this approximation makes no mathematical
+sense.  They say they treat $W(\fatdot)$ as a constant (matrix-valued) function
+in some places but not in other places.  We are going to do the same thing
+they do, but talk about it a little more rigorously.
 
 Following \citet{reaster},
 for any positive semidefinite symmetric matrix $W$, define
@@ -209,7 +279,23 @@ for any positive semidefinite symmetric matrix $W$, define
 \end{equation}
 Considered as functions of $b$ for fixed $\alpha$ and $\nu$
 \eqref{eq:mlogl-complete} and \eqref{eq:pee} differ only by a constant,
-hence have the same minimizer.
+hence have the same minimizer $b^*$.
+
+Now we modify \eqref{eq:mlogl-pickle} correspondingly.
+\begin{equation} \label{eq:queue}
+\begin{split}
+   q_W(\alpha, \nu)
+   & =
+   - l(a + M \alpha + Z b^*) + \tfrac{1}{2} (b^*)^T D^{-1} b^*
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id} \bigr]
+\end{split}
+\end{equation}
+That is,
+\begin{equation*}
+   q_W(\alpha, \nu) = p_W(\alpha, b^*, \nu) = \inf p_W(\alpha, \fatdot, \nu)
+\end{equation*}
+so jointly minimizing $p_W$ also minimizes $q_W$ and $q_W$ is a profile
+function of $p_W$.
 
 We thus consider the problem of jointly
 minimizing $p_W$ as a function of $(\alpha, b, \nu)$.
@@ -218,17 +304,43 @@ When $W$ is close to
    \widehat{W} =
    W\bigl(a + M \hat{\alpha} + Z b^*(\hat{\alpha}, \hat{\nu})\bigr)
 \end{equation}
-The function
-$$
-   \inf p_W(\alpha, \fatdot, \nu)
-$$
-should be close to the Laplace approximation \eqref{eq:mlogl-pickle}.
-(This is the conclusion of Theorem~\ref{th:pee-epi} below.)
+the function $q_W$ should be close to the Laplace approximation for
+minus the log likelihood.
 
-So the joint minimizer of $p_W$ should be close to the minimizers
-of the Laplace approximation \eqref{eq:mlogl-pickle},
-when $W$ is close to $\hat{W}$.
-(This is implied by Theorems~\ref{th:attouch} and~\ref{th:pee-epi} below.)
+\subsection{Algorithm}
+\label{sec:algorithm}
+
+Thus we use the following algorithm (with the definition of $p_W$ modified
+in the discussion below, equation \eqref{eq:pee-lsc}).
+\begin{algorithm}
+\caption{Fit Aster Model with Random Effects}
+\label{alg:reaster}
+\begin{tabbing}
+Initialize $W$ to be a positive definite symmetric matrix\\
+\textbf{repeat} \{\\
+\qquad \= Find $(\alpha, b, \nu)$ that minimize $p_W$ given by
+    \eqref{eq:pee-lsc}\\
+\> Set $W$ to $- l''(a + M \alpha + Z b)$\\
+\> If the sequence of iterates $(\alpha, b, \nu, W)$ appears
+    to have converged, stop\\
+\}
+\end{tabbing}
+\end{algorithm}
+This is what \citet{reaster} actually describe and
+R function \code{reaster} in R package \code{aster} \citep{aster-package}
+actually does (at least approximately).
+
+Calling Algorithm~\ref{alg:reaster} an ``algorithm'' is a bit iffy because
+\begin{itemize}
+\item we don't specify what ``appears to have converged'' means,
+\item and we don't specify what ``minimized'' means,
+    global or local minimization (the theory we use is about global
+    minimization but the software we use only does local minimization).
+\end{itemize}
+
+From now on, we will be working with $p_W$ and $q_W$ rather than the
+actual log likelihood for the random effects model or its Laplace
+approximation.
 
 \subsection{Basic Optimization Theory}
 \label{sec:basic}
@@ -257,7 +369,8 @@ zero additional mathematical content.  After all, the change of point of
 view from maximizing $f$ to minimizing $- f$ is truly trivial.
 
 This is why, in this chapter, we are minimizing minus the log likelihood
-(or its Laplace approximation) rather than maximizing the log likelihood.
+(or its Laplace approximation or the second approximation to that)
+rather than maximizing the log likelihood.
 We want to use a lot of optimization theory.
 
 The point of the second item is hard to explain.  Like many places
@@ -281,7 +394,8 @@ But it can be LSC.
 
 Having allowed $+\infty$ as a value of the objective function, we also allow
 $-\infty$ as a value for technical reasons.  This means we are working with
-the \emph{extended real number system} with its usual arithmetic, order, and
+the \emph{extended real number system} $\exreal$ with its usual arithmetic,
+order, and
 topology \citep[Section~1.E]{rockafellar-wets}.  The only tricky bit is that
 there are no natural definitions of zero times infinity or infinity minus
 infinity.  \citet{rockafellar-wets} define $0 \cdot \infty = 0$, a convention
@@ -290,10 +404,29 @@ the context of minimization (they note that you would
 want $\infty - \infty = - \infty$ in the context of maximization, which,
 of course, the turn-everything-upside-down principle gives).
 
-Topologically, the extended real number system, denoted $\exreal$ is a compact
-set.  So every sequence has a convergent subsequence.  What it means for
+Topologically, $\exreal$ is a compact
+set.  Every sequence has a convergent subsequence.  What it means for
 objective function values to converge to infinity is just what it means in
 calculus.
+
+In applications, we do not have objective functions that take the value
+$-\infty$.  So because $-\infty$ is theoretically allowed, we need a term
+for that.  In the minimization context, we say a function $f$ is \emph{proper}
+if $f(x) < +\infty$ for at least one $x$ and
+if $f(x) > -\infty$ for all $x$.
+\index{proper (extended-real-valued function)}
+All objective functions we use in applications are proper.
+
+Another useful term for discussing extended-real-valued functions
+is the following.
+The \emph{effective domain} of an extended-real-valued function $f$ is
+$$
+   \dom f = \set{ x : f(x) < +\infty }
+$$
+\index{effective domain (of extended-real-valued function)}
+Of course, the effective domain is not the domain unless we do not have
+any $x$ such that $f(x) = +\infty$.  But $\dom f$ is what is elsewhere
+called the constraint set, so is important.
 
 \subsection{Lower Semicontinuous Regularization}
 \label{sec:lsc}
@@ -317,14 +450,14 @@ sum of terms of the form $h(b_i, \nu_k) = b_i^2 / \nu_k$,
 where $\nu_k = \var(b_i)$.  Thus we start with the LSC regularization of $h$.
 
 Again we define $h(b, \nu) = +\infty$ when $\nu < 0$ to enforce
-the constraints.  Clearly $h(b, \nu) \ge 0$ for all $b$ and $\nu \neq 0$, and
+the constraints.  Clearly $h(b, \nu) \ge 0$ for all $b$ and all $\nu > 0$, and
 $$
    \lim_{\substack{b = 0 \\ \nu \searrow 0}} h(b, \nu) = 0
 $$
 So we define $h(0, 0) = 0$.  Conversely, if $b_n$ is a sequence bounded
 away from zero
 $$
-   \lim_{\nu_n \to 0} h(b_n, \nu_n) = + \infty
+   \lim_{\nu_n \searrow 0} h(b_n, \nu_n) = + \infty
 $$
 Thus the LSC regularization of $h$ has the form
 \begin{equation} \label{eq:h}
@@ -356,10 +489,7 @@ and the LSC regularization of $p_W$ has the form
 where $I^{(\alpha)}$, $I^{(b)}$, and $I^{(\nu)}$ are the
 index sets of the vectors $\alpha$, $b$, and $\nu$, respectively,
 and where
-$\equiv$ means equal by design rather than by accident (we can have
-two components of $\nu$ equal by accident because they are nonnegative-valued
-variables, but $\equiv$ means equal by the design of the experiment,
-forced to be always equal even as they are varied).
+$\equiv$ means equal by design rather than by accident, as explained above.
 
 This still leaves us with a problem with the third term in \eqref{eq:pee}
 or \eqref{eq:pee-lsc}.
@@ -390,11 +520,11 @@ of a product is the product of determinants,
    \det \left( D^{1/2} Z^T W Z D^{1/2} + \text{Id} \right)
 \end{align*}
 Reading from end to end, we have
-\begin{equation*}
+\begin{equation} \label{eq:symmetrization}
    \det \left( Z^T W Z D + \text{Id} \right)
    =
    \det \left( D^{1/2} Z^T W Z D^{1/2} + \text{Id} \right)
-\end{equation*}
+\end{equation}
 which no longer contains $D^{-1/2}$.  Hence, by continuity, this equation
 also holds when all components of $\nu$ are nonnegative.
 
@@ -419,7 +549,12 @@ determinant is undefined.  We have to separately define the value of
 (Of course, the principle of incorporating the constraints into the
 objective function, requires the value to be $+\infty$ whenever any
 component of $\nu$ is negative, so this paragraph is just about being
-careful about that.)
+careful about that.  The only point of the lemma is to assure us that
+we do not have any other issues with $p_W$ being well defined.)
+
+Now $q_W$ is defined by \eqref{eq:queue} with $p_W$ now defined by
+\eqref{eq:pee-lsc}, that is, $q_W(\alpha, \nu)$ is finite when all components
+of $\nu$ are nonnegative, and $+\infty$ otherwise.
 
 \subsection{Epiconvergence}
 
@@ -448,7 +583,7 @@ This is denoted $f_n \eto f$.
 
 If we changed \eqref{eq:epiconvergence-some} so it said ``every'' instead
 of ``some'' this would define uniform convergence on compact sets
-(also called continuous convergence) \citep[Section~7.C]{rockafellar-wets}.
+(also called continuous convergence, \citealp[Section~7.C]{rockafellar-wets}).
 
 As it is \eqref{eq:epiconvergence-some} is weaker than what pointwise
 convergence says: that \eqref{eq:epiconvergence-some} holds when $x_n = x$
@@ -459,11 +594,16 @@ convergence on compact sets, but a weaker guarantee from above than
 pointwise convergence.  As with replacing continous with LSC, this is
 just what is needed for minimization.
 \begin{theorem} \label{th:attouch}
-Suppose $f_n \eto f$ and $x_n \to x$ and $f_n(x_n) - \inf f_n \to 0$.
+Suppose
+\begin{itemize}
+\item[\normalfont (a)] $f_n \eto f$ and
+\item[\normalfont (b)] $x_n \to x$ and
+\item[\normalfont (c)] $f_n(x_n) - \inf f_n \to 0$.
+\end{itemize}
 Then
 \begin{itemize}
-\item[\normalfont (a)] $f(x) = \inf f$.
-\item[\normalfont (b)] $f_n(x_n) \to f(x)$.
+\item[\normalfont (d)] $f(x) = \inf f$ and
+\item[\normalfont (e)] $f_n(x_n) \to f(x)$.
 \end{itemize}
 \end{theorem}
 This is Proposition~{3.1} in \citet{constrained-m-estimation} which
@@ -477,9 +617,9 @@ we use the subsequence principle (if every convergent subsequence converges
 to the same limit, then the whole sequence converges to that limit) to
 conclude $x_n \to x$.  The problem is obtaining boundedness (no escape
 to infinity) and uniqueness ($f$ has a unique minimizer).  Neither is
-easy.  We will not be able to prove either: that our algorithm (still
-to be described) has a bounded sequence of iterates or that our objective
-function \eqref{eq:mlogl-pickle} has a unique minimizer.
+easy.  We will not be able to prove either: that Algorithm~\ref{alg:reaster}
+has a bounded sequence of iterates or that our objective
+function $p_W$ given by \eqref{eq:pee-lsc} has a unique minimizer.
 So Theorem~\ref{th:attouch} is often the best we can do.
 
 \begin{theorem} \label{th:pee-epi}
@@ -496,6 +636,7 @@ We consider separately the three terms of \eqref{eq:pee-lsc}.
    \\
    p_2(\alpha, b, \nu)
    & =
+   \tfrac{1}{2}
    \sum_{k \in I^{(\nu)}}
    \sum_{\substack{j \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
    h(b_j, \nu_k)
@@ -512,9 +653,11 @@ for these constant sequences.
 Also note that $p_2$ does not actually depend on $\alpha$ or $W$ so we are
 considering constant sequences for it as $W_n \to W$.  Since each term of
 its definition is LSC, the sum multiplied by a positive scalar is LSC
-\citet[Theorem~1.39]{rockafellar-wets}, that is, $p_2$ is LSC.
-Since a constant sequence of functions $f$ epiconverges to $\closure f$,
-we have epiconvergence of these constant sequences.
+\citep[Theorem~1.39]{rockafellar-wets}, that is, $p_2$ is LSC.
+Since a constant sequence of functions $f$ epiconverges to $\closure f$
+\citep[Proposition~7.4]{rockafellar-wets},
+we have epiconvergence of these constant sequences
+($f$ LSC means $f = \closure f$).
 
 Now $p_{3, W}$ does not actually depend on $\alpha$ or $b$.  And its
 defining formula is a continuous function of $\nu$ and $W$ so
@@ -522,44 +665,76 @@ $$
    p_{3, W_n}(\nu_n) \to p_{3, W}(\nu), \qquad \text{as $W_n \to W$
    and $\nu_n \to \nu$}
 $$
-This is continuous convergence $p_{3, W_n} \to p_{3. W}$.
+This is continuous convergence $p_{3, W_n} \to p_{3, W}$.
 
 Now we apply (twice) that the sum of an epiconverging sequence
-and a continuously converging sequence epiconverges
+and a continuously converging sequence epiconverges to the sum of the limits
 \citep[Theorem~7.46 (b)]{rockafellar-wets}.
 \end{proof}
 
-\subsection{Algorithm}
+The point of the theorem, is that we have convergence of minimizers
+(assuming a convergent sequence of iterates in Algorithm~\ref{alg:reaster},
+including in the case where we
+are converging to solutions what have $\nu_k = 0$ for some $k$.
+That is why we need the optimization theory.  More on this below
+(Sections~\ref{sec:subderivatives}, \ref{sec:second-subderivatives},
+and~\ref{sec:descent-directions}).
 
-This gives us an algorithm.
-\begin{enumerate}
-\item Initialize $W$ to be a positive definite symmetric matrix.
-\item Find $(\alpha, b, \nu)$ that minimize $p_W$ given by \eqref{eq:pee-lsc}.
-\item Set $W$ to $- l''(a + M \alpha + Z b)$.
-\item If the sequence of iterates $(\alpha, b, \nu, W)$ appears
-    to have converged, stop.  Otherwise, go to step 2.
-\end{enumerate}
+\begin{lemma} \label{lem:bee-star}
+The function $b^*$ defined in Section~\ref{sec:laplace-approximation} above
+is continuous on its domain, which is the set of $(\alpha, \nu)$ with
+$\nu$ having all components nonnegative.
+\end{lemma}
+\begin{proof}
+We will find out in Section~\ref{sec:first-derivatives} below that
+$b^*$ is actually differentiable (hence continuous) at points $(\alpha, \nu)$
+with $\nu$ having all components strictly positive.
 
-This is cheating a bit in several ways.
-\begin{itemize}
-\item Theorem~\ref{th:attouch} is about global minimizers, but all the
-    optimization algorithms we have access to only find local minimizers
-    (p given by \eqref{eq:pee-lsc} is not convex).
-\item We have not stated what our convergence criteria are.
-\end{itemize}
+Thus it only remains to check points on the boundary of the domain,
+where $\nu_k = 0$ for some $k$ and this implies $b^*_i(\alpha, \nu) = 0$
+whenever $\var(b_i) \equiv \nu_k$.
 
-Nevertheless, Theorems~\ref{th:attouch} and~\ref{th:pee-epi} do say
-that if we are finding global minimizers in Step 2 and if the iterates
-converge, then they converge to the global minimizer of
-\eqref{eq:mlogl-pickle}.
+So consider a sequence $(\alpha_n, \nu_n) \to (\alpha, \nu)$, where $\nu$
+has some components equal to zero.  We now divide up $p_W$ differently
+from in the preceding proof.
+\begin{align*}
+   \tilde{p}(\alpha', b', \nu')
+   & =
+   \tfrac{1}{2}
+   \sum_{\substack{k \in I^{(\nu)} \\ \nu_k = 0}}
+   \sum_{\substack{j \in I^{(b)} \\ \var(b_j) \equiv \nu_k}}
+   h(b_j', \nu_k')
+   \\
+   \tilde{\tilde{p}}(\alpha', b', \nu')
+   & =
+   - l(a + M \alpha' + Z b')
+   + \tfrac{1}{2}
+   \sum_{\substack{k \in I^{(\nu)} \\ \nu_k > 0}}
+   \sum_{\substack{j \in I^{(b)} \\ \var(b_j) \equiv \nu_k}}
+   h(b_j', \nu_k')
+\end{align*}
+Note that the $\nu$ that controls which terms go in which function is
+the limit of the sequence $\nu_n \to \nu$, whereas the argument of the
+functions being defined are a different variable $\nu'$.
+Because $\tilde{\tilde{p}}$ is a continuous function, for any $\varepsilon > 0$
+we have
+\begin{gather*}
+    \nu_n \le \varepsilon
+    \\
+   \tilde{p}(\alpha_n, b, \nu_n) \le
+   \tilde{p}(\alpha, b, \nu) + \varepsilon
+\end{gather*}
+\end{proof}
 
-Note that, despite what might appear at first sight.  This is an algorithm
-for minimizing the Laplace approximation $q$ given by \eqref{eq:mlogl-pickle}
-not for minimizing $p_W$.
+\begin{theorem} \label{th:queue-epi}
+Suppose $W_n \to W$, then $q_{W_n} \eto q_{W}$.
+\end{theorem}
+\begin{proof}
+\end{proof}
 
 \section{Derivatives}
 
-We all know that derivatives (first and second) have something to do with
+We know that derivatives (first and second) have something to do with
 optimization.  Especially in statistics, where second derivatives define
 Fisher information used to derive standard errors of MLE.
 
@@ -569,27 +744,28 @@ at points where some component of $\nu$ is zero and the corresponding
 components of $b$ are zero.
 
 \subsection{Classical First Derivatives}
+\label{sec:first-derivatives}
 
-\citet{reaster-tr,reaster} give derivatives of the objective function $q$
-given by \eqref{eq:mlogl-pickle}.  We follow them closely here.  Since
-$q$ is only defined implicitly (it involves $b^*$ for which we have only
+\citet{reaster-tr,reaster} give derivatives of the objective function $q_W$
+given by \eqref{eq:queue}.  We follow them closely here.  Since
+$q_W$ is only defined implicitly (it involves $b^*$ for which we have only
 an implicit definition), we need to use the implicit function theorem.
 
 Thus we start with derivatives of $p_W$ given by \eqref{eq:pee} and
-derive derivatives of $q$ given by \eqref{eq:mlogl-pickle} from them.
+derive derivatives of $q_W$ given by \eqref{eq:queue} from them.
 All of these derivatives are found in Section~1.7 of \citet{reaster-tr}.
 
 First derivatives of $p_W$ are
+\begin{subequations}
 \begin{align}
    p_{W, \alpha}(\alpha, b, \nu)
    & =
-   - M^T \bigl[ y - \mu(a + M \alpha + Z b) \bigr]
+   - M^T l'(a + M \alpha + Z b)
    \label{eq:p-alpha}
    \\
    p_{W, b}(\alpha, b, \nu)
    & =
-   =
-   - Z^T \bigl[ y - \mu(a + M \alpha + Z b) \bigr] + D^{- 1} b
+   - Z^T l'(a + M \alpha + Z b) + D^{- 1} b
    \label{eq:p-bee}
    \\
    p_{W, \nu_k}(\alpha, b, \nu)
@@ -601,18 +777,18 @@ First derivatives of $p_W$ are
    \Bigr)
    \label{eq:p-nu-k}
 \end{align}
+\end{subequations}
 where
 \begin{itemize}
-\item derivatives are noted by subscripts, if $f$ is a scalar-valued function
+\item on the left-hand side, derivatives are noted by subscripts,
+    if $f$ is a scalar-valued function
     of vector variables, then $f_\theta$ is the vector of partial derivatives
     with respect to the components of $\theta$
-    and $f_\theta(\alpha, \beta, \theta)$ is the
-    value of this derivative at the point $(\alpha, \beta, \theta)$,
-\item $y$ is the response vector (the observed data), and
-\item $\mu(\fatdot)$ is the expectation of $y$ given the parameters and
-    random effects (so it is a function of $\alpha$ and $b$).
-    From exponential family theory $l_\alpha(\alpha, b, \nu) =
-    y - \mu(a + M \alpha + Z b)$.
+    and $f_\theta(\alpha, \beta, \nu)$ is the
+    value of this derivative at the point $(\alpha, \beta, \nu)$,
+\item $l'(\fatdot)$ is the first derivative vector (also called the
+    gradient vector) of the log likelihood $l$ for the saturated aster
+    model.
 \end{itemize}
 
 The estimating equation for $b^*$ can be written
@@ -623,15 +799,15 @@ The estimating equation for $b^*$ can be written
 actually depend on $W$ because the part of $p_W$ containing $W$ does not
 contain $b$.
 
-Then \citet[Section~1.7]{reaster-tr} derive the first derivatives of $q$
+Then \citet[Section~1.7]{reaster-tr} derive the first derivatives of $q_W$
 from \eqref{eq:estimating-bee-star} and the multivariate chain rule
 \begin{align}
-   q_\alpha(\alpha, \nu)
+   q_{W, \alpha}(\alpha, \nu)
    & =
    p_{W, \alpha}(\alpha, b^*, \nu)
    \label{eq:q-alpha}
    \\
-   q_{\nu_k}(\alpha, \nu)
+   q_{W, \nu_k}(\alpha, \nu)
    & =
    p_{W, \nu_k}(\alpha, b^*, \nu)
    \label{eq:q-nu-k}
@@ -654,16 +830,38 @@ theorem \citep[Section~1.8]{reaster}
 \end{align}
 These formulas require that the matrix $p_{W, b b}(\alpha, b^*, \nu)$,
 which, recall, does not depend on $W$ despite the notation,
-is invertible.  We will eventually find out that it is
+is invertible.
+\begin{theorem} \label{th:invertible-bb}
+$p_{W, b b}(\alpha, b^*, \nu)$ is always positive definite,
+when the derivative exists (when all components of $\nu$
+are strictly positive).
+\end{theorem}
+\begin{proof}
+In the proof of Theorem~\ref{th:pickle} we established that
+$p_W(\alpha, \fatdot, \nu)$ is a strictly convex function.
+Hence it has a positive-semidefinite Hessian matrix
+\citep[Theorem~2.14 (c)]{rockafellar-wets}.  To prove strict
+positive-definiteness, we look at the actual formula for the
+Hessian, \eqref{eq:p-w-b-b} below.  On the right-hand side
+the first term $Z^T W(a + M \alpha + Z b) Z$ is positive
+semidefinite because $W(\fatdot)$ is the variance-covariance
+matrix of the response vector (this assumes no subsampling)
+or at least (with subsampling) $Z^T W(a + M \alpha + Z b^*) Z$
+is positive semidefinite because 
+\end{proof}
+
+  We will eventually find out that it is
 (Theorem~\ref{th:positive-definite} below).
 These formulas also require second derivatives of $p_W$ which are found
 in the following section.
 
 \subsection{Classical Second Derivatives}
+\label{sec:second-derivatives}
 
 These are given in \citet[Section~1.8]{reaster-tr}.
 We start with derivatives of $p_W$.
-\begin{align*}
+\begin{subequations}
+\begin{align}
    p_{W,\alpha \alpha}(\alpha, b, \nu)
    & =
    M^T W(a + M \alpha + Z b) M
@@ -675,6 +873,7 @@ We start with derivatives of $p_W$.
    p_{W, b b}(\alpha, b, \nu)
    & =
    Z^T W(a + M \alpha + Z b) Z + D^{- 1}
+   \label{eq:p-w-b-b}
    \\
    p_{W, \alpha \nu_k}(\alpha, b, \nu)
    & =
@@ -687,51 +886,59 @@ We start with derivatives of $p_W$.
    p_{W, \nu_j \nu_k}(\alpha, b, \nu)
    & =
    b^T D^{- 1} E_j D^{- 1} E_k D^{- 1} b
+   \nonumber
    \\
    & \qquad
    -
    \tfrac{1}{2} \tr \Bigl(
    \bigl[ Z^T W Z D + I \bigr]^{- 1}
    Z^T W Z E_j
+   \nonumber
    \\
    & \qquad \qquad
    \bigl[ Z^T W Z D + I \bigr]^{- 1}
    Z^T W Z E_k
    \Bigr)
-\end{align*}
+\end{align}
+\end{subequations}
 where all of these are now matrices: the $i, j$ component
 of $f_{\alpha, \beta}$ evaluated at the point $x$ is
 $\partial^2 f(x) / \partial \alpha_i \partial \beta_j$.
 
-And the derivatives of $q$.
-\begin{align*}
-   q_{\alpha \alpha}(\alpha, \nu)
+And the derivatives of $q_W$.
+\begin{subequations}
+\begin{align}
+   q_{W, \alpha \alpha}(\alpha, \nu)
    & =
    p_{W, \alpha \alpha}(\alpha, b^*, \nu)
    -
    p_{W, \alpha b}(\alpha, b^*, \nu)
    p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \alpha}(\alpha, b^*, \nu)
+   \label{eq:q-alpha-alpha}
    \\
-   q_{\alpha \nu}(\alpha, \nu)
+   q_{W, \alpha \nu}(\alpha, \nu)
    & =
    p_{W, \alpha \nu}(\alpha, b^*, \nu)
    -
    p_{W, \alpha b}(\alpha, b^*, \nu)
    p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \nu}(\alpha, b^*, \nu)
+   \label{eq:q-alpha-nu}
    \\
-   q_{\nu \nu}(\alpha, \nu)
+   q_{W, \nu \nu}(\alpha, \nu)
    & =
    p_{W, \nu \nu}(\alpha, b^*, \nu)
    -
    p_{W, \nu b}(\alpha, b^*, \nu)
    p_{W, b b}(\alpha, b^*, \nu)^{-1} p_{W, b \nu}(\alpha, b^*, \nu)
-\end{align*}
+   \label{eq:q-nu-nu}
+\end{align}
+\end{subequations}
 
 If we combine all the parameters
 in one vector $\psi = (\alpha, \nu)$ and write $p_W(\psi, b)$ instead
 of $p_W(\alpha, b, \nu)$ we have
-\begin{equation} \label{eq:psi-psi}
-   q_{\psi \psi}(\psi)
+\begin{equation} \label{eq:q-psi-psi}
+   q_{W, \psi \psi}(\psi)
    =
    p_{W, \psi \psi}(\psi, b^*)
    -
@@ -742,10 +949,40 @@ of $p_W(\alpha, b, \nu)$ we have
 
 \citet[Section~1.8]{reaster-tr} prove the following.
 \begin{theorem} \label{th:positive-definite}
-If $p_W$ has a positive definite Hessian matrix, so does $q$.
+If $p_W$ has a positive definite Hessian matrix, so does $q_W$.
 \end{theorem}
 
+\subsection{Fisher Information}
+\label{sec:fisher-reaster}
+
+\Citet[Section~12]{reaster} take $q_W''(\hat{\alpha}, \hat{\nu})$ given
+by equations
+\eqref{eq:q-alpha-alpha}, \eqref{eq:q-alpha-nu}, and \eqref{eq:q-nu-nu} above
+or by \eqref{eq:q-psi-psi} above
+to be approximate
+observed Fisher information for the parameter vector $(\alpha, \nu)$.
+This is where R generic function \code{summary} when applied to objects
+returned by R function \code{reaster} gets standard errors.
+
+In future work we are interested not only in parameter estimates (functions
+of $\alpha$ and $\nu$) but also in random effects estimates (functions of $b$).
+For these we use the point estimates $\hat{b}$ and we need standard errors for
+them.  These come from the delta method applied to what we have so far.
+Define the matrix
+\begin{equation} \label{eq:delta-method-for-b}
+   V = \begin{pmatrix} \text{Id}_{\dim(\alpha)} & 0 \\
+   b^*_\alpha(\hat{\alpha}, \hat{\nu}) & b^*_\nu(\hat{\alpha}, \hat{\nu}) \\
+   0 & \text{Id}_{\dim(\nu)}
+   \end{pmatrix}
+\end{equation}
+where the derivatives of $b^*$ are given by
+\eqref{eq:bee-star-alpha} and \eqref{eq:bee-star-nu}.
+Then $V q_{W, \psi \psi}(\hat{\alpha}, \hat{\nu})^{-1} V$ is the
+approximate asymptotic variance of the vector
+$(\hat{\alpha}, \hat{b}, \hat{\nu})$.
+
 \subsection{Subderivatives}
+\label{sec:subderivatives}
 
 Given an extended-real-valued function $f$ of one vector variable,
 at a point $x$ such that $f(x)$ is finite,
@@ -836,6 +1073,7 @@ This is the subderivative of the function $p_W$ at the point $(\alpha, b, \nu)$
 in the direction $(t, u, v)$.
 
 \subsection{Directional Derivatives}
+\label{sec:directional-derivatives}
 
 \citet{reaster-tr} note that in all cases of interest to them
 subderivatives are equal to directional derivatives,
@@ -859,11 +1097,12 @@ did not mention subderivatives.  But without subderivative theory
 \citep[Chapters~8 and~10]{rockafellar-wets} we would not know that the
 directional derivatives exist or have anything to do with minimization.
 
-\subsection{Second Derivatives}
+\subsection{Second Subderivatives}
+\label{sec:second-subderivatives}
 
 \citet{reaster-tr,reaster} did not discuss second derivative information
-where the function is not differentiable (on the boundary), but
-\citet[Chapter~13]{rockafellar-wets} do.
+where the function is not differentiable (on the boundary of the effective
+domain), but \citet[Chapter~13]{rockafellar-wets} do.
 
 As in the case of subderivatives, we are primarily interested in the nonsmooth
 function $h$ defined by \eqref{eq:h} at its only boundary point $(0, 0)$.
@@ -880,7 +1119,8 @@ the function $d^2 f(x) : \real^d \to \exreal$ defined by
 
 \begin{theorem} \label{th:second-subderivative}
 The second subderivative of $h$ defined by \eqref{eq:h} at $(0, 0)$ is
-the constant function everywhere equal to zero.
+the function that is zero where $h$ is finite and $+\infty$
+where $h$ is $+\infty$.
 \end{theorem}
 \begin{proof}
 Applied to $h$ the definition \eqref{eq:second-subderivative} gives
@@ -895,9 +1135,10 @@ and this is zero because $h(\tau u, \tau v) = \tau u^2 / v = \tau h(u, v)$.
 Having gotten this far, we drop this subject, leaving our discussion
 incomplete.  It seems that whether we have a local minimum where some
 variance component is zero is determined entirely by first subderivative
-information.  So we now turn to that.
+information.  So we now return to that.
 
 \section{Descent Directions from the Boundary}
+\label{sec:descent-directions}
 
 \citet[Section~4]{reaster} backed up by \citet[Section~1.10.4]{reaster-tr}
 give a criterion for when $\nu_k = 0$ at a solution to the problem of minizing
@@ -942,7 +1183,7 @@ functions are smooth and easy to handle.  Thus we decide to solve the following
 optimization problem
 \begin{subequations}
 \begin{align}
-   \text{minimize } & d p(\alpha, b, \nu)(t, u, v)
+   \text{minimize } & d p_W(\alpha, b, \nu)(t, u, v)
    \label{eq:problem-objfun}
    \\
    \text{subject to } &
@@ -958,19 +1199,20 @@ the lambdas being arbitrary strictly positive numbers
 The variables being optimized over are $(t, u, v)$ not $(\alpha, b, \nu)$.
 
 Since the objective function of this optimization problem is convex
-(we know that subderivatives of convex functions are sublinear, hence convex,
+(we know that subderivatives of convex functions are sublinear
+\citep[Proposition~8.21]{rockafellar-wets}, hence convex,
 and we know that derivatives of smooth function are linear, hence convex,
 and we know that sums of convex functions are convex
 \citep[Exercise~2.18]{rockafellar-wets}.  Thus we know that any local minimizer
 of our optimization problem (finding a descent direction) is the global
 minimizer, and a local minimizer always exists (by compactness).
 
-Following \citet{reaster-tr,reaster} we use the method of
+Following \citet{reaster-tr,reaster} we use the method of Lagrange multipliers,
 also known as the Kuhn-Tucker conditions when inequality constraints
 are involved.  The Lagrangian function for this problem is
 \begin{equation} \label{eq:problem-lagrangian}
 \begin{split}
-   L(t, u, v) & = d p(\alpha, b, \nu)(t, u, v)
+   L(t, u, v) & = d p_W(\alpha, b, \nu)(t, u, v)
    \\
    & \qquad
    + \kappa \left( \sum_{i \in I^{(\alpha)}} \lambda^{(\alpha)}_i t_i^2
@@ -983,8 +1225,8 @@ where $\kappa$ is a Lagrange multiplier that must be nonnegative
 \eqref{eq:problem-consfun} holds with equality at the solution
 (complementary slackness).
 
-Corollary~{28.8.1} in \citet{rockafellar} says that the method
-of Kuhn and Tucker is guaranteed to find a solution of this convex programming
+Corollary~{28.8.1} in \citet{rockafellar} says that the Kuhn-Tucker method
+is guaranteed to find a solution of this convex programming
 problem (we can always find a $\kappa$ so that the unconstrained minimum of
 the Lagrangian is the constrained minimum of the stated problem).
 
@@ -995,7 +1237,8 @@ If there exists a descent direction, the minimum value will be negative.
 If there does not exist a descent direction, the minimum value will be zero.
 
 So let us get on with solving the problem.  By convexity of the Lagrangian,
-the minimum (if not on the boundary) occurs where the gradient is zero.
+the minimum (if not at on the boundary) occurs where the gradient of the
+Lagrangian is zero.
 So we differentiate, or, if on the boundary, subdifferentiate.
 
 Differentiating the Lagrangian with respect to $t_i$,
@@ -1004,7 +1247,7 @@ setting equal to zero, and solving gives
 \begin{equation} \label{eq:solution-t}
    t_i =
    - \frac{1}{2 \kappa \lambda^{(\alpha)}_i}
-   \frac{\partial p(\alpha, b, \nu)}{\partial \alpha_i}
+   \frac{\partial p_W(\alpha, b, \nu)}{\partial \alpha_i}
 \end{equation}
 Similarly, for any $i$ and $j$ such that $\var(b_i) \equiv \nu_j > 0$,
 differentiating the Lagrangian with respect to $v_j$,
@@ -1012,28 +1255,28 @@ setting equal to zero, and solving gives
 \begin{equation} \label{eq:solution-v-nu-positive}
    v_j =
    - \frac{1}{2 \kappa \lambda^{(\nu)}_j}
-   \frac{\partial p(\alpha, b, \nu)}{\partial \nu_j}
+   \frac{\partial p_W(\alpha, b, \nu)}{\partial \nu_j}
 \end{equation}
 and differentiating the Lagrangian with respect to $u_i$,
 setting equal to zero, and solving gives
 \begin{equation} \label{eq:solution-u-nu-positive}
    u_i =
    - \frac{1}{2 \kappa \lambda^{(b)}_i}
-   \frac{\partial p(\alpha, b, \nu)}{\partial b_i}
+   \frac{\partial p_W(\alpha, b, \nu)}{\partial b_i}
 \end{equation}
 
 In contrast, for any $i$ and $j$ such that $\var(b_i) \equiv \nu_j = 0$,
-which implies $b_i = 0$ in order for the $p_W(\alpha, b, \nu)$ to be finite,
+which implies $b_i = 0$ in order for $p_W(\alpha, b, \nu)$ to be finite,
 we have
 \begin{align}
    \frac{\partial L(t, u. v)}{\partial u_i} & =
-   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i}
+   \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial b_i}
    + 2 \kappa \lambda^{(b)}_i u_i
    + \frac{u_i}{v_j}
    \label{eq:lagrangian-u-zero}
    \\
    \frac{\partial L(t, u. v)}{\partial v_j} & =
-   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial \nu_j}
    + 2 \kappa \lambda^{(\nu)}_j v_j
    - \frac{1}{2 v_j^2}
    \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}} u_i^2
@@ -1044,19 +1287,19 @@ for $u_i$ gives
 \begin{equation} \label{eq:solution-u-nu-zero}
    u_i = -
    \left( \frac{1}{v_j} + 2 \kappa \lambda^{(b)}_i \right)^{-1}
-   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i}
+   \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial b_i}
 \end{equation}
 \end{subequations}
 And plugging this back into \eqref{eq:lagrangian-v-zero} gives
 \begin{equation} \label{eq:lagrangian-v-plug}
 \begin{split}
    \frac{\partial L(t, u. v)}{\partial v_j} & =
-   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial \nu_j}
    + 2 \kappa \lambda^{(\nu)}_j v_j
    \\
    & \qquad
    - \frac{1}{2} \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
-   \left( \frac{\partial \bar{p}(\alpha, b, \nu) / \partial b_i}
+   \left( \frac{\partial \bar{p}_W(\alpha, b, \nu) / \partial b_i}
    {1 + 2 \kappa \lambda^{(b)}_i v_j} \right)^2
 \end{split}
 \end{equation}
@@ -1064,11 +1307,11 @@ Since the lambdas are assumed strictly positive, $\kappa > 0$ implies
 \eqref{eq:lagrangian-v-plug} is a strictly increasing continuous function
 of $v_j$ that is unbounded above.
 Thus \eqref{eq:lagrangian-v-plug} has
-a zero when $v_j > 0$ only if it is negative when $v_j = 0$, that is,
+a zero when $v_j > 0$ if and only if it is negative when $v_j = 0$, that is,
 \begin{equation} \label{eq:zero-criterion}
-   \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial \nu_j}
+   \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial \nu_j}
    - \frac{1}{2} \sum_{\substack{i \in I^{(b)} \\ \var(b_i) \equiv \nu_j}}
-   \left( \frac{\partial \bar{p}(\alpha, b, \nu)}{\partial b_i} \right)^2
+   \left( \frac{\partial \bar{p}_W(\alpha, b, \nu)}{\partial b_i} \right)^2
    < 0
 \end{equation}
 
@@ -1130,6 +1373,8 @@ of $\kappa$ and the lambdas) may give one pause.
 
 \section{Square Root Parameterization}
 
+\subsection{What This Is}
+
 \citet{reaster} suggest a re-parameterization that makes the problem with
 zero variance components go away.
 The original variables are $(\alpha, b, \nu)$, and
@@ -1142,5 +1387,283 @@ the new variables are $(\alpha, c, \sigma)$, where
 The inverse transformation is not one-to-one.  We allow $\sigma_k$ to be
 either square root of $\nu_k$, that is, $\sigma_k = \pm \sqrt{\nu_k}$.
 We do this in order that our objective function be continuous and
-differentiable at zero.
+differentiable at points where $\sigma_k = 0$ for some $k$.
 
+With this change of variables, the objective function becomes
+\begin{equation} \label{eq:pee-sigma}
+   p_W(\alpha, c, \sigma) =
+   - l(a + M \alpha + Z A c) + \tfrac{1}{2} c^T c
+   + \tfrac{1}{2} \log \det \bigl[ Z^T W Z A^2 + \text{Id}
+   \bigr]
+\end{equation}
+
+\subsection{Why This is Problematic}
+\label{sec:problematic}
+
+\subsection{Classical First Derivatives}
+\label{sec:first-derivatives-sigma}
+
+\citet[Section~1.11.1]{reaster-tr} give classical first derivatives of $p_W$.
+Subderivatives are not needed because $p_W$ is differentiable everywhere
+as a function of $(\alpha, c, \sigma)$.
+
+These first derivatives are
+\begin{subequations}
+\begin{align}
+   p_{W, \alpha}(\alpha, c, \sigma)
+   & =
+   - M^T l'(a + M \alpha + Z A c)
+   \label{eq:key-rooted-alpha}
+   \\
+   p_{W,_c}(\alpha, c, \sigma)
+   & =
+   - A Z^T l'(a + M \alpha + Z A c)
+   + c
+   \label{eq:key-rooted-c}
+   \\
+   p_{W,_{\sigma_j}}(\alpha, c, \sigma)
+   & =
+   - c^T E_j Z^T l'(a + M \alpha + Z A c)
+   \nonumber
+   \\
+   & \qquad
+   +
+   \tr\left( [ Z^T W Z A^2 + I \bigr]^{- 1}
+   Z^T W Z A E_j
+   \right)
+   \label{eq:key-rooted-sigma}
+\end{align}
+\end{subequations}
+where $E_j$ is given by \eqref{eq:eek} and where $A$ is the diagonal matrix
+whose diagonal elements are the corresponding components of $\sigma$, that
+is $A = D^{1 / 2}$ when this is defined but when not, we always have the $i, i$
+element of $A$ is $\sigma_k$ where $\sigma^2_k \equiv \var(b_i)$.
+
+As in the proof of Theorem~\ref{th:pee-epi} above, we divide the objective
+function into three parts, but do a little differently here.
+\begin{align*}
+   p_1(\alpha, c, \sigma)
+   & =
+   - l(a + M \alpha + Z b)
+   \\
+   p_2(\alpha, c, \sigma)
+   & =
+   \tfrac{1}{2} c^T c
+   \\
+   p_{3, W}(\alpha, c, \sigma)
+   & =
+   \tfrac{1}{2} \log \det \bigl[ Z^T W Z D + \text{Id} \bigr]
+\end{align*}
+As before, we note that only the third part depends on $W$,
+and that third part depends only on $\nu$ or $\sigma$.
+Now we see that the second part depends only on $c$.
+This and the chain rule helps us organize our calculations.
+The nonzero partial derivatives are, when $(\alpha, b, \nu)$ and
+$(\alpha, c, \sigma)$ are for the same probability model,
+\begin{subequations}
+\begin{align}
+   p_{1, \alpha}(\alpha, c, \sigma) & = p_{1, \alpha}(\alpha, b, \nu)
+   \\
+   p_{1, c}(\alpha, c, \sigma) & = p_{1, b}(\alpha, b, \nu) \cdot
+   \frac{\partial b}{\partial c}
+   = A \cdot p_{1, b}(\alpha, b, \nu)
+   \\
+   p_{1, \sigma_k}(\alpha, c, \sigma_k) & = p_{1, \nu}(\alpha, b, \nu) \cdot
+   \frac{\partial b}{\partial \sigma_k}
+   = c^T E_k \cdot p_{1, b}(\alpha, b, \nu)
+   \\
+   p_{2, c}(\alpha, c, \sigma) & = c
+   \\
+   p_{3, \sigma_k}(\alpha, c, \sigma_k) & = p_{3, \nu}(\alpha, b, \nu) \cdot
+   \frac{\partial \nu_k}{\partial \sigma_k}
+   = p_{3, \nu}(\alpha, b, \nu) \cdot 2 \sigma_k
+\end{align}
+\end{subequations}
+This helps us calculate first derivatives in the $(\alpha, c, \sigma)$
+parameterization after we have already calculated first derivatives
+in the $(\alpha, b, \nu)$ parameterization, except for $p_2$ which is much
+simpler in the latter parameterization (so we do directly rather than using
+the chain rule, this, of course, was the whole motivation for
+that parameterization in the first place).
+
+\subsection{Classical Second Derivatives}
+\label{sec:second-derivatives-sigma}
+
+\begin{subequations}
+\begin{align}
+   p_{W, \alpha \alpha}(\alpha, c, \sigma)
+   & =
+   M^T W(a + M \alpha + Z A c) M
+   \label{eq:key-rooted-alpha-alpha}
+   \\
+   p_{W, \alpha c}(\alpha, c, \sigma)
+   & =
+   M^T W(a + M \alpha + Z A c) Z A
+   \label{eq:key-rooted-alpha-c}
+   \\
+   p_{W, \alpha \sigma_j}(\alpha, c, \sigma)
+   & =
+   M^T W(a + M \alpha + Z A c) Z E_j c
+   \label{eq:key-rooted-alpha-sigma}
+   \\
+   p_{W, c c}(\alpha, c, \sigma)
+   & =
+   A Z^T W(a + M \alpha + Z A c) Z A + \text{Id}
+   \label{eq:key-rooted-c-c}
+   \\
+   p_{W, c {\sigma_j}}(\alpha, c, \sigma)
+   & =
+   A Z^T W(a + M \alpha + Z A c) Z E_j c
+   \nonumber
+   \\
+   & \qquad
+   - E_j Z^T l'(a + M \alpha + Z A c)
+   \label{eq:key-rooted-c-sigma}
+   \\
+   p_{W,_{\sigma_j \sigma_k}}(\alpha, c, \sigma)
+   & =
+   c^T E_j Z^T W(a + M \alpha + Z A c) Z E_k c
+   \nonumber
+   \\
+   & \qquad
+   +
+   \tr\left( [ Z^T W Z A^2 + I \bigr]^{- 1}
+   Z^T W Z E_j E_k
+   \right)
+   \nonumber
+   \\
+   & \qquad
+   -
+   2 \tr\Bigl( [ Z^T W Z A^2 + I \bigr]^{- 1}
+   Z^T W Z A E_j
+   \nonumber
+   \\
+   & \qquad
+   \quad \times
+   [ Z^T W Z A^2 + I \bigr]^{- 1}
+   Z^T W Z A E_k
+   \Bigr)
+   \label{eq:key-rooted-sigma-sigma}
+\end{align}
+\end{subequations}
+
+If we try to work with the chain rule, like in the preceding section,
+things become a bit more complicated, but we have the following.
+\begin{align*}
+   p_{1, \alpha \alpha}(\alpha, c, \sigma)
+   & =
+   p_{1, \alpha \alpha}(\alpha, b, \nu)
+   \\
+   p_{1, \alpha c}(\alpha, c, \sigma)
+   & =
+   p_{1, \alpha b}(\alpha, b, \nu) \cdot \frac{\partial b}{\partial c}
+   =
+   p_{1, \alpha b}(\alpha, b, \nu) \cdot A
+   \\
+   p_{1, \alpha \sigma_k}(\alpha, c, \sigma)
+   & =
+   p_{1, \alpha b}(\alpha, b, \nu) \cdot \frac{\partial b}{\partial \sigma_k}
+   =
+   p_{1, \alpha b}(\alpha, b, \nu) \cdot E_k c
+   \\
+   p_{1, c c}(\alpha, c, \sigma)
+   & =
+   \left(\frac{\partial b}{\partial c}\right)^T
+   p_{1, b b}(\alpha, b, \nu) \cdot \frac{\partial b}{\partial c}
+   =
+   A \cdot p_{1, b b}(\alpha, b, \nu) \cdot A
+   \\
+   p_{1, c \sigma_k}(\alpha, c, \sigma)
+   & =
+   \frac{\partial}{\partial \sigma_k} A p_{1, b}(\alpha, b, \nu)
+   \\
+   & =
+   p_{1, b}(\alpha, b, \nu)^T E_k
+   +
+   A p_{1, b b}(\alpha, b, \nu) \cdot \frac{\partial b}{\partial \sigma_k}
+   \\
+   & =
+   p_{1, b}(\alpha, b, \nu)^T \cdot E_k
+   +
+   A \cdot p_{1, b b}(\alpha, b, \nu) \cdot E_k c
+   \\
+   p_{1, \sigma_j \sigma_k}(\alpha, c, \sigma)
+   & =
+   \left(\frac{\partial b}{\partial \sigma_j}\right)^T
+   p_{1, b b}(\alpha, b, \nu)
+   \cdot \frac{\partial b}{\partial \sigma_k}
+   =
+   c^T E_j \cdot p_{1, b b}(\alpha, b, \nu) \cdot E_k c
+   \\
+   p_{2, c c}(\alpha, c, \sigma) & = \text{Id}
+   \\
+   p_{3, \sigma_j \sigma_k}(\alpha, c, \sigma) & =
+   p_{3, \nu_j \nu_k}(\alpha, b, \nu)
+   \cdot
+   \frac{\partial \nu_j}{\partial \sigma_j}
+   \cdot
+   \frac{\partial \nu_k}{\partial \sigma_k}
+   +
+   \frac{\partial^2 \nu_k}{\partial \sigma_j \partial \sigma_k}
+   \cdot
+   p_{3, \nu_k}(\alpha, b, \nu)
+   \\
+   & =
+   4 p_{3, \nu_j \nu_k}(\alpha, b, \nu) \sigma_j \sigma_k
+   +
+   2 p_{3, \nu_j \nu_k}(\alpha, b, \nu) \bone(j = k)
+\end{align*}
+where, as in Chapter~\ref{ch:subsampling}, $\bone$ is a function that converts
+false and true to zero and one.
+
+In summary, this gives us
+\begin{subequations}
+\begin{align}
+   p_{W, \alpha \alpha}(\alpha, c, \sigma)
+   & =
+   p_{W, \alpha \alpha}(\alpha, b, \nu)
+   \\
+   p_{W, \alpha c}(\alpha, c, \sigma)
+   & =
+   p_{W, \alpha b}(\alpha, b, \nu) A
+   \\
+   p_{W, \alpha \sigma_j}(\alpha, c, \sigma)
+   & =
+   p_{W, \alpha b}(\alpha, b, \nu) E_j c
+   \\
+   p_{W, c c}(\alpha, c, \sigma)
+   & =
+   A p_{W, b b}(\alpha, b, \nu) A + \text{Id}
+   \\
+   p_{W, c \sigma_j}(\alpha, c, \sigma)
+   & =
+   p_{1, b}(\alpha, b, \nu)^T E_j + A p_{1, b b}(\alpha, b, \nu) E_j c
+   \\
+   p_{W, \sigma_j \sigma_k}(\alpha, c, \sigma)
+   & =
+   c^T E_j p_{1, b b}(\alpha, b, \nu) E_k c
+   +
+   4 p_{3, \nu_j \nu_k}(\alpha, b, \nu) \sigma_j \sigma_k
+   \nonumber
+   \\
+   & \qquad
+   +
+   2 p_{3, \nu_j \nu_k}(\alpha, b, \nu) \bone(j = k)
+\end{align}
+\end{subequations}
+
+\section{Fisher Information}
+
+\citet{reaster} propose to use $q_{\widehat{W}}''(\hat{\alpha}, \hat{\nu})$
+having components given by \eqref{eq:q-alpha-alpha}, \eqref{eq:q-alpha-nu}, and
+\eqref{eq:q-nu-nu} as if it were the observed Fisher information matrix.
+This is only approximate (because of Laplace approximation and the second
+approximation of Section~\ref{sec:second-approximation}) but does at least
+respect the random effects story for the model.
+We will follow them on this.
+
+It has turned out that the vector of ``estimated'' in scare quotes
+(Section~\ref{sec:bee-hat} above) have turned out to be scientifically
+interesting.  Thus we need variance information for them too.
+These we obtain from the delta method using \eqref{eq:bee-star-alpha} and
+\eqref{eq:bee-star-nu} for the derivatives in that method.

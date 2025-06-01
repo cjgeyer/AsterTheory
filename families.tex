@@ -190,6 +190,7 @@ There are two rationales for this distribution, both so closely related
 that they are almost one rationale.  First, the Poisson distribution is
 an approximation to the $\text{binomial}(n, p)$ distribution when $n$
 is very large and $p$ is very small and the mean $n p$ is moderate sized.
+
 An example is a lottery.  Every week millions, sometimes hundreds of millions
 of tickets are sold (that's $n$), the probability of any one ticket winning
 is very small --- for example, for the Powerball lottery, the probability is
@@ -1153,6 +1154,7 @@ Since this parameter is considered known, this kind of
 limit cannot arise in the process of maximum likelihood.
 
 \section{Zero-Truncated Negative Binomial}
+\label{sec:zero-truncated-negative-binomial}
 
 This section is just like Section~\ref{sec:zero-truncated-poisson} above
 \emph{mutatis mutandis}.
@@ -1768,7 +1770,7 @@ This illustrates another thing wrong with the concept of the link function:
 it forces the canonical parameterization to be identifiable even when this
 is inadvisable.  Using our choice of parameterization here there can be
 no link function because the map $\theta \to \xi$ is not one-to-one, so
-its inverse mapping does not exist (an that inverse mapping is supposed to
+its inverse mapping does not exist (and that inverse mapping is supposed to
 be the ``link'' function).
 
 We also clear up a mystery left hanging and check
